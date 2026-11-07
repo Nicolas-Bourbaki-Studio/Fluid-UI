@@ -117,8 +117,9 @@ to resize it. Closed windows can be restored with
 `Context::SetWindowOpen("Window title", true)`. Long content scrolls vertically with the
 mouse wheel or by dragging the scrollbar.
 
-Drag a window by its title bar toward a screen edge to see a live docking preview. Dropping
-within 32 pixels of an edge docks the window into that edge's region. Docked windows tile
-without overlapping; adding panels on other edges automatically adjusts the available
-regions. Drag dividers between same-edge panels to resize them, and groups adapt when the
-display size changes. Use `Context::DockWindows(false)` to disable edge snapping.
+Hold a window's title bar to show the docking compass. Hover its left, right, top, bottom,
+or center target to preview that layout, then release to dock. Docked windows tile without
+overlapping; adding panels on other edges adjusts the available regions. Drag the boundary
+splitters to resize edge regions horizontally or vertically, or drag dividers between
+same-edge panels to resize individual windows. The layout adapts when the display changes
+size. Use `Context::DockWindows(false)` to disable docking.

@@ -34,6 +34,8 @@ void Context::NewFrame(const InputState& input) {
     horizontalLayout_ = false;
     sameLine_ = false;
     hasDockPreview_ = false;
+    dockCompassVisible_ = false;
+    dockCompassSelection_ = DockSide::None;
     dockLayoutDone_ = false;
     dockSplitters_.clear();
     windowInputEnabled_ = true;
@@ -63,9 +65,37 @@ const DrawList& Context::EndFrame() {
                      Fade(previewStyle.accent, 0.95f), 2.f, previewStyle.rounding);
         DrawTextCentered(dockPreview_, "Dock preview", previewStyle);
     }
+    if (dockCompassVisible_) {
+        const ComputedStyle menuStyle = Resolve("dock-menu", 0);
+        const ComputedStyle targetStyle = Resolve("dock-target", 0);
+        draw_.AddShadow(dockCompassRect_, Fade(menuStyle.shadowColor, menuStyle.opacity),
+                        menuStyle.shadowBlur, menuStyle.rounding);
+        draw_.AddBox(dockCompassRect_, Fade(menuStyle.background, menuStyle.opacity),
+                     Fade(menuStyle.borderColor, menuStyle.opacity),
+                     menuStyle.borderWidth, menuStyle.rounding);
+        constexpr DockSide sides[] = {
+            DockSide::Left, DockSide::Right, DockSide::Top,
+            DockSide::Bottom, DockSide::Center
+        };
+        constexpr std::string_view labels[] = {"L", "R", "T", "B", "C"};
+        for (size_t i = 0; i < std::size(sides); ++i) {
+            const Rect target = DockTargetRect(sides[i]);
+            const bool hovered = target.Contains(in_.mousePos);
+            ComputedStyle style = Resolve("dock-target",
+                hovered ? State_Hovered : State_None);
+            if (sides[i] == dockCompassSelection_) style.background = targetStyle.accent;
+            draw_.AddBox(target, Fade(style.background, style.opacity),
+                         Fade(style.borderColor, style.opacity),
+                         style.borderWidth, style.rounding);
+            DrawTextCentered(target, labels[i], style);
+        }
+    }
     draw_.PopClipRect();
     prevMouseDown_ = in_.mouseDown[0];
-    if (!in_.mouseDown[0]) active_ = 0; // never leave a stuck active widget
+    if (!in_.mouseDown[0]) {
+        active_ = 0;
+        activeDockSplitter_ = 0;
+    }
     return draw_;
 }
 
@@ -167,25 +197,92 @@ void Context::SetWindowOpen(std::string_view title, bool open) {
     dockLayoutDone_ = false;
 }
 
-std::array<Rect, 5> Context::DockRegions() const {
+Rect Context::DockTargetRect(DockSide side) const {
+    constexpr float buttonSize = 32.f;
+    constexpr float buttonOffset = 42.f;
+    const float centerX = in_.displaySize.x * 0.5f;
+    const float centerY = in_.displaySize.y * 0.5f;
+    switch (side) {
+        case DockSide::Left: return {centerX - buttonOffset - buttonSize * 0.5f,
+                                     centerY - buttonSize * 0.5f, buttonSize, buttonSize};
+        case DockSide::Right: return {centerX + buttonOffset - buttonSize * 0.5f,
+                                      centerY - buttonSize * 0.5f, buttonSize, buttonSize};
+        case DockSide::Top: return {centerX - buttonSize * 0.5f,
+                                    centerY - buttonOffset - buttonSize * 0.5f, buttonSize, buttonSize};
+        case DockSide::Bottom: return {centerX - buttonSize * 0.5f,
+                                       centerY + buttonOffset - buttonSize * 0.5f, buttonSize, buttonSize};
+        case DockSide::Center: return {centerX - buttonSize * 0.5f,
+                                       centerY - buttonSize * 0.5f, buttonSize, buttonSize};
+        case DockSide::None: break;
+    }
+    return {};
+}
+
+Context::DockSide Context::DockTargetAt(Vec2 position) const {
+    constexpr DockSide sides[] = {
+        DockSide::Center, DockSide::Left, DockSide::Right,
+        DockSide::Top, DockSide::Bottom
+    };
+    for (DockSide side : sides)
+        if (DockTargetRect(side).Contains(position)) return side;
+    return DockSide::None;
+}
+
+void Context::SetDockPreview(DockSide side, WidgetId newWindow) {
+    if (side == DockSide::None) {
+        hasDockPreview_ = false;
+        return;
+    }
+    const size_t index = static_cast<size_t>(side);
+    const Rect region = DockRegions()[index];
+    const auto& group = dockedWindows_[index];
+    if (newWindow != 0 && windows_.contains(newWindow)) {
+        const WindowState& window = windows_.at(newWindow);
+        dockPreview_ = {window.pos.x, window.pos.y, window.size.x, window.size.y};
+    } else if (group.empty()) {
+        dockPreview_ = region;
+    } else {
+        float existingSpan = 0.f;
+        for (WidgetId id : group) existingSpan += std::max(0.01f, windows_.at(id).dockSpan);
+        const float newSpan = existingSpan / static_cast<float>(group.size());
+        const float newSize = (side == DockSide::Left || side == DockSide::Right)
+            ? region.h * newSpan / (existingSpan + newSpan)
+            : region.w * newSpan / (existingSpan + newSpan);
+        if (side == DockSide::Left || side == DockSide::Right)
+            dockPreview_ = {region.x, region.y + region.h - newSize, region.w, newSize};
+        else
+            dockPreview_ = {region.x + region.w - newSize, region.y, newSize, region.h};
+    }
+    hasDockPreview_ = true;
+}
+
+std::array<Rect, 6> Context::DockRegions() const {
     const bool left = !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty();
     const bool right = !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
     const bool top = !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty();
     const bool bottom = !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
-    const bool vertical = left || right;
-    const bool horizontal = top || bottom;
-    const float leftWidth = left ? in_.displaySize.x * (horizontal ? 0.3f : 0.5f) : 0.f;
-    const float rightWidth = right ? in_.displaySize.x * (horizontal ? 0.3f : 0.5f) : 0.f;
+    const bool hasDocked = left || right || top || bottom ||
+                           !dockedWindows_[static_cast<size_t>(DockSide::Center)].empty();
+    const float sideWidthScale = (left && right && dockLeftRatio_ + dockRightRatio_ > 0.8f)
+        ? 0.8f / (dockLeftRatio_ + dockRightRatio_) : 1.f;
+    const float sideHeightScale = (top && bottom && dockTopRatio_ + dockBottomRatio_ > 0.8f)
+        ? 0.8f / (dockTopRatio_ + dockBottomRatio_) : 1.f;
+    const float leftWidth = left ? in_.displaySize.x * dockLeftRatio_ * sideWidthScale : 0.f;
+    const float rightWidth = right ? in_.displaySize.x * dockRightRatio_ * sideWidthScale : 0.f;
     const float centerWidth = std::max(0.f, in_.displaySize.x - leftWidth - rightWidth);
-    const float topHeight = top ? in_.displaySize.y * (vertical ? 0.3f : 0.5f) : 0.f;
-    const float bottomHeight = bottom ? in_.displaySize.y * (vertical ? 0.3f : 0.5f) : 0.f;
-    std::array<Rect, 5> regions{};
+    const float topHeight = top ? in_.displaySize.y * dockTopRatio_ * sideHeightScale : 0.f;
+    const float bottomHeight = bottom ? in_.displaySize.y * dockBottomRatio_ * sideHeightScale : 0.f;
+    const float centerHeight = std::max(0.f, in_.displaySize.y - topHeight - bottomHeight);
+    std::array<Rect, 6> regions{};
     regions[static_cast<size_t>(DockSide::Left)] = {0.f, 0.f, leftWidth, in_.displaySize.y};
     regions[static_cast<size_t>(DockSide::Right)] =
         {in_.displaySize.x - rightWidth, 0.f, rightWidth, in_.displaySize.y};
     regions[static_cast<size_t>(DockSide::Top)] = {leftWidth, 0.f, centerWidth, topHeight};
     regions[static_cast<size_t>(DockSide::Bottom)] =
         {leftWidth, in_.displaySize.y - bottomHeight, centerWidth, bottomHeight};
+    regions[static_cast<size_t>(DockSide::Center)] = hasDocked
+        ? Rect{leftWidth, topHeight, centerWidth, centerHeight}
+        : Rect{0.f, 0.f, in_.displaySize.x, in_.displaySize.y};
     return regions;
 }
 
@@ -202,7 +299,58 @@ void Context::LayoutDockedWindows() {
         }), ids.end());
     }
 
-    const std::array<Rect, 5> regions = DockRegions();
+    auto addBoundarySplitter = [&](DockSide side, Rect rect, bool horizontalAxis,
+                                  float& ratio) {
+        const WidgetId id = HashStr("##dock-edge-splitter", static_cast<WidgetId>(side));
+        const Interaction interaction = Behavior(id, rect.Expanded(4.f));
+        const float mouse = horizontalAxis ? in_.mousePos.x : in_.mousePos.y;
+        if (interaction.held) {
+            if (activeDockSplitter_ != id) {
+                activeDockSplitter_ = id;
+                dockSplitterMouseStart_ = mouse;
+                dockBoundaryStart_ = ratio;
+            }
+            const float delta = (mouse - dockSplitterMouseStart_) /
+                std::max(1.f, horizontalAxis ? in_.displaySize.x : in_.displaySize.y);
+            const bool reverse = side == DockSide::Right || side == DockSide::Bottom;
+            float maxRatio = 0.75f;
+            if (side == DockSide::Left && !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty())
+                maxRatio = 0.8f - dockRightRatio_;
+            if (side == DockSide::Right && !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty())
+                maxRatio = 0.8f - dockLeftRatio_;
+            if (side == DockSide::Top && !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty())
+                maxRatio = 0.8f - dockBottomRatio_;
+            if (side == DockSide::Bottom && !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty())
+                maxRatio = 0.8f - dockTopRatio_;
+            ratio = std::clamp(dockBoundaryStart_ + (reverse ? -delta : delta),
+                               0.12f, std::max(0.12f, maxRatio));
+        } else if (activeDockSplitter_ == id && !in_.mouseDown[0]) {
+            activeDockSplitter_ = 0;
+        }
+        dockSplitters_.push_back(rect);
+    };
+
+    std::array<Rect, 6> regions = DockRegions();
+    if (!dockedWindows_[static_cast<size_t>(DockSide::Left)].empty())
+        addBoundarySplitter(DockSide::Left,
+            {regions[static_cast<size_t>(DockSide::Left)].w - 3.f, 0.f, 6.f, in_.displaySize.y},
+            true, dockLeftRatio_);
+    if (!dockedWindows_[static_cast<size_t>(DockSide::Right)].empty())
+        addBoundarySplitter(DockSide::Right,
+            {regions[static_cast<size_t>(DockSide::Right)].x - 3.f, 0.f, 6.f, in_.displaySize.y},
+            true, dockRightRatio_);
+    if (!dockedWindows_[static_cast<size_t>(DockSide::Top)].empty())
+        addBoundarySplitter(DockSide::Top,
+            {regions[static_cast<size_t>(DockSide::Top)].x, regions[static_cast<size_t>(DockSide::Top)].h - 3.f,
+             regions[static_cast<size_t>(DockSide::Top)].w, 6.f},
+            false, dockTopRatio_);
+    if (!dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty())
+        addBoundarySplitter(DockSide::Bottom,
+            {regions[static_cast<size_t>(DockSide::Bottom)].x,
+             regions[static_cast<size_t>(DockSide::Bottom)].y - 3.f,
+             regions[static_cast<size_t>(DockSide::Bottom)].w, 6.f},
+            false, dockBottomRatio_);
+    regions = DockRegions();
     for (size_t side = 1; side < dockedWindows_.size(); ++side) {
         auto& ids = dockedWindows_[side];
         if (ids.empty()) continue;
@@ -334,28 +482,33 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             dockLayoutDone_ = false;
             LayoutDockedWindows();
             w.dragOff = in_.mousePos - w.pos;
+            dockCompassRect_ = {in_.displaySize.x * 0.5f - 64.f,
+                                in_.displaySize.y * 0.5f - 64.f, 128.f, 128.f};
         }
         w.pos = in_.mousePos - w.dragOff;
+        dockCompassRect_ = {in_.displaySize.x * 0.5f - 64.f,
+                            in_.displaySize.y * 0.5f - 64.f, 128.f, 128.f};
+        dockCompassVisible_ = dockingEnabled_;
+        dockCompassSelection_ = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
+        SetDockPreview(dockCompassSelection_);
     } else if (wasDragging && !in_.mouseDown[0]) {
-        if (dockingEnabled_) {
-            constexpr float dockThreshold = 32.f;
-            if (in_.mousePos.x <= dockThreshold) w.dock = DockSide::Left;
-            else if (in_.mousePos.x >= in_.displaySize.x - dockThreshold) w.dock = DockSide::Right;
-            else if (in_.mousePos.y <= dockThreshold) w.dock = DockSide::Top;
-            else if (in_.mousePos.y >= in_.displaySize.y - dockThreshold) w.dock = DockSide::Bottom;
-            if (w.dock != DockSide::None) {
-                auto& dockGroup = dockedWindows_[static_cast<size_t>(w.dock)];
-                if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end()) {
-                    float existingSpan = 0.f;
-                    for (WidgetId dockedId : dockGroup)
-                        existingSpan += std::max(0.01f, windows_[dockedId].dockSpan);
-                    w.dockSpan = dockGroup.empty()
-                        ? 1.f : existingSpan / static_cast<float>(dockGroup.size());
-                    dockGroup.push_back(id);
-                }
-                dockLayoutDone_ = false;
-                LayoutDockedWindows();
+        const DockSide target = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
+        dockCompassVisible_ = false;
+        dockCompassSelection_ = target;
+        if (target != DockSide::None) {
+            w.dock = target;
+            auto& dockGroup = dockedWindows_[static_cast<size_t>(target)];
+            if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end()) {
+                float existingSpan = 0.f;
+                for (WidgetId dockedId : dockGroup)
+                    existingSpan += std::max(0.01f, windows_[dockedId].dockSpan);
+                w.dockSpan = dockGroup.empty()
+                    ? 1.f : existingSpan / static_cast<float>(dockGroup.size());
+                dockGroup.push_back(id);
             }
+            dockLayoutDone_ = false;
+            LayoutDockedWindows();
+            SetDockPreview(target, id);
         }
         w.dragging = false;
     }
@@ -411,47 +564,6 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     draw_.AddRectFilled(finalClose, Fade(closeStyle.background, closeStyle.opacity),
                         closeStyle.rounding);
     DrawTextCentered(finalClose, "x", closeStyle);
-
-    if (w.dragging && dockingEnabled_) {
-        constexpr float dockThreshold = 32.f;
-        DockSide previewSide = DockSide::None;
-        if (in_.mousePos.x <= dockThreshold) previewSide = DockSide::Left;
-        else if (in_.mousePos.x >= in_.displaySize.x - dockThreshold) previewSide = DockSide::Right;
-        else if (in_.mousePos.y <= dockThreshold) previewSide = DockSide::Top;
-        else if (in_.mousePos.y >= in_.displaySize.y - dockThreshold) previewSide = DockSide::Bottom;
-        if (previewSide != DockSide::None) {
-            const bool verticalEdges = previewSide == DockSide::Left || previewSide == DockSide::Right ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty() ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
-            const bool horizontalEdges = previewSide == DockSide::Top || previewSide == DockSide::Bottom ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty() ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
-            const bool hasLeft = previewSide == DockSide::Left ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty();
-            const bool hasRight = previewSide == DockSide::Right ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
-            const bool hasTop = previewSide == DockSide::Top ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty();
-            const bool hasBottom = previewSide == DockSide::Bottom ||
-                !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
-            const float leftWidth = hasLeft ? in_.displaySize.x * (horizontalEdges ? 0.3f : 0.5f) : 0.f;
-            const float rightWidth = hasRight ? in_.displaySize.x * (horizontalEdges ? 0.3f : 0.5f) : 0.f;
-            const float centerWidth = std::max(0.f, in_.displaySize.x - leftWidth - rightWidth);
-            const float topHeight = hasTop ? in_.displaySize.y * (verticalEdges ? 0.3f : 0.5f) : 0.f;
-            const float bottomHeight = hasBottom ? in_.displaySize.y * (verticalEdges ? 0.3f : 0.5f) : 0.f;
-            Rect preview;
-            if (previewSide == DockSide::Left)
-                preview = {0.f, 0.f, leftWidth, in_.displaySize.y};
-            else if (previewSide == DockSide::Right)
-                preview = {in_.displaySize.x - rightWidth, 0.f, rightWidth, in_.displaySize.y};
-            else if (previewSide == DockSide::Top)
-                preview = {leftWidth, 0.f, centerWidth, topHeight};
-            else
-                preview = {leftWidth, in_.displaySize.y - bottomHeight, centerWidth, bottomHeight};
-            dockPreview_ = preview;
-            hasDockPreview_ = true;
-        }
-    }
 
     if (w.dock == DockSide::None) {
         const ComputedStyle gripStyle = Resolve("window-resize", 0);

@@ -1,5 +1,3 @@
-/* Fluid UI — Unreal Engine inspired dark theme */
-
 :root {
     --ui-accent: #3978B8;
     --ui-accent-hover: #55A0E5;
@@ -65,6 +63,27 @@ dock-splitter {
     background: #45464B;
     accent: var(--ui-accent-hover);
     border-radius: 3px;
+}
+
+dock-menu {
+    background: #202124;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    shadow-color: rgba(0, 0, 0, 0.56);
+    shadow-blur: 14px;
+}
+
+dock-target {
+    background: #343539;
+    border: 1px solid #55575D;
+    border-radius: 6px;
+    color: var(--ui-text);
+    font-size: 13px;
+}
+
+dock-target:hover {
+    background: var(--ui-accent-hover);
+    border-color: var(--ui-accent);
 }
 
 /* ================= TEXT ================= */

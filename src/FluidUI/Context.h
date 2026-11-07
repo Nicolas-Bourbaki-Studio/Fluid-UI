@@ -75,7 +75,7 @@ public:
 
 private:
     struct Interaction { bool hovered = false, held = false, pressed = false; };
-    enum class DockSide : uint8_t { None, Left, Right, Top, Bottom };
+    enum class DockSide : uint8_t { None, Left, Right, Top, Bottom, Center };
     struct WindowState {
         Vec2 pos, size, dragOff, resizeStart, startSize;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
@@ -101,7 +101,10 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
-    std::array<Rect, 5> DockRegions() const;
+    std::array<Rect, 6> DockRegions() const;
+    Rect DockTargetRect(DockSide side) const;
+    DockSide DockTargetAt(Vec2 position) const;
+    void SetDockPreview(DockSide side, WidgetId newWindow = 0);
     void LayoutDockedWindows();
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
@@ -119,13 +122,16 @@ private:
     WidgetId activeDockSplitter_ = 0;
     float dockSplitterMouseStart_ = 0.f, dockSplitterSpanStart_ = 0.f;
     float dockSplitterPairSpan_ = 0.f;
+    float dockBoundaryStart_ = 0.f;
+    float dockLeftRatio_ = 0.30f, dockRightRatio_ = 0.30f;
+    float dockTopRatio_ = 0.30f, dockBottomRatio_ = 0.30f;
     bool dockLayoutDone_ = false;
 
     std::vector<WidgetId> idStack_;
     std::vector<std::string> classStack_;
     std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
-    std::array<std::vector<WidgetId>, 5> dockedWindows_;
+    std::array<std::vector<WidgetId>, 6> dockedWindows_;
     WidgetId focusedWindow_ = 0;
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
@@ -141,6 +147,9 @@ private:
     Rect windowViewport_;
     Rect dockPreview_;
     bool hasDockPreview_ = false;
+    Rect dockCompassRect_;
+    DockSide dockCompassSelection_ = DockSide::None;
+    bool dockCompassVisible_ = false;
     float cursorY_ = 0.f, lineTop_ = 0.f, lineBottom_ = 0.f, lastRight_ = 0.f, cursorX_ = 0.f;
     bool sameLine_ = false;
 };
