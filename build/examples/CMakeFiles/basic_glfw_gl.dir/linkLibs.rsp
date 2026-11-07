@@ -1,0 +1,1 @@
+  -LC:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib  ../src/libFluidUI.dll.a -lopengl32 C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a -lgdi32 -lopengl32 -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 
