@@ -3,7 +3,7 @@
 </div>
 
 <div align="center">
-<a href="#license"><img src="https://img.shields.io/github/license/Nicolas-Bourbaki-Studio/Fluid-UI"></a>
+    <a href="#license"><img src="https://img.shields.io/github/license/Nicolas-Bourbaki-Studio/Fluid-UI"></a>
 </div>
 
 ## Fluid UI is a lightweight, highly customizable UI library for C++ applications, designed to make building beautiful, native interfaces simple and intuitive.
