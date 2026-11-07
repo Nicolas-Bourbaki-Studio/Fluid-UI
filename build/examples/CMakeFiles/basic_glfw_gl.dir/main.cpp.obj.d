@@ -1,5 +1,5 @@
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
- C:\Users\mike1\source\repos\FluidUI\ Liberary\examples\main.cpp \
+ C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp \
  C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include/GLFW/glfw3.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stddef.h \
  C:/msys64/ucrt64/include/stddef.h C:/msys64/ucrt64/include/crtdefs.h \
@@ -9,11 +9,11 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/vadefs.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/GL/gl.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/FluidUI.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/Backend.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/DrawList.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/Export.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/Types.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Backend.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/DrawList.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Export.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Types.h \
  C:/msys64/ucrt64/include/c++/16.2.0/algorithm \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_algobase.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++config.h \
@@ -126,8 +126,8 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/16.2.0/tuple \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/Context.h \
- C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI/Style.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h \
  C:/msys64/ucrt64/include/c++/16.2.0/string \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/localefwd.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++locale.h \

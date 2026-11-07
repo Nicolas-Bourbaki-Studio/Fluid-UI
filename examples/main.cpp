@@ -48,7 +48,7 @@ int main() {
     glfwSwapInterval(1);
 
     Context ui;
-    ui.Style() = StyleSheet::Light();
+    ui.Style() = StyleSheet::Dark();
 
     // Customize anything: a new "danger" variant of buttons
     ui.Style().Rule("button.danger").Background(Color::FromHex(0x8E2B2BFF)).Rounding(2);

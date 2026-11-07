@@ -56,10 +56,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary"
+CMAKE_SOURCE_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary\build"
+CMAKE_BINARY_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -129,14 +129,14 @@ src/clean: src/CMakeFiles/FluidUI.dir/clean
 src/CMakeFiles/FluidUI.dir/all:
 	$(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/depend
 	$(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=1,2,3,4,5 "Built target FluidUI"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=1,2,3,4,5 "Built target FluidUI"
 .PHONY : src/CMakeFiles/FluidUI.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/FluidUI.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 5
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/CMakeFiles/FluidUI.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 0
 .PHONY : src/CMakeFiles/FluidUI.dir/rule
 
 # Convenience name for target.
@@ -146,7 +146,7 @@ FluidUI: src/CMakeFiles/FluidUI.dir/rule
 # codegen rule for target.
 src/CMakeFiles/FluidUI.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=1,2,3,4,5 "Finished codegen for target FluidUI"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=1,2,3,4,5 "Finished codegen for target FluidUI"
 .PHONY : src/CMakeFiles/FluidUI.dir/codegen
 
 # clean rule for target.
@@ -161,14 +161,14 @@ src/CMakeFiles/FluidUI.dir/clean:
 examples/CMakeFiles/basic_glfw_gl.dir/all: src/CMakeFiles/FluidUI.dir/all
 	$(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/depend
 	$(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=6,7 "Built target basic_glfw_gl"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=6,7 "Built target basic_glfw_gl"
 .PHONY : examples/CMakeFiles/basic_glfw_gl.dir/all
 
 # Build rule for subdir invocation for target.
 examples/CMakeFiles/basic_glfw_gl.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 7
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 7
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/CMakeFiles/basic_glfw_gl.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 0
 .PHONY : examples/CMakeFiles/basic_glfw_gl.dir/rule
 
 # Convenience name for target.
@@ -178,7 +178,7 @@ basic_glfw_gl: examples/CMakeFiles/basic_glfw_gl.dir/rule
 # codegen rule for target.
 examples/CMakeFiles/basic_glfw_gl.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=6,7 "Finished codegen for target basic_glfw_gl"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=6,7 "Finished codegen for target basic_glfw_gl"
 .PHONY : examples/CMakeFiles/basic_glfw_gl.dir/codegen
 
 # clean rule for target.

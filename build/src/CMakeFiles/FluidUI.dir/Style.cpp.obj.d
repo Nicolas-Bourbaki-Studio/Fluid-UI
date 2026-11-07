@@ -1,8 +1,8 @@
 src/CMakeFiles/FluidUI.dir/Style.cpp.obj: \
- C:\Users\mike1\source\repos\FluidUI\ Liberary\src\Style.cpp \
- C:\Users\mike1\source\repos\FluidUI\ Liberary\src\FluidUI/Style.h \
- C:\Users\mike1\source\repos\FluidUI\ Liberary\src\FluidUI/Export.h \
- C:\Users\mike1\source\repos\FluidUI\ Liberary\src\FluidUI/Types.h \
+ C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Style.cpp \
+ C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI/Style.h \
+ C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI/Export.h \
+ C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI/Types.h \
  C:/msys64/ucrt64/include/c++/16.2.0/algorithm \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_algobase.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++config.h \
