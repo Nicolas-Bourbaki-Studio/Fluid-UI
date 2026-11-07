@@ -28,16 +28,42 @@ public:
     // Containers
     bool BeginWindow(std::string_view title, Rect initial);
     void EndWindow();
+    bool BeginContainer(std::string_view label, Vec2 size);
+    bool BeginList(std::string_view label, Vec2 size, bool horizontal);
+    void EndContainer();
+
+    enum class TabPosition : uint8_t { Top, Bottom, Left };
+    struct TabItem {
+        std::string_view label;
+        std::string_view icon;
+        bool showText = true;
+    };
+    bool BeginTabContainer(std::string_view label, Vec2 size,
+                           const std::vector<TabItem>& tabs, int* selected,
+                           TabPosition position = TabPosition::Top);
 
     // Widgets. "Label##suffix" shows "Label" but hashes the full string for the ID.
     void Text(std::string_view text);
+    void TextLabel(std::string_view text);
+    void TextLabelLeft(std::string_view text, std::string_view icon);
+    void TextLabelRight(std::string_view text, std::string_view icon);
     bool Button(std::string_view label);
+    bool ImageButton(std::string_view label, uint64_t texture, Vec2 imageSize);
     bool Checkbox(std::string_view label, bool* value);
+    bool Toggle(std::string_view label, bool* value);
+    bool Radio(std::string_view label, int* value, int option);
     bool SliderFloat(std::string_view label, float* value, float minV, float maxV);
+    bool ValueSlider(std::string_view label, float* value, float minV, float maxV);
+    bool Dropdown(std::string_view label, const std::vector<std::string_view>& items,
+                  int* selected, std::string_view icon = {}, bool showText = true);
+    void ImageLabel(std::string_view label, uint64_t texture, Vec2 imageSize);
+    bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
+    void Image(uint64_t texture, Vec2 size);
 
     // Layout
     void SameLine();
     void Spacing(float pixels);
+    void DockWindows(bool enabled) { dockingEnabled_ = enabled; }
 
     // Styling / IDs
     void PushClass(std::string_view cls);
@@ -47,8 +73,20 @@ public:
 
 private:
     struct Interaction { bool hovered = false, held = false, pressed = false; };
-    struct WindowState { Vec2 pos, size, dragOff; bool init = false, dragging = false; };
+    enum class DockSide : uint8_t { None, Left, Right, Top, Bottom };
+    struct WindowState {
+        Vec2 pos, size, dragOff;
+        DockSide dock = DockSide::None;
+        bool init = false, dragging = false;
+    };
     struct Anim { float hover = 0.f, active = 0.f; };
+    struct LayoutState {
+        Rect content;
+        float cursorY = 0.f, lineTop = 0.f, lineBottom = 0.f, lastRight = 0.f;
+        float cursorX = 0.f;
+        bool sameLine = false, horizontal = false;
+    };
+    struct ContainerState { LayoutState outer; };
 
     WidgetId GetID(std::string_view label) const;
     ComputedStyle Resolve(std::string_view widget, uint8_t state) const;
@@ -57,6 +95,9 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
+    bool BeginContainerImpl(Vec2 size, bool horizontal,
+                            std::string_view widget = "container");
+    void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
 
     StyleSheet style_;
     DrawList draw_;
@@ -71,10 +112,14 @@ private:
     std::vector<std::string> classStack_;
     std::unordered_map<WidgetId, WindowState> windows_;
     std::unordered_map<WidgetId, Anim> anims_;
+    std::vector<ContainerState> containerStack_;
+    std::unordered_map<WidgetId, bool> dropdowns_;
+    bool horizontalLayout_ = false;
+    bool dockingEnabled_ = true;
 
     // Layout cursor (current window)
     Rect content_;
-    float cursorY_ = 0.f, lineTop_ = 0.f, lineBottom_ = 0.f, lastRight_ = 0.f;
+    float cursorY_ = 0.f, lineTop_ = 0.f, lineBottom_ = 0.f, lastRight_ = 0.f, cursorX_ = 0.f;
     bool sameLine_ = false;
 };
 

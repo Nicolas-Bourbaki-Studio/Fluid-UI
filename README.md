@@ -8,3 +8,77 @@
 
 ## Fluid UI is a lightweight, highly customizable UI library for C++ applications, designed to make building beautiful, native interfaces simple and intuitive.
 
+## Components
+
+`fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
+dropdown menus, text and image labels, image buttons, collapsible containers, containers,
+horizontal/vertical lists, and tabbed containers. Text/icon labels can be combined as needed.
+Images are caller-owned backend texture IDs rendered through `DrawList`; the UI does not
+load or manage image files.
+
+```cpp
+fluid::Context ui;
+ui.Style() = fluid::StyleSheet::Dark();
+
+bool enabled = true;
+float value = 0.5f;
+int selected = 0;
+const std::vector<std::string_view> options{"One", "Two", "Three"};
+
+ui.Toggle("Enabled", &enabled);
+ui.ValueSlider("Value", &value, 0.0f, 1.0f);
+ui.Dropdown("Choice", options, &selected);
+
+if (ui.BeginContainer("Panel", {300.0f, 120.0f})) {
+    ui.TextLabelLeft("Status", "*");
+    ui.EndContainer();
+}
+```
+
+Call `EndContainer()` for each successful `BeginContainer`, `BeginList`,
+`BeginTabContainer`, or `BeginCollapsible`. `BeginList(label, size, true)` creates a
+horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
+`TabPosition::Top`, `Bottom`, or `Left` setting. A `TabItem` with no icon displays text;
+one with an icon displays both by default, or just the icon when `showText` is false.
+
+## CSS-like themes and classes
+
+Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
+Selectors support widget names, one class, and widget states (`hover`, `active`, `checked`,
+`disabled`). Color values use `#RRGGBB` or `#RRGGBBAA`; numeric values may include `px`.
+Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
+`shadow-color`, `border-width`, `border-radius`, `font-size`, `gap`, `shadow-blur`,
+`opacity`, `transition-speed`, and CSS-style one-to-four-value `padding`.
+
+```css
+button.primary {
+    background: #3559D8;
+    border-radius: 8px;
+    padding: 7px 14px;
+}
+
+button.primary:hover {
+    background: #4A6CF7;
+}
+```
+
+```cpp
+std::string error;
+if (!ui.Style().LoadCSSFile("ui.css", &error)) {
+    // Handle the reported file or syntax error.
+}
+
+ui.PushClass("primary");
+ui.Button("Save");
+ui.PopClass();
+```
+
+The `examples` target includes `theme.css` and a GLFW demo covering the controls, container
+layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible
+content.
+
+## Dynamic docking
+
+Windows can be dragged by their title bars. Dropping a window within 24 pixels of a display
+edge docks it to that edge's half-screen region; docked windows recalculate their bounds as
+the display changes size. Use `Context::DockWindows(false)` to disable edge snapping.

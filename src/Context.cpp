@@ -29,6 +29,8 @@ void Context::NewFrame(const InputState& input) {
     draw_.PushClipRect({0.f, 0.f, in_.displaySize.x, in_.displaySize.y});
     idStack_.clear();
     classStack_.clear();
+    containerStack_.clear();
+    horizontalLayout_ = false;
     sameLine_ = false;
 }
 
@@ -84,7 +86,10 @@ Context::Interaction Context::Behavior(WidgetId id, Rect r) {
 
 Rect Context::Place(Vec2 size, float spacing) {
     Vec2 pos;
-    if (sameLine_) {
+    if (horizontalLayout_) {
+        pos = {cursorX_, content_.y};
+        cursorX_ = pos.x + size.x + spacing;
+    } else if (sameLine_) {
         pos = {lastRight_ + spacing, lineTop_};
         lineBottom_ = std::max(lineBottom_, pos.y + size.y);
     } else {
@@ -123,24 +128,56 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         w.pos = {initial.x, initial.y};
         w.size = {initial.w, initial.h};
     }
+    if (w.dock != DockSide::None && !w.dragging) {
+        const float halfW = in_.displaySize.x * 0.5f;
+        const float halfH = in_.displaySize.y * 0.5f;
+        switch (w.dock) {
+            case DockSide::Left:   w.pos = {0.f, 0.f}; w.size = {halfW, in_.displaySize.y}; break;
+            case DockSide::Right:  w.pos = {halfW, 0.f}; w.size = {halfW, in_.displaySize.y}; break;
+            case DockSide::Top:    w.pos = {0.f, 0.f}; w.size = {in_.displaySize.x, halfH}; break;
+            case DockSide::Bottom: w.pos = {0.f, halfH}; w.size = {in_.displaySize.x, halfH}; break;
+            case DockSide::None: break;
+        }
+    }
 
     const ComputedStyle ws = Resolve("window", 0);
     const ComputedStyle ts = Resolve("window-title", 0);
     const std::string_view text = DisplayLabel(title);
     const float titleH = ts.fontSize * 1.2f + ts.padding.Vertical();
 
-    const Rect frame{w.pos.x, w.pos.y, w.size.x, w.size.y};
-    const Rect bar{frame.x, frame.y, frame.w, titleH};
+    Rect frame{w.pos.x, w.pos.y, w.size.x, w.size.y};
+    const Rect hitBar{frame.x, frame.y, frame.w, titleH};
 
     // Drag by title bar
     const WidgetId dragId = HashStr("##titlebar", id);
-    Behavior(dragId, bar);
-    if (active_ == dragId) {
-        if (!w.dragging) { w.dragging = true; w.dragOff = in_.mousePos - w.pos; }
+    const bool wasDragging = w.dragging;
+    const Interaction drag = Behavior(dragId, hitBar);
+    if (drag.held) {
+        if (!wasDragging) { w.dragging = true; w.dock = DockSide::None; w.dragOff = in_.mousePos - w.pos; }
         w.pos = in_.mousePos - w.dragOff;
-    } else {
+    } else if (wasDragging && !in_.mouseDown[0]) {
+        if (dockingEnabled_) {
+            constexpr float dockThreshold = 24.f;
+            if (in_.mousePos.x <= dockThreshold) w.dock = DockSide::Left;
+            else if (in_.mousePos.x >= in_.displaySize.x - dockThreshold) w.dock = DockSide::Right;
+            else if (in_.mousePos.y <= dockThreshold) w.dock = DockSide::Top;
+            else if (in_.mousePos.y >= in_.displaySize.y - dockThreshold) w.dock = DockSide::Bottom;
+        }
         w.dragging = false;
     }
+    if (w.dock != DockSide::None) {
+        const float halfW = in_.displaySize.x * 0.5f;
+        const float halfH = in_.displaySize.y * 0.5f;
+        switch (w.dock) {
+            case DockSide::Left:   w.pos = {0.f, 0.f}; w.size = {halfW, in_.displaySize.y}; break;
+            case DockSide::Right:  w.pos = {halfW, 0.f}; w.size = {halfW, in_.displaySize.y}; break;
+            case DockSide::Top:    w.pos = {0.f, 0.f}; w.size = {in_.displaySize.x, halfH}; break;
+            case DockSide::Bottom: w.pos = {0.f, halfH}; w.size = {in_.displaySize.x, halfH}; break;
+            case DockSide::None: break;
+        }
+    }
+    frame = {w.pos.x, w.pos.y, w.size.x, w.size.y};
+    const Rect bar{frame.x, frame.y, frame.w, titleH};
 
     DrawBox(frame, ws);
     draw_.AddRectFilled(bar, Fade(ts.background, ts.opacity), ws.rounding);
@@ -155,13 +192,152 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
                 frame.w - ws.padding.Horizontal(),
                 frame.h - titleH - ws.padding.Vertical()};
     cursorY_ = content_.y;
+    cursorX_ = content_.x;
     sameLine_ = false;
+    horizontalLayout_ = false;
     return true;
 }
 
 void Context::EndWindow() {
+    while (!containerStack_.empty()) EndContainer();
     draw_.PopClipRect();
     if (!idStack_.empty()) idStack_.pop_back();
+}
+
+bool Context::BeginContainerImpl(Vec2 size, bool horizontal,
+                                std::string_view widget) {
+    const ComputedStyle style = Resolve(widget, 0);
+    if (size.x <= 0.f) size.x = content_.w;
+    if (size.y <= 0.f) size.y = style.fontSize * 6.f + style.padding.Vertical();
+    const Rect frame = Place(size, style.spacing);
+
+    LayoutState outer{content_, cursorY_, lineTop_, lineBottom_, lastRight_, cursorX_,
+                      sameLine_, horizontalLayout_};
+    containerStack_.push_back({outer});
+    DrawBox(frame, style);
+    draw_.PushClipRect(frame);
+    content_ = {frame.x + style.padding.left, frame.y + style.padding.top,
+                std::max(0.f, frame.w - style.padding.Horizontal()),
+                std::max(0.f, frame.h - style.padding.Vertical())};
+    cursorY_ = content_.y;
+    cursorX_ = content_.x;
+    lineTop_ = content_.y;
+    lineBottom_ = content_.y;
+    lastRight_ = content_.x;
+    sameLine_ = false;
+    horizontalLayout_ = horizontal;
+    return true;
+}
+
+bool Context::BeginContainer(std::string_view label, Vec2 size) {
+    PushID(label);
+    const bool result = BeginContainerImpl(size, false);
+    return result;
+}
+
+bool Context::BeginList(std::string_view label, Vec2 size, bool horizontal) {
+    PushID(label);
+    return BeginContainerImpl(size, horizontal,
+                              horizontal ? "horizontal-list" : "vertical-list");
+}
+
+void Context::EndContainer() {
+    if (containerStack_.empty()) return;
+    draw_.PopClipRect();
+    const LayoutState outer = containerStack_.back().outer;
+    containerStack_.pop_back();
+    content_ = outer.content;
+    cursorY_ = outer.cursorY;
+    lineTop_ = outer.lineTop;
+    lineBottom_ = outer.lineBottom;
+    lastRight_ = outer.lastRight;
+    cursorX_ = outer.cursorX;
+    sameLine_ = outer.sameLine;
+    horizontalLayout_ = outer.horizontal;
+    PopID();
+}
+
+void Context::DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& style) {
+    const Vec2 measured = text_->Measure(text, style.fontSize);
+    text_->Emit(draw_, {r.x + (r.w - measured.x) * 0.5f, r.y + (r.h - measured.y) * 0.5f},
+                text, style.fontSize, Fade(style.foreground, style.opacity));
+}
+
+bool Context::BeginTabContainer(std::string_view label, Vec2 size,
+                                const std::vector<TabItem>& tabs, int* selected,
+                                TabPosition position) {
+    if (!selected || tabs.empty()) return false;
+    PushID(label);
+    if (!BeginContainerImpl(size, false)) { PopID(); return false; }
+
+    const ComputedStyle style = Resolve("tab", 0);
+    const float barSize = style.fontSize * 1.2f + style.padding.Vertical();
+    float tabWidth = barSize;
+    if (position == TabPosition::Left) {
+        for (const TabItem& tab : tabs) {
+            const std::string text = tab.icon.empty() || tab.showText
+                ? (tab.icon.empty() ? std::string(tab.label)
+                                    : std::string(tab.icon) + " " + std::string(tab.label))
+                : std::string(tab.icon);
+            const ComputedStyle tabStyle = Resolve("tab", 0);
+            tabWidth = std::max(tabWidth, text_->Measure(text, tabStyle.fontSize).x +
+                                           tabStyle.padding.Horizontal());
+        }
+    }
+    const Rect originalContent = content_;
+    if (position == TabPosition::Bottom) {
+        content_.y += std::max(0.f, content_.h - barSize);
+        content_.h = barSize;
+    } else if (position == TabPosition::Left) {
+        content_.w = tabWidth;
+    } else {
+        content_.h = barSize;
+    }
+    horizontalLayout_ = position != TabPosition::Left;
+    cursorY_ = content_.y;
+    cursorX_ = content_.x;
+    for (size_t i = 0; i < tabs.size(); ++i) {
+        const TabItem& tab = tabs[i];
+        const std::string visibleText = tab.icon.empty() || tab.showText
+            ? (tab.icon.empty() ? std::string(tab.label)
+                                : std::string(tab.icon) + " " + std::string(tab.label))
+            : std::string(tab.icon);
+        const std::string_view visible = visibleText;
+        const WidgetId tabId = HashStr(tab.label, GetID("##tab"));
+        const ComputedStyle base = Resolve("tab", *selected == static_cast<int>(i) ? State_Checked : State_None);
+        Vec2 measured = text_->Measure(visible, base.fontSize);
+        Vec2 tabSize{measured.x + base.padding.Horizontal(), measured.y + base.padding.Vertical()};
+        if (position == TabPosition::Left) {
+            tabSize.x = tabWidth;
+            tabSize.y = std::max(barSize, measured.y + base.padding.Vertical());
+        } else {
+            tabSize.y = barSize;
+        }
+        const Rect tabRect = Place(tabSize, base.spacing);
+        const Interaction interaction = Behavior(tabId, tabRect);
+        const ComputedStyle tabStyle = Animate(tabId, "tab",
+            *selected == static_cast<int>(i) ? State_Checked : State_None,
+            interaction.hovered, interaction.held);
+        DrawBox(tabRect, tabStyle);
+        DrawTextCentered(tabRect, visible, tabStyle);
+        if (interaction.pressed) *selected = static_cast<int>(i);
+    }
+    content_ = originalContent;
+    if (position == TabPosition::Left) {
+        content_.x += tabWidth;
+        content_.w = std::max(0.f, content_.w - tabWidth);
+    } else {
+        content_.y += position == TabPosition::Bottom ? 0.f : barSize;
+        content_.h = std::max(0.f, content_.h - barSize);
+    }
+    cursorY_ = content_.y;
+    cursorX_ = content_.x;
+    lineTop_ = cursorY_;
+    lineBottom_ = cursorY_;
+    lastRight_ = content_.x;
+    sameLine_ = false;
+    horizontalLayout_ = false;
+    return true;
 }
 
 // ---------------------------------------------------------------- widgets
@@ -172,6 +348,34 @@ void Context::Text(std::string_view text) {
     const Rect r = Place({ts.x + s.padding.Horizontal(), ts.y + s.padding.Vertical()}, s.spacing);
     text_->Emit(draw_, {r.x + s.padding.left, r.y + s.padding.top}, text,
                 s.fontSize, Fade(s.foreground, s.opacity));
+}
+
+void Context::TextLabel(std::string_view text) { Text(text); }
+
+void Context::TextLabelLeft(std::string_view text, std::string_view icon) {
+    const ComputedStyle style = Resolve("text-label", 0);
+    const Vec2 iconSize = text_->Measure(icon, style.fontSize);
+    const Vec2 textSize = text_->Measure(text, style.fontSize);
+    const Rect r = Place({iconSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
+                          std::max(iconSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f},
+                icon, style.fontSize, Fade(style.foreground, style.opacity));
+    text_->Emit(draw_, {r.x + style.padding.left + iconSize.x + style.spacing,
+                        r.y + (r.h - textSize.y) * 0.5f},
+                text, style.fontSize, Fade(style.foreground, style.opacity));
+}
+
+void Context::TextLabelRight(std::string_view text, std::string_view icon) {
+    const ComputedStyle style = Resolve("text-label", 0);
+    const Vec2 textSize = text_->Measure(text, style.fontSize);
+    const Vec2 iconSize = text_->Measure(icon, style.fontSize);
+    const Rect r = Place({textSize.x + style.spacing + iconSize.x + style.padding.Horizontal(),
+                          std::max(textSize.y, iconSize.y) + style.padding.Vertical()}, style.spacing);
+    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f},
+                text, style.fontSize, Fade(style.foreground, style.opacity));
+    text_->Emit(draw_, {r.x + style.padding.left + textSize.x + style.spacing,
+                        r.y + (r.h - iconSize.y) * 0.5f},
+                icon, style.fontSize, Fade(style.foreground, style.opacity));
 }
 
 bool Context::Button(std::string_view label) {
@@ -188,6 +392,19 @@ bool Context::Button(std::string_view label) {
     DrawBox(r, s);
     text_->Emit(draw_, {r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, text,
                 s.fontSize, Fade(s.foreground, s.opacity));
+    return b.pressed;
+}
+
+bool Context::ImageButton(std::string_view label, uint64_t texture, Vec2 imageSize) {
+    const WidgetId id = GetID(label);
+    const ComputedStyle base = Resolve("image-button", 0);
+    const Rect r = Place({imageSize.x + base.padding.Horizontal(), imageSize.y + base.padding.Vertical()},
+                         base.spacing);
+    const Interaction b = Behavior(id, r);
+    const ComputedStyle style = Animate(id, "image-button", State_None, b.hovered, b.held);
+    DrawBox(r, style);
+    draw_.AddQuad({r.x + style.padding.left, r.y + style.padding.top, imageSize.x, imageSize.y},
+                  {0.f, 0.f, 1.f, 1.f}, Fade(Color{}, style.opacity), texture);
     return b.pressed;
 }
 
@@ -214,6 +431,56 @@ bool Context::Checkbox(std::string_view label, bool* value) {
 
     if (b.pressed) *value = !*value;
     return b.pressed;
+}
+
+bool Context::Toggle(std::string_view label, bool* value) {
+    if (!value) return false;
+    const WidgetId id = GetID(label);
+    const std::string_view text = DisplayLabel(label);
+    const ComputedStyle base = Resolve("toggle", *value ? State_Checked : State_None);
+    const float trackW = base.fontSize * 2.2f;
+    const float trackH = base.fontSize * 1.15f;
+    const Vec2 textSize = text_->Measure(text, base.fontSize);
+    const Rect r = Place({trackW + base.spacing + textSize.x, std::max(trackH, textSize.y)}, base.spacing);
+    const Interaction interaction = Behavior(id, r);
+    const ComputedStyle style = Animate(id, "toggle", *value ? State_Checked : State_None,
+                                        interaction.hovered, interaction.held);
+    const Rect track{r.x, r.y + (r.h - trackH) * 0.5f, trackW, trackH};
+    draw_.AddRectFilled(track, Fade(*value ? style.accent : style.background, style.opacity), trackH * 0.5f);
+    const float knob = trackH * 0.78f;
+    const float knobX = *value ? track.x + track.w - trackH * 0.89f : track.x + trackH * 0.11f;
+    draw_.AddRectFilled({knobX, track.y + (trackH - knob) * 0.5f, knob, knob},
+                        Fade(style.foreground, style.opacity), knob * 0.5f);
+    text_->Emit(draw_, {track.x + track.w + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
+                text, style.fontSize, Fade(style.foreground, style.opacity));
+    if (interaction.pressed) *value = !*value;
+    return interaction.pressed;
+}
+
+bool Context::Radio(std::string_view label, int* value, int option) {
+    if (!value) return false;
+    const WidgetId id = GetID(label);
+    const std::string_view text = DisplayLabel(label);
+    const bool checked = *value == option;
+    const ComputedStyle base = Resolve("radio", checked ? State_Checked : State_None);
+    const float diameter = base.fontSize * 1.1f;
+    const Vec2 textSize = text_->Measure(text, base.fontSize);
+    const Rect r = Place({diameter + base.spacing + textSize.x, std::max(diameter, textSize.y)}, base.spacing);
+    const Interaction interaction = Behavior(id, r);
+    const ComputedStyle style = Animate(id, "radio", checked ? State_Checked : State_None,
+                                        interaction.hovered, interaction.held);
+    const Rect circle{r.x, r.y + (r.h - diameter) * 0.5f, diameter, diameter};
+    draw_.AddRectFilled(circle, Fade(style.borderColor.a > 0.f ? style.borderColor : style.background,
+                                     style.opacity), diameter * 0.5f);
+    if (checked) {
+        const float inset = diameter * 0.28f;
+        draw_.AddRectFilled(circle.Expanded(-inset), Fade(style.accent, style.opacity),
+                            diameter * 0.5f);
+    }
+    text_->Emit(draw_, {circle.x + diameter + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
+                text, style.fontSize, Fade(style.foreground, style.opacity));
+    if (interaction.pressed) *value = option;
+    return interaction.pressed;
 }
 
 bool Context::SliderFloat(std::string_view label, float* value, float lo, float hi) {
@@ -245,6 +512,79 @@ bool Context::SliderFloat(std::string_view label, float* value, float lo, float 
     text_->Emit(draw_, {r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, buf,
                 s.fontSize, Fade(s.foreground, s.opacity));
     return changed;
+}
+
+bool Context::ValueSlider(std::string_view label, float* value, float lo, float hi) {
+    return SliderFloat(label, value, lo, hi);
+}
+
+void Context::Image(uint64_t texture, Vec2 size) {
+    const Rect r = Place(size, Resolve("image", 0).spacing);
+    draw_.AddQuad(r, {0.f, 0.f, 1.f, 1.f}, Color{}, texture);
+}
+
+void Context::ImageLabel(std::string_view label, uint64_t texture, Vec2 imageSize) {
+    const ComputedStyle style = Resolve("image-label", 0);
+    const Vec2 textSize = text_->Measure(label, style.fontSize);
+    const Rect r = Place({imageSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
+                          std::max(imageSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - imageSize.y) * 0.5f,
+                   imageSize.x, imageSize.y}, {0.f, 0.f, 1.f, 1.f}, Color{}, texture);
+    text_->Emit(draw_, {r.x + style.padding.left + imageSize.x + style.spacing,
+                        r.y + (r.h - textSize.y) * 0.5f},
+                label, style.fontSize, Fade(style.foreground, style.opacity));
+}
+
+bool Context::Dropdown(std::string_view label, const std::vector<std::string_view>& items,
+                       int* selected, std::string_view icon, bool showText) {
+    if (!selected || items.empty()) return false;
+    const WidgetId id = GetID(label);
+    int current = std::clamp(*selected, 0, static_cast<int>(items.size()) - 1);
+    const std::string_view text = icon.empty() ? items[static_cast<size_t>(current)] : icon;
+    const ComputedStyle base = Resolve("dropdown", 0);
+    const std::string display = icon.empty() || !showText
+        ? std::string(icon.empty() ? text : icon)
+        : std::string(icon) + " " + std::string(items[static_cast<size_t>(current)]);
+    const Vec2 fullSize = text_->Measure(display, base.fontSize);
+    const Rect r = Place({fullSize.x + base.padding.Horizontal() + base.fontSize,
+                          fullSize.y + base.padding.Vertical()}, base.spacing);
+    const Interaction interaction = Behavior(id, r);
+    const ComputedStyle style = Animate(id, "dropdown", State_None, interaction.hovered, interaction.held);
+    DrawBox(r, style);
+    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - fullSize.y) * 0.5f},
+                display, style.fontSize, Fade(style.foreground, style.opacity));
+    const float arrowX = r.x + r.w - style.padding.right - style.fontSize * 0.35f;
+    draw_.AddTriangleFilled({arrowX - 4.f, r.y + r.h * 0.42f},
+                            {arrowX + 4.f, r.y + r.h * 0.42f},
+                            {arrowX, r.y + r.h * 0.58f}, Fade(style.foreground, style.opacity));
+    if (interaction.pressed) dropdowns_[id] = !dropdowns_[id];
+
+    bool changed = false;
+    if (dropdowns_[id]) {
+        for (size_t i = 0; i < items.size(); ++i) {
+            PushID("##dropdown-options");
+            PushID(label);
+            PushID(items[i]);
+            if (Button(items[i])) {
+                *selected = static_cast<int>(i);
+                dropdowns_[id] = false;
+                changed = true;
+            }
+            PopID(); PopID(); PopID();
+        }
+    }
+    return changed;
+}
+
+bool Context::BeginCollapsible(std::string_view label, bool* open, Vec2 size) {
+    if (!open) return false;
+    const WidgetId id = GetID(label);
+    const std::string header = std::string(*open ? "v " : "> ") + std::string(DisplayLabel(label));
+    if (Button(header)) *open = !*open;
+    if (!*open) return false;
+    if (size.x <= 0.f) size.x = content_.w;
+    PushID(label);
+    return BeginContainerImpl(size, false, "collapsible-container");
 }
 
 } // namespace fluid

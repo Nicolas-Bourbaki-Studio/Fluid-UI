@@ -1,0 +1,25 @@
+/* Stylesheets use widget.class:state selectors and #RRGGBB[AA] colors. */
+button.primary {
+    background: #3559D8;
+    border-color: #5578F0;
+    border-radius: 8px;
+    padding: 7px 14px;
+}
+
+button.primary:hover {
+    background: #4A6CF7;
+}
+
+button.danger {
+    background: #8E2B2B;
+}
+
+button.danger:hover {
+    background: #C0392B;
+}
+
+container {
+    background: #202027;
+    border-color: #41414D;
+    padding: 8px;
+}

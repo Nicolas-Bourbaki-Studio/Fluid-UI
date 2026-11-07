@@ -95,6 +95,8 @@ public:
 
     void SetProp(size_t ruleIndex, Prop p, StyleValue v);
     void Clear();
+    bool LoadCSS(std::string_view css, std::string* error = nullptr);
+    bool LoadCSSFile(const std::string& path, std::string* error = nullptr);
     uint32_t Version() const { return version_; }
 
     static StyleSheet Dark(); // built-in theme
