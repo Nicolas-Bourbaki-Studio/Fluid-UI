@@ -4,6 +4,7 @@
 #include <bit>
 #include <charconv>
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
@@ -38,15 +39,30 @@ uint8_t StateFromName(std::string_view n) {
     return 0;
 }
 
-void ParseSelector(std::string_view s, std::string& widget, std::string& cls, uint8_t& mask) {
+void ParseSelector(std::string_view s, std::string& widget,
+                   std::vector<std::string>& classes, uint8_t& mask) {
+    if (s == ":root") {
+        widget.clear();
+        classes.clear();
+        mask = 0;
+        return;
+    }
     const size_t colon = s.find(':');
     std::string_view head = s.substr(0, colon);
     std::string_view states = (colon == std::string_view::npos) ? std::string_view{} : s.substr(colon + 1);
 
     const size_t dot = head.find('.');
     widget = std::string(head.substr(0, dot));
-    cls = (dot == std::string_view::npos) ? std::string{} : std::string(head.substr(dot + 1));
     if (widget == "*") widget.clear();
+    classes.clear();
+    if (dot != std::string_view::npos) {
+        std::string_view remaining = head.substr(dot + 1);
+        while (!remaining.empty()) {
+            const size_t next = remaining.find('.');
+            classes.emplace_back(remaining.substr(0, next));
+            remaining = next == std::string_view::npos ? std::string_view{} : remaining.substr(next + 1);
+        }
+    }
 
     mask = 0;
     while (!states.empty()) {
@@ -54,6 +70,48 @@ void ParseSelector(std::string_view s, std::string& widget, std::string& cls, ui
         mask |= StateFromName(states.substr(0, c));
         states = (c == std::string_view::npos) ? std::string_view{} : states.substr(c + 1);
     }
+}
+
+bool ValidSelector(std::string_view selector) {
+    if (selector == ":root") return true;
+    if (selector.empty()) return false;
+    for (char ch : selector)
+        if (std::isspace(static_cast<unsigned char>(ch))) return false;
+    const size_t colon = selector.find(':');
+    std::string_view head = selector.substr(0, colon);
+    std::string_view states = colon == std::string_view::npos
+        ? std::string_view{} : selector.substr(colon + 1);
+    const size_t dot = head.find('.');
+    std::string_view widget = head.substr(0, dot);
+    if (widget == "*") widget = {};
+    auto validName = [](std::string_view name) {
+        if (name.empty()) return false;
+        for (char ch : name) {
+            if (!std::isalnum(static_cast<unsigned char>(ch)) && ch != '-' && ch != '_')
+                return false;
+        }
+        return true;
+    };
+    if (!widget.empty() && !validName(widget)) return false;
+    if (dot != std::string_view::npos) {
+        std::string_view classes = head.substr(dot + 1);
+        while (!classes.empty()) {
+            const size_t next = classes.find('.');
+            if (!validName(classes.substr(0, next))) return false;
+            if (next == std::string_view::npos) break;
+            classes.remove_prefix(next + 1);
+        }
+    }
+    while (!states.empty()) {
+        const size_t next = states.find(':');
+        const std::string_view state = states.substr(0, next);
+        if (state != "hover" && state != "active" && state != "checked" && state != "disabled")
+            return false;
+        if (next != std::string_view::npos && next + 1 == states.size()) return false;
+        if (next == std::string_view::npos) break;
+        states.remove_prefix(next + 1);
+    }
+    return true;
 }
 
 void Apply(ComputedStyle& s, const StyleDecl& d) {
@@ -89,13 +147,64 @@ bool ParseNumber(std::string_view text, float& value) {
     std::string owned(text);
     char* end = nullptr;
     value = std::strtof(owned.c_str(), &end);
-    return end != owned.c_str() && *end == '\0';
+    return end != owned.c_str() && *end == '\0' && std::isfinite(value);
 }
 
 bool ParseColor(std::string_view text, Color& color) {
     text = Trim(text);
+    if (text == "transparent") { color = {0.f, 0.f, 0.f, 0.f}; return true; }
+    if (text == "black") { color = Color::FromHex(0x000000FF); return true; }
+    if (text == "white") { color = Color::FromHex(0xFFFFFFFF); return true; }
+    if (text == "red") { color = Color::FromHex(0xFF0000FF); return true; }
+    if (text == "green") { color = Color::FromHex(0x008000FF); return true; }
+    if (text == "blue") { color = Color::FromHex(0x0000FFFF); return true; }
+    if (text == "yellow") { color = Color::FromHex(0xFFFF00FF); return true; }
+    if (text == "orange") { color = Color::FromHex(0xFFA500FF); return true; }
+    if (text == "purple") { color = Color::FromHex(0x800080FF); return true; }
+    if (text == "gray" || text == "grey") { color = Color::FromHex(0x808080FF); return true; }
+    if (text.starts_with("rgb(") || text.starts_with("rgba(")) {
+        const bool hasAlpha = text.starts_with("rgba(");
+        const size_t open = text.find('('), close = text.rfind(')');
+        if (close != text.size() - 1 || close <= open + 1) return false;
+        std::string_view parts = text.substr(open + 1, close - open - 1);
+        float channels[4]{0.f, 0.f, 0.f, 1.f};
+        size_t count = 0;
+        while (!parts.empty() && count < 4) {
+            const size_t comma = parts.find(',');
+            std::string_view component = Trim(parts.substr(0, comma));
+            const bool percent = !component.empty() && component.back() == '%';
+            if (percent) component.remove_suffix(1);
+            float value = 0.f;
+            if (!ParseNumber(component, value)) return false;
+            channels[count] = count == 3
+                ? (percent ? value / 100.f : value)
+                : (percent ? value / 100.f : value / 255.f);
+            ++count;
+            if (comma == std::string_view::npos) {
+                parts = {};
+                break;
+            }
+            parts.remove_prefix(comma + 1);
+        }
+        if (count != (hasAlpha ? 4u : 3u) || !Trim(parts).empty()) return false;
+        color = {std::clamp(channels[0], 0.f, 1.f), std::clamp(channels[1], 0.f, 1.f),
+                 std::clamp(channels[2], 0.f, 1.f), std::clamp(channels[3], 0.f, 1.f)};
+        return true;
+    }
     if (text.empty() || text.front() != '#') return false;
     text.remove_prefix(1);
+    if (text.size() == 3 || text.size() == 4) {
+        uint32_t value = 0;
+        for (char digit : text) {
+            uint32_t nibble = 0;
+            const auto parsed = std::from_chars(&digit, &digit + 1, nibble, 16);
+            if (parsed.ec != std::errc{}) return false;
+            value = (value << 8) | (nibble * 17u);
+        }
+        if (text.size() == 3) value = (value << 8) | 0xFFu;
+        color = Color::FromHex(value);
+        return true;
+    }
     if (text.size() != 6 && text.size() != 8) return false;
     uint32_t value = 0;
     const auto parsed = std::from_chars(text.data(), text.data() + text.size(), value, 16);
@@ -122,7 +231,7 @@ bool ParseDeclaration(std::string_view name, std::string_view value,
         out = {{v, 0.f, 0.f, 0.f}};
         return true;
     };
-    if (name == "background") return color(Prop::Background);
+    if (name == "background" || name == "background-color") return color(Prop::Background);
     if (name == "color" || name == "foreground") return color(Prop::Foreground);
     if (name == "accent") return color(Prop::Accent);
     if (name == "border-color") return color(Prop::BorderColor);
@@ -155,11 +264,71 @@ bool ParseDeclaration(std::string_view name, std::string_view value,
     return false;
 }
 
+bool ResolveVariables(std::string_view source,
+                      const std::unordered_map<std::string, std::string>& variables,
+                      std::string& resolved) {
+    resolved.assign(source);
+    for (size_t position = 0; (position = resolved.find("var(", position)) != std::string::npos;) {
+        const size_t close = resolved.find(')', position + 4);
+        if (close == std::string::npos) return false;
+        const std::string_view expression(resolved.data() + position + 4,
+                                          close - position - 4);
+        const size_t comma = expression.find(',');
+        const std::string key(Trim(expression.substr(0, comma)));
+        auto value = variables.find(key);
+        std::string replacement;
+        if (value != variables.end()) {
+            replacement = value->second;
+        } else if (comma != std::string_view::npos) {
+            replacement = std::string(Trim(expression.substr(comma + 1)));
+        } else {
+            return false;
+        }
+        resolved.replace(position, close - position + 1, replacement);
+        position += replacement.size();
+    }
+    return true;
+}
+
+void CollectVariables(std::string_view source,
+                      std::unordered_map<std::string, std::string>& variables) {
+    while (!(source = Trim(source)).empty()) {
+        const size_t open = source.find('{');
+        if (open == std::string_view::npos) break;
+        const size_t close = source.find('}', open + 1);
+        if (close == std::string_view::npos) break;
+        std::string_view declarations = source.substr(open + 1, close - open - 1);
+        std::string_view selectorList = Trim(source.substr(0, open));
+        bool global = false;
+        while (!selectorList.empty()) {
+            const size_t comma = selectorList.find(',');
+            const std::string_view selector = Trim(selectorList.substr(0, comma));
+            global = global || selector == ":root" || selector == "*";
+            if (comma == std::string_view::npos) break;
+            selectorList.remove_prefix(comma + 1);
+        }
+        while (!Trim(declarations).empty()) {
+            const size_t semi = declarations.find(';');
+            const std::string_view declaration = Trim(declarations.substr(0, semi));
+            const size_t colon = declaration.find(':');
+            if (global && colon != std::string_view::npos) {
+                const std::string_view name = Trim(declaration.substr(0, colon));
+                if (name.starts_with("--")) {
+                    variables[std::string(name)] = std::string(Trim(declaration.substr(colon + 1)));
+                }
+            }
+            if (semi == std::string_view::npos) break;
+            declarations.remove_prefix(semi + 1);
+        }
+        source.remove_prefix(close + 1);
+    }
+}
+
 } // namespace
 
 StyleSheet::RuleBuilder StyleSheet::Rule(std::string_view selector) {
     StyleRule r;
-    ParseSelector(selector, r.widget, r.cls, r.stateMask);
+    ParseSelector(selector, r.widget, r.classes, r.stateMask);
     rules_.push_back(std::move(r));
     cache_.clear();
     ++version_;
@@ -188,6 +357,8 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
         source.erase(start, end + 2 - start);
     }
 
+    std::unordered_map<std::string, std::string> variables;
+    CollectVariables(source, variables);
     StyleSheet candidate = *this;
     std::string_view rest(source);
     while (!(rest = Trim(rest)).empty()) {
@@ -209,14 +380,53 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
             const std::string_view decl = Trim(body.substr(0, semi));
             if (!decl.empty()) {
                 const size_t colon = decl.find(':');
-                Prop prop{};
-                StyleValue value{};
+                const std::string_view name = colon == std::string_view::npos
+                    ? std::string_view{} : Trim(decl.substr(0, colon));
+                std::string value;
                 if (colon == std::string_view::npos ||
-                    !ParseDeclaration(decl.substr(0, colon), decl.substr(colon + 1), prop, value)) {
-                    if (error) *error = "Invalid or unsupported CSS declaration: " + std::string(decl);
+                    (!name.starts_with("--") &&
+                     !ResolveVariables(decl.substr(colon + 1), variables, value))) {
+                    if (error) *error = "Invalid CSS variable in declaration: " + std::string(decl);
                     return false;
                 }
-                declarations.emplace_back(prop, value);
+                if (!name.starts_with("--")) {
+                    std::vector<std::pair<Prop, StyleValue>> parsed;
+                    if (name == "border") {
+                        std::string_view parts = Trim(value);
+                        bool valid = true, foundWidth = false, foundColor = false;
+                        while (!parts.empty()) {
+                            const size_t split = parts.find_first_of(" \t\r\n");
+                            const std::string_view token = Trim(parts.substr(0, split));
+                            if (token == "solid") {
+                            } else if (token == "none") {
+                                parsed.emplace_back(Prop::BorderWidth, StyleValue{{0.f, 0.f, 0.f, 0.f}});
+                                foundWidth = true;
+                            } else if (Color color; ParseColor(token, color)) {
+                                parsed.emplace_back(Prop::BorderColor,
+                                                    StyleValue{{color.r, color.g, color.b, color.a}});
+                                foundColor = true;
+                            } else {
+                                float width = 0.f;
+                                if (!ParseNumber(token, width)) { valid = false; break; }
+                                parsed.emplace_back(Prop::BorderWidth, StyleValue{{width, 0.f, 0.f, 0.f}});
+                                foundWidth = true;
+                            }
+                            if (split == std::string_view::npos) break;
+                            parts.remove_prefix(split + 1);
+                        }
+                        if (!valid || (!foundWidth && !foundColor)) parsed.clear();
+                    } else {
+                        Prop prop{};
+                        StyleValue parsedValue{};
+                        if (ParseDeclaration(name, value, prop, parsedValue))
+                            parsed.emplace_back(prop, parsedValue);
+                    }
+                    if (parsed.empty()) {
+                        if (error) *error = "Invalid or unsupported CSS declaration: " + std::string(decl);
+                        return false;
+                    }
+                    declarations.insert(declarations.end(), parsed.begin(), parsed.end());
+                }
             }
             if (semi == std::string_view::npos) break;
             body.remove_prefix(semi + 1);
@@ -225,8 +435,8 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
         while (!remainingSelectors.empty()) {
             const size_t comma = remainingSelectors.find(',');
             const std::string_view selector = Trim(remainingSelectors.substr(0, comma));
-            if (selector.empty()) {
-                if (error) *error = "Empty CSS selector";
+            if (!ValidSelector(selector)) {
+                if (error) *error = "Invalid or unsupported CSS selector: " + std::string(selector);
                 return false;
             }
             auto rule = candidate.Rule(selector);
@@ -268,9 +478,11 @@ ComputedStyle StyleSheet::Resolve(std::string_view widget,
     std::vector<std::pair<int, const StyleRule*>> hits;
     for (const StyleRule& r : rules_) {
         if (!r.widget.empty() && r.widget != widget) continue;
-        if (!r.cls.empty() && std::find(classes.begin(), classes.end(), r.cls) == classes.end()) continue;
+        if (!std::all_of(r.classes.begin(), r.classes.end(), [&](const std::string& cls) {
+                return std::find(classes.begin(), classes.end(), cls) != classes.end();
+            })) continue;
         if ((r.stateMask & ~static_cast<unsigned>(state)) != 0) continue;
-        const int spec = (r.widget.empty() ? 0 : 1) + (r.cls.empty() ? 0 : 2)
+        const int spec = (r.widget.empty() ? 0 : 1) + static_cast<int>(r.classes.size()) * 2
                        + 4 * std::popcount(static_cast<unsigned>(r.stateMask));
         hits.emplace_back(spec, &r);
     }
@@ -289,64 +501,78 @@ StyleSheet StyleSheet::Dark() {
     using C = Color;
     StyleSheet s;
 
-    s.Rule("*").Foreground(C::FromHex(0xE6E6EBFF)).FontSize(16).Spacing(6).TransitionSpeed(14);
+    s.Rule("*").Foreground(C::FromHex(0xE7EDF7FF)).FontSize(15).Spacing(8).TransitionSpeed(16);
 
     s.Rule("window")
-        .Background(C::FromHex(0x1B1B20F2)).BorderColor(C::FromHex(0x34343EFF)).BorderWidth(1)
-        .Rounding(10).Padding(Edges(10))
-        .ShadowColor(C::FromHex(0x000000A0)).ShadowBlur(18);
+        .Background(C::FromHex(0x101722F8)).BorderColor(C::FromHex(0x334155FF)).BorderWidth(1)
+        .Rounding(12).Padding(Edges(12))
+        .ShadowColor(C::FromHex(0x020617A0)).ShadowBlur(18);
     s.Rule("window-title")
-        .Background(C::FromHex(0x24242BFF)).Padding(Edges(6, 10));
+        .Background(C::FromHex(0x1A2637FF)).Foreground(C::FromHex(0xF1F5FCFF))
+        .Padding(Edges(7, 12)).FontSize(15);
+    s.Rule("window-control")
+        .Background(C::FromHex(0x29374AFF)).Foreground(C::FromHex(0xDCE7F7FF))
+        .Rounding(6).FontSize(15);
+    s.Rule("window-control:hover").Background(C::FromHex(0x3B4D65FF));
+    s.Rule("window-close")
+        .Background(C::FromHex(0x29374AFF)).Foreground(C::FromHex(0xF1F5FCFF))
+        .Rounding(6).FontSize(15);
+    s.Rule("window-close:hover").Background(C::FromHex(0xD94B5AFF));
+    s.Rule("window-scrollbar")
+        .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
+    s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
+        .Rounding(14);
 
-    s.Rule("text").Padding(Edges(2, 0));
+    s.Rule("text").Padding(Edges(2, 0)).Foreground(C::FromHex(0xCFD9E8FF));
 
     s.Rule("button")
-        .Background(C::FromHex(0x2E2E38FF)).BorderColor(C::FromHex(0x3C3C48FF)).BorderWidth(1)
-        .Rounding(6).Padding(Edges(6, 14));
-    s.Rule("button:hover").Background(C::FromHex(0x3A3A48FF));
-    s.Rule("button:active").Background(C::FromHex(0x4A6CF7FF));
+        .Background(C::FromHex(0x253449FF)).BorderColor(C::FromHex(0x3D526FFF)).BorderWidth(1)
+        .Rounding(8).Padding(Edges(8, 15));
+    s.Rule("button:hover").Background(C::FromHex(0x304762FF)).BorderColor(C::FromHex(0x5C7DA6FF));
+    s.Rule("button:active").Background(C::FromHex(0x386FE0FF));
 
     s.Rule("checkbox")
-        .Background(C::FromHex(0x2A2A33FF)).BorderColor(C::FromHex(0x3C3C48FF)).BorderWidth(1)
-        .Rounding(4).Accent(C::FromHex(0x4A6CF7FF));
-    s.Rule("checkbox:hover").BorderColor(C::FromHex(0x4A6CF7FF));
+        .Background(C::FromHex(0x1B2839FF)).BorderColor(C::FromHex(0x526783FF)).BorderWidth(1)
+        .Rounding(5).Accent(C::FromHex(0x5A91F7FF));
+    s.Rule("checkbox:hover").BorderColor(C::FromHex(0x7EA8E9FF));
 
     s.Rule("slider")
-        .Background(C::FromHex(0x2A2A33FF)).Accent(C::FromHex(0x4A6CF7B0))
-        .Rounding(6).Padding(Edges(5, 10));
-    s.Rule("slider:hover").Accent(C::FromHex(0x4A6CF7E0));
+        .Background(C::FromHex(0x24364FFF)).Accent(C::FromHex(0x5A91F7FF))
+        .Rounding(7).Padding(Edges(5, 10));
+    s.Rule("slider:hover").Accent(C::FromHex(0x82B2FFFF));
 
     s.Rule("toggle")
-        .Background(C::FromHex(0x383843FF)).Accent(C::FromHex(0x4A6CF7FF))
-        .Foreground(C::FromHex(0xF5F5FAFF)).Spacing(8);
+        .Background(C::FromHex(0x35465DFF)).Accent(C::FromHex(0x5A91F7FF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).Spacing(9);
     s.Rule("radio")
-        .Background(C::FromHex(0x2A2A33FF)).BorderColor(C::FromHex(0x737381FF))
-        .BorderWidth(1).Accent(C::FromHex(0x4A6CF7FF)).Spacing(8);
+        .Background(C::FromHex(0x1B2839FF)).BorderColor(C::FromHex(0x607995FF))
+        .BorderWidth(1).Accent(C::FromHex(0x5A91F7FF)).Spacing(9);
     s.Rule("container")
-        .Background(C::FromHex(0x202027FF)).BorderColor(C::FromHex(0x34343EFF))
-        .BorderWidth(1).Rounding(8).Padding(Edges(8)).Spacing(8);
+        .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
+        .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);
     s.Rule("collapsible-container")
-        .Background(C::FromHex(0x202027FF)).BorderColor(C::FromHex(0x34343EFF))
-        .BorderWidth(1).Rounding(8).Padding(Edges(8)).Spacing(8);
+        .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
+        .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);
     s.Rule("horizontal-list")
-        .Background(C::FromHex(0x202027FF)).BorderColor(C::FromHex(0x34343EFF))
-        .BorderWidth(1).Rounding(8).Padding(Edges(8)).Spacing(8);
+        .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
+        .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);
     s.Rule("vertical-list")
-        .Background(C::FromHex(0x202027FF)).BorderColor(C::FromHex(0x34343EFF))
-        .BorderWidth(1).Rounding(8).Padding(Edges(8)).Spacing(8);
+        .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
+        .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);
     s.Rule("tab")
-        .Background(C::FromHex(0x2A2A33FF)).BorderColor(C::FromHex(0x3C3C48FF))
-        .BorderWidth(1).Rounding(5).Padding(Edges(5, 10));
-    s.Rule("tab:checked").Background(C::FromHex(0x4A6CF7FF));
+        .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x344D6AFF))
+        .BorderWidth(1).Rounding(7).Padding(Edges(7, 11));
+    s.Rule("tab:checked").Background(C::FromHex(0x386FE0FF)).BorderColor(C::FromHex(0x6190E8FF));
     s.Rule("dropdown")
-        .Background(C::FromHex(0x2E2E38FF)).BorderColor(C::FromHex(0x3C3C48FF))
-        .BorderWidth(1).Rounding(6).Padding(Edges(6, 12));
-    s.Rule("dropdown:hover").Background(C::FromHex(0x3A3A48FF));
+        .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
+        .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
+    s.Rule("dropdown:hover").Background(C::FromHex(0x304762FF));
     s.Rule("image-button")
-        .Background(C::FromHex(0x2E2E38FF)).BorderColor(C::FromHex(0x3C3C48FF))
-        .BorderWidth(1).Rounding(6).Padding(Edges(6, 12));
-    s.Rule("image-button:hover").Background(C::FromHex(0x3A3A48FF));
-    s.Rule("text-label, image-label").Spacing(6);
+        .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
+        .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
+    s.Rule("image-button:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("text-label").Spacing(7);
+    s.Rule("image-label").Spacing(7);
 
     return s;
 }

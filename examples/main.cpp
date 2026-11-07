@@ -4,9 +4,16 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <string>
 #include <vector>
 
 using namespace fluid;
+
+static float gMouseWheel = 0.f;
+
+static void OnScroll(GLFWwindow*, double, double yOffset) {
+    gMouseWheel += static_cast<float>(yOffset);
+}
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
     glViewport(0, 0, fbW, fbH);
@@ -117,6 +124,7 @@ int main() {
     if (!win) { glfwTerminate(); return 1; }
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);
+    glfwSetScrollCallback(win, OnScroll);
 
     Context ui;
     ui.Style() = StyleSheet::Dark();
@@ -128,10 +136,21 @@ int main() {
         glfwTerminate();
         return 1;
     }
-    ui.Style().Rule("button.danger").Background(Color::FromHex(0x8E2B2BFF)).Rounding(2);
-    ui.Style().Rule("button.danger:hover").Background(Color::FromHex(0xC0392BFF));
-    ui.Style().Rule("button.danger:active").Background(Color::FromHex(0xFF5544FF));
-
+    const std::vector<std::string> emphasisClasses{"primary", "emphasis"};
+    const ComputedStyle primaryButton = ui.Style().Resolve("button", emphasisClasses, State_None);
+    const ComputedStyle windowStyle = ui.Style().Resolve("window", {}, State_None);
+    if (primaryButton.background.ToU32() != Color::FromHex(0x3978B8FF).ToU32() ||
+        primaryButton.shadowBlur != 8.f ||
+        ui.Style().Resolve("dock-splitter", {}, State_None).background.ToU32() !=
+            Color::FromHex(0x45464BFF).ToU32() ||
+        windowStyle.borderWidth != 1.f ||
+        windowStyle.borderColor.ToU32() != Color::FromHex(0x3A3B3FFF).ToU32() ||
+        windowStyle.shadowColor.a < 0.55f) {
+        std::fprintf(stderr, "theme.css selectors or declarations did not resolve correctly\n");
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
     const GLuint demoTexture = CreateDemoTexture();
     const GLuint fontTexture = CreateDemoFontTexture();
     DemoTextBackend demoText(fontTexture);
@@ -145,6 +164,9 @@ int main() {
     bool enabled = true, showAdvanced = true, expanded = true, showDanger = false;
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
     float volume = 0.62f;
+    constexpr std::string_view componentWindow = "Components##main";
+    constexpr std::string_view tabsWindow = "Tabs and collapse##tabs";
+    constexpr std::string_view managerWindow = "Window manager##manager";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -156,15 +178,21 @@ int main() {
         InputState in;
         in.mousePos = {static_cast<float>(mx), static_cast<float>(my)};
         in.mouseDown[0] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        in.mouseWheel = gMouseWheel;
+        gMouseWheel = 0.f;
         in.deltaTime = static_cast<float>(now - last);
         in.displaySize = {static_cast<float>(w), static_cast<float>(h)};
         last = now;
         ui.NewFrame(in);
+        ui.DockWindows(showAdvanced);
 
-        if (ui.BeginWindow("Components##main", {24, 24, 500, 720})) {
+        if (ui.BeginWindow(componentWindow, {24, 24, 500, 720})) {
             ui.Text("Core controls");
+            if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);
             ui.PushClass("primary");
+            ui.PushClass("emphasis");
             if (ui.Button("Button")) {}
+            ui.PopClass();
             ui.PopClass();
             ui.SameLine();
             ui.PushClass("danger");
@@ -200,14 +228,23 @@ int main() {
                 ui.Text("Vertical list item three");
                 ui.EndContainer();
             }
+            ui.Text("Scroll test - use the mouse wheel or drag the scrollbar");
+            for (int i = 1; i <= 14; ++i) {
+                char row[48];
+                std::snprintf(row, sizeof(row), "Scrollable sample row %02d", i);
+                ui.Text(row);
+            }
             ui.EndWindow();
         }
 
-        if (ui.BeginWindow("Tabs and collapse##tabs", {548, 24, 550, 720})) {
+        if (ui.BeginWindow(tabsWindow, {548, 24, 550, 720})) {
             ui.Text("Configurable tab positions");
+            if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);
             if (ui.BeginTabContainer("Top tabs", {0, 145}, textTabs, &topTab,
                                      Context::TabPosition::Top)) {
-                ui.Text("Top tabs with text labels.");
+                if (topTab == 0) ui.Text("Overview: text-only tab labels.");
+                else if (topTab == 1) ui.Text("Details: selected tab state updates immediately.");
+                else ui.Text("Preview: try resizing or docking this window.");
                 ui.EndContainer();
             }
             if (ui.BeginTabContainer("Left tabs", {0, 145}, iconTabs, &iconChoice,
@@ -228,15 +265,18 @@ int main() {
             ui.EndWindow();
         }
 
-        if (ui.BeginWindow("Dynamic docking##help", {1120, 24, 300, 235})) {
-            ui.Text("Dynamic docking");
-            ui.Text("Drag this title bar to a screen edge.");
-            ui.Text("Left / right and top / bottom");
-            ui.Text("snap to resizable half-screen areas.");
-            ui.Text("Resize the window to see the dock");
-            ui.Text("layout adapt to the display.");
-            ui.Toggle("Enable snapping", &showAdvanced);
-            ui.DockWindows(showAdvanced);
+        if (ui.BeginWindow(managerWindow, {1120, 24, 390, 350})) {
+            ui.Text("Window management");
+            ui.Text("Drag a title bar to a screen edge.");
+            ui.Text("A live preview shows the snap area.");
+            ui.Text("Docked windows resize with the display.");
+            ui.Text("Drag the bottom-right corner to resize.");
+            ui.Text("Minimize keeps the title bar; close hides a window.");
+            ui.Toggle("Enable docking", &showAdvanced);
+            if (ui.Button("Show components")) ui.SetWindowOpen(componentWindow, true);
+            if (ui.Button("Show tabs and collapse")) ui.SetWindowOpen(tabsWindow, true);
+            if (ui.Button("Hide components")) ui.SetWindowOpen(componentWindow, false);
+            if (ui.Button("Hide tabs and collapse")) ui.SetWindowOpen(tabsWindow, false);
             ui.EndWindow();
         }
 

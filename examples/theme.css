@@ -1,25 +1,195 @@
-/* Stylesheets use widget.class:state selectors and #RRGGBB[AA] colors. */
+/* Fluid UI — Unreal Engine inspired dark theme */
+
+:root {
+    --ui-accent: #3978B8;
+    --ui-accent-hover: #55A0E5;
+    --ui-panel: #292A2D;
+    --ui-border: #3A3B3F;
+    --ui-text: #D9DEE7;
+}
+
+* {
+    color: var(--ui-text);
+    font-size: 14px;
+    gap: 6px;
+    transition-speed: 12;
+}
+
+/* ================= WINDOW ================= */
+
+window {
+    background: #202124;
+    border: 1px solid var(--ui-border);
+    border-radius: 6px;
+    padding: 8px;
+    shadow-color: rgba(0, 0, 0, 0.56);
+    shadow-blur: 20px;
+}
+
+window-title {
+    background: #292A2D;
+    color: #F0F0F0;
+    font-size: 14px;
+    padding: 6px 10px;
+}
+
+window-control, window-close {
+    background: #343539;
+    color: #D9DEE7;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+window-control:hover {
+    background: #45464B;
+}
+
+window-close:hover {
+    background: #C74747;
+}
+
+/* ================= SCROLLING ================= */
+
+window-scrollbar {
+    background: #252629;
+    accent: var(--ui-accent);
+}
+
+window-resize {
+    accent: var(--ui-accent);
+}
+
+dock-preview {
+    background: var(--ui-accent);
+    accent: var(--ui-accent-hover);
+    border-radius: 6px;
+}
+
+dock-splitter {
+    background: #45464B;
+    accent: var(--ui-accent-hover);
+    border-radius: 3px;
+}
+
+/* ================= TEXT ================= */
+
+text {
+    color: #C8CDD5;
+    padding: 2px 0;
+}
+
+text-label, image-label {
+    gap: 6px;
+}
+
+/* ================= BUTTONS ================= */
+
+button, dropdown, image-button {
+    background: #35363A;
+    color: #E0E3E8;
+    border-color: #45464B;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+
+button:hover, dropdown:hover, image-button:hover {
+    background: #414348;
+    border-color: #5B5D63;
+}
+
+button:active {
+    background: #2B5F91;
+}
+
+/* Primary buttons */
+
 button.primary {
-    background: #3559D8;
-    border-color: #5578F0;
-    border-radius: 8px;
-    padding: 7px 14px;
+    background: var(--ui-accent);
+    border-color: #397FB8;
+    color: #FFFFFF;
 }
 
 button.primary:hover {
-    background: #4A6CF7;
+    background: var(--ui-accent-hover);
+    border-color: #4A96D4;
 }
 
+button.primary.emphasis {
+    shadow-color: rgba(40, 120, 184, 0.31);
+    shadow-blur: 8px;
+}
+
+/* Destructive buttons */
+
 button.danger {
-    background: #8E2B2B;
+    background: #713737;
+    border-color: #914747;
 }
 
 button.danger:hover {
-    background: #C0392B;
+    background: #914545;
 }
 
-container {
-    background: #202027;
-    border-color: #41414D;
+/* ================= CHECKBOXES ================= */
+
+checkbox, radio {
+    background: #292A2D;
+    border-color: #55575D;
+    border-width: 1px;
+    accent: var(--ui-accent);
+}
+
+checkbox:hover, radio:hover {
+    border-color: #6BA9DF;
+}
+
+/* ================= TOGGLES ================= */
+
+toggle {
+    background: #404146;
+    accent: var(--ui-accent);
+    color: #E4E7EC;
+    gap: 8px;
+}
+
+/* ================= SLIDERS ================= */
+
+slider {
+    background: #303136;
+    accent: var(--ui-accent);
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+slider:hover {
+    accent: var(--ui-accent-hover);
+}
+
+/* ================= PANELS ================= */
+
+container, collapsible-container,
+horizontal-list, vertical-list {
+    background: var(--ui-panel);
+    border-color: var(--ui-border);
+    border-width: 1px;
+    border-radius: 5px;
     padding: 8px;
+    gap: 6px;
+}
+
+/* ================= TABS ================= */
+
+tab {
+    background: #303136;
+    border-color: #3D3E43;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+tab:checked {
+    background: var(--ui-accent);
+    border-color: var(--ui-accent);
+    color: #FFFFFF;
 }

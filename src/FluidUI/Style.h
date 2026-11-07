@@ -48,7 +48,7 @@ struct StyleDecl  { Prop prop; StyleValue value; };
 
 struct StyleRule {
     std::string widget;      // empty = any
-    std::string cls;         // empty = any
+    std::vector<std::string> classes;
     uint8_t stateMask = 0;   // all bits must be present in the current state
     std::vector<StyleDecl> decls;
 };
@@ -83,8 +83,8 @@ public:
         size_t index_;
     };
 
-    // Selector grammar:  [widget|*][.class][:state[:state...]]
-    // e.g. "button", "button.primary", "button.primary:hover", "*", ".danger:active"
+    // Selector grammar: [widget|*][.class...][:state[:state...]]
+    // e.g. "button", "button.primary", "button.primary.large:hover", "*", ".danger:active"
     // States: hover, active, checked, disabled
     RuleBuilder Rule(std::string_view selector);
 

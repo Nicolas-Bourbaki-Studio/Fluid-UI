@@ -44,11 +44,16 @@ one with an icon displays both by default, or just the icon when `showText` is f
 ## CSS-like themes and classes
 
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
-Selectors support widget names, one class, and widget states (`hover`, `active`, `checked`,
-`disabled`). Color values use `#RRGGBB` or `#RRGGBBAA`; numeric values may include `px`.
+Selectors support widget names, multiple stacked classes, grouped selectors, and widget
+states (`hover`, `active`, `checked`, `disabled`). Global custom properties can be declared
+in `:root` and referenced with `var(--name)` (including a fallback). Colors support 3/4/6/8
+digit hex, common named colors, `rgb()` and `rgba()`, and the `transparent` keyword;
+numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius`, `font-size`, `gap`, `shadow-blur`,
-`opacity`, `transition-speed`, and CSS-style one-to-four-value `padding`.
+`opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
+`padding`. Unsupported selectors and declarations report an error, and failed stylesheet
+loads do not partially modify the active theme.
 
 ```css
 button.primary {
@@ -59,6 +64,12 @@ button.primary {
 
 button.primary:hover {
     background: #4A6CF7;
+}
+
+window-title {
+    background: #1A2637;
+    color: #F1F5FC;
+    padding: 7px 12px;
 }
 ```
 
@@ -77,8 +88,14 @@ The `examples` target includes `theme.css` and a GLFW demo covering the controls
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible
 content.
 
-## Dynamic docking
+## Windows and dynamic docking
 
-Windows can be dragged by their title bars. Dropping a window within 24 pixels of a display
-edge docks it to that edge's half-screen region; docked windows recalculate their bounds as
-the display changes size. Use `Context::DockWindows(false)` to disable edge snapping.
+Window titles are centered in the title bar; the right-side controls minimize and close the
+window. Drag the bottom-right corner to resize it. Closed windows can be restored with
+`Context::SetWindowOpen("Window title", true)`. Long content scrolls vertically with the
+mouse wheel or by dragging the scrollbar.
+
+Drag a window by its title bar toward a screen edge to see a live docking preview. Dropping within 32 pixels of an edge docks the window into that edge's region. Windows
+docked to the same edge tile together; drag the dividers between them to resize adjacent
+panels, and the group recalculates as the display changes size. Use
+`Context::DockWindows(false)` to disable edge snapping.

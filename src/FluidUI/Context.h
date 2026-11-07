@@ -4,6 +4,7 @@
 #include "Export.h"
 #include "Style.h"
 
+#include <array>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -28,6 +29,7 @@ public:
     // Containers
     bool BeginWindow(std::string_view title, Rect initial);
     void EndWindow();
+    void SetWindowOpen(std::string_view title, bool open);
     bool BeginContainer(std::string_view label, Vec2 size);
     bool BeginList(std::string_view label, Vec2 size, bool horizontal);
     void EndContainer();
@@ -75,9 +77,11 @@ private:
     struct Interaction { bool hovered = false, held = false, pressed = false; };
     enum class DockSide : uint8_t { None, Left, Right, Top, Bottom };
     struct WindowState {
-        Vec2 pos, size, dragOff;
+        Vec2 pos, size, dragOff, resizeStart, startSize;
+        float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
         DockSide dock = DockSide::None;
-        bool init = false, dragging = false;
+        bool init = false, open = true, minimized = false;
+        bool dragging = false, resizing = false, scrolling = false;
     };
     struct Anim { float hover = 0.f, active = 0.f; };
     struct LayoutState {
@@ -95,6 +99,7 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
+    void LayoutDockedWindows();
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
     void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
@@ -107,18 +112,29 @@ private:
     InputState in_;
     bool prevMouseDown_ = false;
     WidgetId active_ = 0;
+    WidgetId currentWindowId_ = 0;
+    WidgetId activeDockSplitter_ = 0;
+    float dockSplitterMouseStart_ = 0.f, dockSplitterSpanStart_ = 0.f;
+    float dockSplitterPairSpan_ = 0.f;
+    bool dockLayoutDone_ = false;
 
     std::vector<WidgetId> idStack_;
     std::vector<std::string> classStack_;
+    std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
+    std::array<std::vector<WidgetId>, 5> dockedWindows_;
     std::unordered_map<WidgetId, Anim> anims_;
     std::vector<ContainerState> containerStack_;
+    std::vector<Rect> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;
 
     // Layout cursor (current window)
     Rect content_;
+    Rect windowViewport_;
+    Rect dockPreview_;
+    bool hasDockPreview_ = false;
     float cursorY_ = 0.f, lineTop_ = 0.f, lineBottom_ = 0.f, lastRight_ = 0.f, cursorX_ = 0.f;
     bool sameLine_ = false;
 };
