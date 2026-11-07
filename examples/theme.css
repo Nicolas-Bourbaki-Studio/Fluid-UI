@@ -18,9 +18,9 @@
 window {
     background: #202124;
     border: 1px solid var(--ui-border);
-    border-radius: 6px;
+    border-radius: 5px;
     padding: 8px;
-    shadow-color: rgba(0, 0, 0, 0.56);
+    shadow-color: rgba(0, 0, 0, 0);
     shadow-blur: 20px;
 }
 
@@ -40,6 +40,47 @@ window-close {
 
 window-close:hover {
     background: #C74747;
+}
+
+main-menu-bar {
+    background: #191A1D;
+    border-color: var(--ui-border);
+    border-width: 1px;
+    padding: 3px 8px;
+    shadow-color: rgba(0, 0, 0, 0.3);
+    shadow-blur: 5px;
+}
+
+menu {
+    background: transparent;
+    color: #D9DEE7;
+    border-radius: 4px;
+    padding: 4px 10px;
+}
+
+menu:hover, menu:checked {
+    background: #34363B;
+}
+
+menu-popup {
+    background: #252629;
+    border: 1px solid var(--ui-border);
+    border-radius: 5px;
+    shadow-color: rgba(0, 0, 0, 0.5);
+    shadow-blur: 12px;
+    padding: 4px;
+}
+
+menu-item {
+    background: transparent;
+    color: #D9DEE7;
+    border-radius: 3px;
+    padding: 5px 10px;
+}
+
+menu-item:hover, menu-item:checked {
+    background: var(--ui-accent);
+    color: #FFFFFF;
 }
 
 /* ================= SCROLLING ================= */

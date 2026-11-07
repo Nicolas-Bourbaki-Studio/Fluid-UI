@@ -42,6 +42,50 @@ horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
 `TabPosition::Top`, `Bottom`, or `Left` setting. A `TabItem` with no icon displays text;
 one with an icon displays both by default, or just the icon when `showText` is false.
 
+## Wrapper-friendly windows and menus
+
+The window/layout subset of common immediate-mode wrappers is available without adding
+dependencies on the wrapped application's types:
+
+```cpp
+if (ui.Begin("Inspector", &inspectorOpen)) {
+    if (ui.BeginChild("Properties", {0.0f, -12.0f})) {
+        ui.Text("The child fills the available width and height, leaving 12 px below.");
+        ui.EndChild();
+    }
+    ui.End();
+}
+```
+
+`Begin(title, open)` creates a centered default-size window; the optional `open` value is
+updated when its close control is used. Pair a successful `Begin` with `End`. `BeginChild`
+and `EndChild` are aliases for a clipped, padded container. A zero width fills the available
+width; a non-positive height uses the remaining content height, minus the absolute value
+when negative. The parameterless `SameLine()` places the next item alongside the previous
+one.
+
+The main menu bar is drawn at the top of Fluid UI's client area (below the host operating
+system's native title bar). It reserves space from dock layouts and supports direct menu
+items, nested menus, and popup items:
+
+```cpp
+if (ui.BeginMainMenuBar()) {
+    if (ui.BeginMenu("File")) {
+        if (ui.MenuItem("Open")) { /* open a document */ }
+        if (ui.BeginMenu("Recent")) {
+            if (ui.MenuItem("Project A")) { /* select a project */ }
+            ui.EndMenu();
+        }
+        ui.EndMenu();
+    }
+    if (ui.MenuItem("Help")) { /* show help */ }
+    ui.EndMainMenuBar();
+}
+```
+
+Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu-item`
+CSS selectors. The GLFW demo includes a styled menu bar, nested menu, and child panel.
+
 ## CSS-like themes and classes
 
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.

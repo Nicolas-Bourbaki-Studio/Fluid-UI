@@ -192,7 +192,27 @@ int main() {
         ui.NewFrame(in);
         ui.DockWindows(showAdvanced);
 
-        if (ui.BeginWindow(componentWindow, {24, 24, 500, 720})) {
+        if (ui.BeginMainMenuBar()) {
+            if (ui.BeginMenu("File")) {
+                if (ui.MenuItem("Exit")) glfwSetWindowShouldClose(win, GLFW_TRUE);
+                ui.EndMenu();
+            }
+            if (ui.BeginMenu("View")) {
+                if (ui.MenuItem("Components")) ui.SetWindowOpen(componentWindow, true);
+                if (ui.MenuItem("Tabs and panels")) ui.SetWindowOpen(tabsWindow, true);
+                if (ui.MenuItem("Window manager")) ui.SetWindowOpen(managerWindow, true);
+                if (ui.BeginMenu("More")) {
+                    if (ui.MenuItem("Reset component window"))
+                        ui.SetWindowOpen(componentWindow, true);
+                    ui.EndMenu();
+                }
+                ui.EndMenu();
+            }
+            if (ui.MenuItem("About")) {}
+            ui.EndMainMenuBar();
+        }
+
+        if (ui.BeginWindow(componentWindow, {24, 40, 500, 720})) {
             ui.Text("Core controls");
             if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);
             ui.PushClass("primary");
@@ -219,9 +239,9 @@ int main() {
             if (ui.Dropdown("Icon menu", choices, &iconChoice, "+", false)) {}
             if (ui.Dropdown("Icon and text menu", choices, &mixedChoice, "*")) {}
 
-            if (ui.BeginContainer("Basic container", {0, 62})) {
-                ui.Text("A padded, clipped container.");
-                ui.EndContainer();
+            if (ui.BeginChild("Child demo", {0, 62})) {
+                ui.Text("A wrapper-friendly, padded child region.");
+                ui.EndChild();
             }
             if (ui.BeginList("Horizontal list", {0, 52}, true)) {
                 ui.Button("First");
@@ -244,7 +264,7 @@ int main() {
             ui.EndWindow();
         }
 
-        if (ui.BeginWindow(tabsWindow, {548, 24, 550, 720})) {
+        if (ui.BeginWindow(tabsWindow, {548, 40, 550, 720})) {
             ui.Text("Configurable tab positions");
             if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);
             if (ui.BeginTabContainer("Top tabs", {0, 145}, textTabs, &topTab,
@@ -272,7 +292,7 @@ int main() {
             ui.EndWindow();
         }
 
-        if (ui.BeginWindow(managerWindow, {1120, 24, 390, 350})) {
+        if (ui.BeginWindow(managerWindow, {1120, 40, 390, 350})) {
             ui.Text("Window management");
             ui.Text("Drag a title bar to a screen edge.");
             ui.Text("A live preview shows the snap area.");

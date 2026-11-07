@@ -27,12 +27,22 @@ public:
     const DrawList& EndFrame();
 
     // Containers
+    bool Begin(std::string_view title, bool* open = nullptr);
+    void End();
     bool BeginWindow(std::string_view title, Rect initial);
     void EndWindow();
     void SetWindowOpen(std::string_view title, bool open);
+    bool BeginChild(std::string_view id, Vec2 size = {});
+    void EndChild();
     bool BeginContainer(std::string_view label, Vec2 size);
     bool BeginList(std::string_view label, Vec2 size, bool horizontal);
     void EndContainer();
+
+    bool BeginMainMenuBar();
+    void EndMainMenuBar();
+    bool BeginMenu(std::string_view label);
+    void EndMenu();
+    bool MenuItem(std::string_view label);
 
     enum class TabPosition : uint8_t { Top, Bottom, Left };
     struct TabItem {
@@ -93,6 +103,11 @@ private:
         bool sameLine = false, horizontal = false;
     };
     struct ContainerState { LayoutState outer; };
+    struct MenuState {
+        WidgetId id = 0;
+        Rect popup;
+        float cursorY = 0.f;
+    };
 
     WidgetId GetID(std::string_view label) const;
     ComputedStyle Resolve(std::string_view widget, uint8_t state) const;
@@ -101,6 +116,8 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
+    Interaction DrawMenuButton(Rect rect, std::string_view label, WidgetId id,
+                               std::string_view widget, bool selected = false);
     std::array<Rect, 6> DockRegions() const;
     Rect DockTargetRect(DockSide side) const;
     DockSide DockTargetAt(Vec2 position) const;
@@ -108,6 +125,7 @@ private:
     void LayoutDockedWindows();
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
+    Rect BeginMenuPopup(Rect anchor, size_t depth);
     void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
 
     StyleSheet style_;
@@ -136,11 +154,19 @@ private:
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
     std::vector<ContainerState> containerStack_;
+    std::vector<MenuState> menuStack_;
+    std::vector<WidgetId> openMenus_;
+    std::vector<Rect> menuPopupRects_;
     std::vector<Rect> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;
     bool windowInputEnabled_ = true;
+    bool menuBarActive_ = false;
+    bool menuBarLayerActive_ = false;
+    DrawList::Layer menuBarLayer_;
+    float menuBarHeight_ = 0.f;
+    float menuBarCursorX_ = 0.f;
 
     // Layout cursor (current window)
     Rect content_;

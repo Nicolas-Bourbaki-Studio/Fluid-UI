@@ -25,12 +25,22 @@ void Context::SetTextBackend(ITextBackend* backend) { text_ = backend ? backend 
 
 void Context::NewFrame(const InputState& input) {
     in_ = input;
+    const bool menuClickOutside = in_.mouseDown[0] && !prevMouseDown_ &&
+        !openMenus_.empty() && in_.mousePos.y >= menuBarHeight_ &&
+        std::none_of(menuPopupRects_.begin(), menuPopupRects_.end(),
+            [&](const Rect& popup) { return popup.Contains(in_.mousePos); });
+    if (menuClickOutside) openMenus_.clear();
+    menuPopupRects_.clear();
     draw_.Clear();
     draw_.PushClipRect({0.f, 0.f, in_.displaySize.x, in_.displaySize.y});
     idStack_.clear();
     classStack_.clear();
     interactionClips_.clear();
     containerStack_.clear();
+    menuStack_.clear();
+    menuBarActive_ = false;
+    menuBarLayerActive_ = false;
+    menuBarHeight_ = 0.f;
     horizontalLayout_ = false;
     sameLine_ = false;
     hasDockPreview_ = false;
@@ -50,6 +60,7 @@ const DrawList& Context::EndFrame() {
         focused != windows_.end() && focused->second.hasDrawLayer) {
         draw_.BringLayerToFront(focused->second.drawLayer);
     }
+    if (menuBarLayerActive_) draw_.BringLayerToFront(menuBarLayer_);
     const ComputedStyle splitterStyle = Resolve("dock-splitter", 0);
     for (const Rect& splitter : dockSplitters_) {
         const bool hovered = splitter.Expanded(3.f).Contains(in_.mousePos);
@@ -171,6 +182,18 @@ void Context::DrawBox(Rect r, const ComputedStyle& s) {
                  s.borderWidth, s.rounding);
 }
 
+Context::Interaction Context::DrawMenuButton(Rect rect, std::string_view label, WidgetId id,
+                                             std::string_view widget, bool selected) {
+    const Interaction interaction = Behavior(id, rect);
+    const ComputedStyle style = Animate(id, widget,
+        selected ? State_Checked : State_None, interaction.hovered, interaction.held);
+    DrawBox(rect, style);
+    const Rect textRect{rect.x + style.padding.left, rect.y,
+                        std::max(0.f, rect.w - style.padding.Horizontal()), rect.h};
+    DrawTextCentered(textRect, label, style);
+    return interaction;
+}
+
 // ---------------------------------------------------------------- ids / classes / layout
 
 void Context::PushClass(std::string_view cls) { classStack_.emplace_back(cls); }
@@ -183,18 +206,187 @@ void Context::Spacing(float px) { cursorY_ += px; }
 // ---------------------------------------------------------------- window
 
 void Context::SetWindowOpen(std::string_view title, bool open) {
-    WindowState& window = windows_[HashStr(title)];
+    const WidgetId id = HashStr(title);
+    WindowState& window = windows_[id];
     window.open = open;
     if (open) {
         window.zOrder = ++nextWindowZ_;
-        focusedWindow_ = HashStr(title);
+        focusedWindow_ = id;
         if (window.dock != DockSide::None) {
             auto& dockGroup = dockedWindows_[static_cast<size_t>(window.dock)];
-            if (std::find(dockGroup.begin(), dockGroup.end(), HashStr(title)) == dockGroup.end())
-                dockGroup.push_back(HashStr(title));
+            if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end())
+                dockGroup.push_back(id);
         }
     }
     dockLayoutDone_ = false;
+}
+
+bool Context::Begin(std::string_view title, bool* open) {
+    const WidgetId id = GetID(title);
+    if (open) {
+        if (!*open) {
+            SetWindowOpen(title, false);
+            return false;
+        }
+        const auto it = windows_.find(id);
+        if (it != windows_.end() && !it->second.open)
+            SetWindowOpen(title, true);
+    }
+
+    const float width = std::min(in_.displaySize.x * 0.72f,
+                                 std::max(320.f, in_.displaySize.x - 48.f));
+    const float height = std::min(in_.displaySize.y * 0.78f,
+                                  std::max(240.f, in_.displaySize.y - 72.f));
+    const Rect initial{std::max(0.f, (in_.displaySize.x - width) * 0.5f),
+                       std::max(menuBarHeight_, (in_.displaySize.y - height) * 0.5f),
+                       width, height};
+    const bool visible = BeginWindow(title, initial);
+    if (!visible && open) *open = false;
+    return visible;
+}
+
+void Context::End() { EndWindow(); }
+
+bool Context::BeginChild(std::string_view id, Vec2 size) {
+    PushID(id);
+    if (size.x <= 0.f) size.x = content_.w;
+    if (size.y <= 0.f) {
+        const float startY = horizontalLayout_ ? content_.y : (sameLine_ ? lineTop_ : cursorY_);
+        size.y = std::max(0.01f, content_.y + content_.h - startY + size.y);
+    }
+    return BeginContainerImpl(size, false, "container");
+}
+
+void Context::EndChild() { EndContainer(); }
+
+bool Context::BeginMainMenuBar() {
+    if (menuBarActive_) return false;
+    const ComputedStyle style = Resolve("main-menu-bar", 0);
+    menuBarHeight_ = std::max(style.fontSize * 1.2f + style.padding.Vertical(), 1.f);
+    menuBarCursorX_ = style.padding.left;
+    menuBarActive_ = true;
+    menuBarLayer_ = draw_.BeginLayer();
+    menuBarLayerActive_ = true;
+    DrawBox({0.f, 0.f, in_.displaySize.x, menuBarHeight_}, style);
+    menuStack_.clear();
+    return true;
+}
+
+void Context::EndMainMenuBar() {
+    if (!menuBarActive_) return;
+    while (!menuStack_.empty()) EndMenu();
+    draw_.EndLayer(menuBarLayer_);
+    menuBarLayerActive_ = true;
+    menuBarActive_ = false;
+}
+
+Rect Context::BeginMenuPopup(Rect anchor, size_t depth) {
+    const ComputedStyle style = Resolve("menu-popup", 0);
+    const float width = std::min(std::max(180.f, in_.displaySize.x * 0.18f),
+                                 std::max(1.f, in_.displaySize.x));
+    const ComputedStyle itemStyle = Resolve("menu-item", 0);
+    const float rowHeight = itemStyle.fontSize * 1.4f + itemStyle.padding.Vertical();
+    float x = anchor.x;
+    float y = anchor.y + anchor.h;
+    if (depth > 0) {
+        x = anchor.x + anchor.w;
+        if (x + width > in_.displaySize.x) x = std::max(0.f, anchor.x - width);
+        y = anchor.y;
+    }
+    x = std::clamp(x, 0.f, std::max(0.f, in_.displaySize.x - width));
+    const float height = std::min(in_.displaySize.y - std::max(0.f, y), rowHeight * 12.f);
+    Rect popup{x, y, width, std::max(rowHeight, height)};
+    if (y + popup.h > in_.displaySize.y) popup.y = std::max(0.f, in_.displaySize.y - popup.h);
+    draw_.AddShadow(popup, Fade(style.shadowColor, style.opacity), style.shadowBlur, style.rounding);
+    draw_.AddBox(popup, Fade(style.background, style.opacity),
+                 Fade(style.borderColor, style.opacity), style.borderWidth, style.rounding);
+    draw_.PushClipRect(popup);
+    interactionClips_.push_back(popup);
+    menuPopupRects_.push_back(popup);
+    return popup;
+}
+
+bool Context::BeginMenu(std::string_view label) {
+    if (!menuBarActive_) return false;
+
+    const size_t depth = menuStack_.size();
+    const WidgetId parentId = depth == 0 ? GetID("##main-menu") : menuStack_.back().id;
+    const WidgetId id = HashStr(label, parentId);
+    const ComputedStyle style = Resolve(depth == 0 ? "menu" : "menu-item", 0);
+    const float rowHeight = style.fontSize * 1.4f + style.padding.Vertical();
+    Rect row;
+    if (depth == 0) {
+        const float width = std::max(40.f, text_->Measure(label, style.fontSize).x +
+                                     style.padding.Horizontal());
+        row = {menuBarCursorX_, 0.f, width, menuBarHeight_};
+        menuBarCursorX_ += width;
+    } else {
+        MenuState& parent = menuStack_.back();
+        row = {parent.popup.x, parent.cursorY, parent.popup.w, rowHeight};
+        parent.cursorY += rowHeight;
+    }
+
+    const bool selected = depth < openMenus_.size() && openMenus_[depth] == id;
+    const Interaction interaction =
+        DrawMenuButton(row, label, id, depth == 0 ? "menu" : "menu-item", selected);
+    if (depth > 0) {
+        const ComputedStyle arrowStyle = Resolve("menu-item", 0);
+        const Vec2 arrowSize = text_->Measure(">", arrowStyle.fontSize);
+        text_->Emit(draw_, {row.x + row.w - arrowSize.x - arrowStyle.padding.right,
+                            row.y + (row.h - arrowSize.y) * 0.5f},
+                    ">", arrowStyle.fontSize, Fade(arrowStyle.foreground, arrowStyle.opacity));
+    }
+
+    if (interaction.pressed) {
+        if (selected) {
+            openMenus_.resize(depth);
+        } else {
+            openMenus_.resize(depth);
+            openMenus_.push_back(id);
+        }
+    } else if (interaction.hovered && !in_.mouseDown[0] && !openMenus_.empty() &&
+               depth < openMenus_.size()) {
+        openMenus_.resize(depth);
+        openMenus_.push_back(id);
+    }
+
+    if (depth >= openMenus_.size() || openMenus_[depth] != id) return false;
+    const Rect popup = BeginMenuPopup(row, depth);
+    const ComputedStyle popupStyle = Resolve("menu-popup", 0);
+    menuStack_.push_back({id, popup, popup.y + popupStyle.padding.top});
+    return true;
+}
+
+void Context::EndMenu() {
+    if (menuStack_.empty()) return;
+    menuStack_.pop_back();
+    draw_.PopClipRect();
+    if (!interactionClips_.empty()) interactionClips_.pop_back();
+}
+
+bool Context::MenuItem(std::string_view label) {
+    if (!menuBarActive_) return false;
+    const size_t depth = menuStack_.size();
+    const ComputedStyle style = Resolve(depth == 0 ? "menu" : "menu-item", 0);
+    const float rowHeight = style.fontSize * 1.4f + style.padding.Vertical();
+    Rect row;
+    if (depth == 0) {
+        const float width = std::max(40.f, text_->Measure(label, style.fontSize).x +
+                                     style.padding.Horizontal());
+        row = {menuBarCursorX_, 0.f, width, menuBarHeight_};
+        menuBarCursorX_ += width;
+    } else {
+        MenuState& parent = menuStack_.back();
+        row = {parent.popup.x, parent.cursorY, parent.popup.w, rowHeight};
+        parent.cursorY += rowHeight;
+    }
+    const WidgetId parentId = depth == 0 ? GetID("##main-menu") : menuStack_.back().id;
+    const WidgetId id = HashStr(label, parentId);
+    const Interaction interaction =
+        DrawMenuButton(row, label, id, depth == 0 ? "menu" : "menu-item");
+    if (!interaction.pressed) return false;
+    openMenus_.clear();
+    return true;
 }
 
 Rect Context::DockTargetRect(DockSide side) const {
@@ -270,19 +462,23 @@ std::array<Rect, 6> Context::DockRegions() const {
     const float leftWidth = left ? in_.displaySize.x * dockLeftRatio_ * sideWidthScale : 0.f;
     const float rightWidth = right ? in_.displaySize.x * dockRightRatio_ * sideWidthScale : 0.f;
     const float centerWidth = std::max(0.f, in_.displaySize.x - leftWidth - rightWidth);
-    const float topHeight = top ? in_.displaySize.y * dockTopRatio_ * sideHeightScale : 0.f;
-    const float bottomHeight = bottom ? in_.displaySize.y * dockBottomRatio_ * sideHeightScale : 0.f;
-    const float centerHeight = std::max(0.f, in_.displaySize.y - topHeight - bottomHeight);
+    const float dockTop = std::min(menuBarHeight_, in_.displaySize.y);
+    const float usableHeight = std::max(0.f, in_.displaySize.y - dockTop);
+    const float topHeight = top ? usableHeight * dockTopRatio_ * sideHeightScale : 0.f;
+    const float bottomHeight = bottom ? usableHeight * dockBottomRatio_ * sideHeightScale : 0.f;
+    const float centerHeight = std::max(0.f, usableHeight - topHeight - bottomHeight);
     std::array<Rect, 6> regions{};
-    regions[static_cast<size_t>(DockSide::Left)] = {0.f, 0.f, leftWidth, in_.displaySize.y};
+    regions[static_cast<size_t>(DockSide::Left)] =
+        {0.f, dockTop, leftWidth, usableHeight};
     regions[static_cast<size_t>(DockSide::Right)] =
-        {in_.displaySize.x - rightWidth, 0.f, rightWidth, in_.displaySize.y};
-    regions[static_cast<size_t>(DockSide::Top)] = {leftWidth, 0.f, centerWidth, topHeight};
+        {in_.displaySize.x - rightWidth, dockTop, rightWidth, usableHeight};
+    regions[static_cast<size_t>(DockSide::Top)] =
+        {leftWidth, dockTop, centerWidth, topHeight};
     regions[static_cast<size_t>(DockSide::Bottom)] =
-        {leftWidth, in_.displaySize.y - bottomHeight, centerWidth, bottomHeight};
+        {leftWidth, dockTop + usableHeight - bottomHeight, centerWidth, bottomHeight};
     regions[static_cast<size_t>(DockSide::Center)] = hasDocked
-        ? Rect{leftWidth, topHeight, centerWidth, centerHeight}
-        : Rect{0.f, 0.f, in_.displaySize.x, in_.displaySize.y};
+        ? Rect{leftWidth, dockTop + topHeight, centerWidth, centerHeight}
+        : Rect{0.f, dockTop, in_.displaySize.x, usableHeight};
     return regions;
 }
 
@@ -333,15 +529,21 @@ void Context::LayoutDockedWindows() {
     std::array<Rect, 6> regions = DockRegions();
     if (!dockedWindows_[static_cast<size_t>(DockSide::Left)].empty())
         addBoundarySplitter(DockSide::Left,
-            {regions[static_cast<size_t>(DockSide::Left)].w - 3.f, 0.f, 6.f, in_.displaySize.y},
+            {regions[static_cast<size_t>(DockSide::Left)].w - 3.f,
+             regions[static_cast<size_t>(DockSide::Left)].y, 6.f,
+             regions[static_cast<size_t>(DockSide::Left)].h},
             true, dockLeftRatio_);
     if (!dockedWindows_[static_cast<size_t>(DockSide::Right)].empty())
         addBoundarySplitter(DockSide::Right,
-            {regions[static_cast<size_t>(DockSide::Right)].x - 3.f, 0.f, 6.f, in_.displaySize.y},
+            {regions[static_cast<size_t>(DockSide::Right)].x - 3.f,
+             regions[static_cast<size_t>(DockSide::Right)].y, 6.f,
+             regions[static_cast<size_t>(DockSide::Right)].h},
             true, dockRightRatio_);
     if (!dockedWindows_[static_cast<size_t>(DockSide::Top)].empty())
         addBoundarySplitter(DockSide::Top,
-            {regions[static_cast<size_t>(DockSide::Top)].x, regions[static_cast<size_t>(DockSide::Top)].h - 3.f,
+            {regions[static_cast<size_t>(DockSide::Top)].x,
+             regions[static_cast<size_t>(DockSide::Top)].y +
+                 regions[static_cast<size_t>(DockSide::Top)].h - 3.f,
              regions[static_cast<size_t>(DockSide::Top)].w, 6.f},
             false, dockTopRatio_);
     if (!dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty())
@@ -532,6 +734,8 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     } else if (w.resizing && !in_.mouseDown[0]) {
         w.resizing = false;
     }
+    if (w.dock == DockSide::None && menuBarHeight_ > 0.f)
+        w.pos.y = std::max(w.pos.y, menuBarHeight_);
     frame = {w.pos.x, w.pos.y, w.size.x, w.size.y};
     const Rect bar{frame.x, frame.y, frame.w, titleH};
     const Rect finalClose{frame.x + frame.w - controlWidth - ts.padding.right, frame.y,
