@@ -50,7 +50,7 @@ public:
     void TextLabelLeft(std::string_view text, std::string_view icon);
     void TextLabelRight(std::string_view text, std::string_view icon);
     bool Button(std::string_view label);
-    bool ImageButton(std::string_view label, uint64_t texture, Vec2 imageSize);
+    bool ImageButton(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool Checkbox(std::string_view label, bool* value);
     bool Toggle(std::string_view label, bool* value);
     bool Radio(std::string_view label, int* value, int option);
@@ -58,9 +58,9 @@ public:
     bool ValueSlider(std::string_view label, float* value, float minV, float maxV);
     bool Dropdown(std::string_view label, const std::vector<std::string_view>& items,
                   int* selected, std::string_view icon = {}, bool showText = true);
-    void ImageLabel(std::string_view label, uint64_t texture, Vec2 imageSize);
+    void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
-    void Image(uint64_t texture, Vec2 size);
+    void Image(GPUImageId imageId, Vec2 size);
 
     // Layout
     void SameLine();
@@ -79,8 +79,10 @@ private:
     struct WindowState {
         Vec2 pos, size, dragOff, resizeStart, startSize;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
+        uint64_t zOrder = 0;
+        DrawList::Layer drawLayer;
         DockSide dock = DockSide::None;
-        bool init = false, open = true, minimized = false;
+        bool init = false, open = true, hasDrawLayer = false;
         bool dragging = false, resizing = false, scrolling = false;
     };
     struct Anim { float hover = 0.f, active = 0.f; };
@@ -99,6 +101,7 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
+    std::array<Rect, 5> DockRegions() const;
     void LayoutDockedWindows();
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
@@ -123,12 +126,15 @@ private:
     std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
     std::array<std::vector<WidgetId>, 5> dockedWindows_;
+    WidgetId focusedWindow_ = 0;
+    uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
     std::vector<ContainerState> containerStack_;
     std::vector<Rect> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;
+    bool windowInputEnabled_ = true;
 
     // Layout cursor (current window)
     Rect content_;

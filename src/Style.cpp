@@ -510,10 +510,6 @@ StyleSheet StyleSheet::Dark() {
     s.Rule("window-title")
         .Background(C::FromHex(0x1A2637FF)).Foreground(C::FromHex(0xF1F5FCFF))
         .Padding(Edges(7, 12)).FontSize(15);
-    s.Rule("window-control")
-        .Background(C::FromHex(0x29374AFF)).Foreground(C::FromHex(0xDCE7F7FF))
-        .Rounding(6).FontSize(15);
-    s.Rule("window-control:hover").Background(C::FromHex(0x3B4D65FF));
     s.Rule("window-close")
         .Background(C::FromHex(0x29374AFF)).Foreground(C::FromHex(0xF1F5FCFF))
         .Rounding(6).FontSize(15);

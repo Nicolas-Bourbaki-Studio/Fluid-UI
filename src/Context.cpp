@@ -36,9 +36,18 @@ void Context::NewFrame(const InputState& input) {
     hasDockPreview_ = false;
     dockLayoutDone_ = false;
     dockSplitters_.clear();
+    windowInputEnabled_ = true;
+    for (auto& [id, window] : windows_) {
+        (void)id;
+        window.hasDrawLayer = false;
+    }
 }
 
 const DrawList& Context::EndFrame() {
+    if (const auto focused = windows_.find(focusedWindow_);
+        focused != windows_.end() && focused->second.hasDrawLayer) {
+        draw_.BringLayerToFront(focused->second.drawLayer);
+    }
     const ComputedStyle splitterStyle = Resolve("dock-splitter", 0);
     for (const Rect& splitter : dockSplitters_) {
         const bool hovered = splitter.Expanded(3.f).Contains(in_.mousePos);
@@ -91,7 +100,9 @@ Context::Interaction Context::Behavior(WidgetId id, Rect r) {
 
     const bool insideClip = std::all_of(interactionClips_.begin(), interactionClips_.end(),
         [&](const Rect& clip) { return clip.Contains(in_.mousePos); });
-    res.hovered = insideClip && r.Contains(in_.mousePos) && (active_ == 0 || active_ == id);
+    const bool windowAllowsInput = windowInputEnabled_ || active_ == id;
+    res.hovered = windowAllowsInput && insideClip && r.Contains(in_.mousePos) &&
+                  (active_ == 0 || active_ == id);
     if (res.hovered && justPressed && active_ == 0) active_ = id;
 
     if (active_ == id) {
@@ -145,7 +156,8 @@ void Context::SetWindowOpen(std::string_view title, bool open) {
     WindowState& window = windows_[HashStr(title)];
     window.open = open;
     if (open) {
-        window.minimized = false;
+        window.zOrder = ++nextWindowZ_;
+        focusedWindow_ = HashStr(title);
         if (window.dock != DockSide::None) {
             auto& dockGroup = dockedWindows_[static_cast<size_t>(window.dock)];
             if (std::find(dockGroup.begin(), dockGroup.end(), HashStr(title)) == dockGroup.end())
@@ -153,6 +165,28 @@ void Context::SetWindowOpen(std::string_view title, bool open) {
         }
     }
     dockLayoutDone_ = false;
+}
+
+std::array<Rect, 5> Context::DockRegions() const {
+    const bool left = !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty();
+    const bool right = !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
+    const bool top = !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty();
+    const bool bottom = !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
+    const bool vertical = left || right;
+    const bool horizontal = top || bottom;
+    const float leftWidth = left ? in_.displaySize.x * (horizontal ? 0.3f : 0.5f) : 0.f;
+    const float rightWidth = right ? in_.displaySize.x * (horizontal ? 0.3f : 0.5f) : 0.f;
+    const float centerWidth = std::max(0.f, in_.displaySize.x - leftWidth - rightWidth);
+    const float topHeight = top ? in_.displaySize.y * (vertical ? 0.3f : 0.5f) : 0.f;
+    const float bottomHeight = bottom ? in_.displaySize.y * (vertical ? 0.3f : 0.5f) : 0.f;
+    std::array<Rect, 5> regions{};
+    regions[static_cast<size_t>(DockSide::Left)] = {0.f, 0.f, leftWidth, in_.displaySize.y};
+    regions[static_cast<size_t>(DockSide::Right)] =
+        {in_.displaySize.x - rightWidth, 0.f, rightWidth, in_.displaySize.y};
+    regions[static_cast<size_t>(DockSide::Top)] = {leftWidth, 0.f, centerWidth, topHeight};
+    regions[static_cast<size_t>(DockSide::Bottom)] =
+        {leftWidth, in_.displaySize.y - bottomHeight, centerWidth, bottomHeight};
+    return regions;
 }
 
 void Context::LayoutDockedWindows() {
@@ -166,31 +200,36 @@ void Context::LayoutDockedWindows() {
             return it == windows_.end() || !it->second.open ||
                    static_cast<size_t>(it->second.dock) != side;
         }), ids.end());
+    }
+
+    const std::array<Rect, 5> regions = DockRegions();
+    for (size_t side = 1; side < dockedWindows_.size(); ++side) {
+        auto& ids = dockedWindows_[side];
         if (ids.empty()) continue;
+        const Rect region = regions[side];
 
         float totalSpan = 0.f;
         for (WidgetId id : ids) totalSpan += std::max(0.01f, windows_[id].dockSpan);
         if (totalSpan <= 0.f) totalSpan = static_cast<float>(ids.size());
 
         float offset = 0.f;
+        const bool verticalSplit = side == static_cast<size_t>(DockSide::Left) ||
+                                   side == static_cast<size_t>(DockSide::Right);
+        const float axisSize = verticalSplit ? region.h : region.w;
         for (size_t i = 0; i + 1 < ids.size(); ++i) {
             WindowState& first = windows_[ids[i]];
             WindowState& second = windows_[ids[i + 1]];
             const float span = std::max(0.01f, first.dockSpan);
             const float normalizedOffset = offset + span;
-            const bool verticalSplit = side == static_cast<size_t>(DockSide::Left) ||
-                                       side == static_cast<size_t>(DockSide::Right);
-            const float axisSize = verticalSplit ? in_.displaySize.y : in_.displaySize.x;
-            const float coordinate = axisSize * normalizedOffset / totalSpan;
+            const float coordinate = (verticalSplit ? region.y : region.x) +
+                                     axisSize * normalizedOffset / totalSpan;
             Rect splitter = verticalSplit
-                ? Rect{side == static_cast<size_t>(DockSide::Left)
-                           ? 0.f : in_.displaySize.x * 0.5f,
+                ? Rect{region.x,
                        coordinate - 3.f,
-                       in_.displaySize.x * 0.5f, 6.f}
+                       region.w, 6.f}
                 : Rect{coordinate - 3.f,
-                       side == static_cast<size_t>(DockSide::Top)
-                           ? 0.f : in_.displaySize.y * 0.5f,
-                       6.f, in_.displaySize.y * 0.5f};
+                       region.y,
+                       6.f, region.h};
             const WidgetId splitterId = HashStr("##dock-splitter",
                 static_cast<WidgetId>((side << 24) ^ (i + 1)));
             const Interaction interaction = Behavior(splitterId, splitter.Expanded(4.f));
@@ -220,22 +259,18 @@ void Context::LayoutDockedWindows() {
 
         totalSpan = 0.f;
         for (WidgetId id : ids) totalSpan += std::max(0.01f, windows_[id].dockSpan);
-        const bool verticalSplit = side == static_cast<size_t>(DockSide::Left) ||
-                                   side == static_cast<size_t>(DockSide::Right);
-        const float regionW = verticalSplit ? in_.displaySize.x * 0.5f : in_.displaySize.x;
-        const float regionH = verticalSplit ? in_.displaySize.y : in_.displaySize.y * 0.5f;
         offset = 0.f;
         for (WidgetId id : ids) {
             WindowState& window = windows_[id];
             const float span = std::max(0.01f, window.dockSpan);
             if (verticalSplit) {
-                const float panelH = regionH * span / totalSpan;
-                window.pos = {side == static_cast<size_t>(DockSide::Left) ? 0.f : regionW, offset};
-                window.size = {regionW, panelH};
+                const float panelH = region.h * span / totalSpan;
+                window.pos = {region.x, region.y + offset};
+                window.size = {region.w, panelH};
             } else {
-                const float panelW = regionW * span / totalSpan;
-                window.pos = {offset, side == static_cast<size_t>(DockSide::Top) ? 0.f : regionH};
-                window.size = {panelW, regionH};
+                const float panelW = region.w * span / totalSpan;
+                window.pos = {region.x + offset, region.y};
+                window.size = {panelW, region.h};
             }
             offset += verticalSplit ? window.size.y : window.size.x;
         }
@@ -250,8 +285,30 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         w.init = true;
         w.pos = {initial.x, initial.y};
         w.size = {initial.w, initial.h};
+        w.zOrder = ++nextWindowZ_;
     }
     if (!w.open) return false;
+
+    WidgetId topWindowAtMouse = 0;
+    uint64_t topWindowZ = 0;
+    if (in_.mousePos.x >= 0.f && in_.mousePos.y >= 0.f &&
+        in_.mousePos.x < in_.displaySize.x && in_.mousePos.y < in_.displaySize.y) {
+        for (const auto& [windowId, candidate] : windows_) {
+            if (!candidate.open || !candidate.init) continue;
+            const Rect candidateFrame{candidate.pos.x, candidate.pos.y,
+                                      candidate.size.x, candidate.size.y};
+            if (candidateFrame.Contains(in_.mousePos) && candidate.zOrder >= topWindowZ) {
+                topWindowAtMouse = windowId;
+                topWindowZ = candidate.zOrder;
+            }
+        }
+    }
+    windowInputEnabled_ = topWindowAtMouse == id;
+    const bool justPressed = in_.mouseDown[0] && !prevMouseDown_;
+    if (justPressed && windowInputEnabled_) {
+        w.zOrder = ++nextWindowZ_;
+        focusedWindow_ = id;
+    }
 
     const ComputedStyle ws = Resolve("window", 0);
     const ComputedStyle ts = Resolve("window-title", 0);
@@ -263,8 +320,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     Rect frame{w.pos.x, w.pos.y, w.size.x, w.size.y};
     const Rect closeRect{frame.x + frame.w - controlWidth - ts.padding.right, frame.y,
                          controlWidth, titleH};
-    const Rect minimizeRect{closeRect.x - controlWidth, frame.y, controlWidth, titleH};
-    const Rect dragRect{frame.x, frame.y, std::max(0.f, minimizeRect.x - frame.x), titleH};
+    const Rect dragRect{frame.x, frame.y, std::max(0.f, closeRect.x - frame.x), titleH};
     const WidgetId dragId = HashStr("##titlebar", id);
     const WidgetId resizeId = HashStr("##resize", id);
     const bool wasDragging = w.dragging;
@@ -275,6 +331,8 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             for (auto& sideWindows : dockedWindows_)
                 sideWindows.erase(std::remove(sideWindows.begin(), sideWindows.end(), id), sideWindows.end());
             w.dock = DockSide::None;
+            dockLayoutDone_ = false;
+            LayoutDockedWindows();
             w.dragOff = in_.mousePos - w.pos;
         }
         w.pos = in_.mousePos - w.dragOff;
@@ -287,10 +345,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             else if (in_.mousePos.y >= in_.displaySize.y - dockThreshold) w.dock = DockSide::Bottom;
             if (w.dock != DockSide::None) {
                 auto& dockGroup = dockedWindows_[static_cast<size_t>(w.dock)];
-                if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end())
+                if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end()) {
+                    float existingSpan = 0.f;
+                    for (WidgetId dockedId : dockGroup)
+                        existingSpan += std::max(0.01f, windows_[dockedId].dockSpan);
+                    w.dockSpan = dockGroup.empty()
+                        ? 1.f : existingSpan / static_cast<float>(dockGroup.size());
                     dockGroup.push_back(id);
-                const float equalSpan = 1.f / static_cast<float>(dockGroup.size());
-                for (WidgetId dockedId : dockGroup) windows_[dockedId].dockSpan = equalSpan;
+                }
                 dockLayoutDone_ = false;
                 LayoutDockedWindows();
             }
@@ -321,38 +383,34 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     const Rect bar{frame.x, frame.y, frame.w, titleH};
     const Rect finalClose{frame.x + frame.w - controlWidth - ts.padding.right, frame.y,
                           controlWidth, titleH};
-    const Rect finalMinimize{finalClose.x - controlWidth, frame.y, controlWidth, titleH};
 
-    const Interaction minimize = Behavior(HashStr("##minimize", id), finalMinimize);
     const Interaction close = Behavior(HashStr("##close", id), finalClose);
-    if (minimize.pressed) w.minimized = !w.minimized;
     if (close.pressed) {
         w.open = false;
+        if (focusedWindow_ == id) focusedWindow_ = 0;
         for (auto& sideWindows : dockedWindows_)
             sideWindows.erase(std::remove(sideWindows.begin(), sideWindows.end(), id), sideWindows.end());
         dockLayoutDone_ = false;
+        windowInputEnabled_ = true;
         return false;
     }
 
+    w.drawLayer = draw_.BeginLayer();
+    w.hasDrawLayer = true;
     DrawBox(frame, ws);
     draw_.AddRectFilled(bar, Fade(ts.background, ts.opacity), ws.rounding);
     const Rect titleRect{bar.x + ts.padding.left, bar.y,
-                         std::max(0.f, bar.w - ts.padding.Horizontal() - controlWidth * 2.f), bar.h};
+                         std::max(0.f, bar.w - ts.padding.Horizontal()), bar.h};
     DrawTextCentered(titleRect, text, ts);
 
-    auto drawControl = [&](Rect rect, std::string_view label, bool isClose, WidgetId controlId) {
-        ComputedStyle controlStyle = Resolve(isClose ? "window-close" : "window-control", 0);
-        Interaction hit;
-        hit.hovered = rect.Contains(in_.mousePos);
-        hit.held = active_ == controlId && in_.mouseDown[0];
-        controlStyle = Animate(controlId, isClose ? "window-close" : "window-control",
-                               State_None, hit.hovered, hit.held);
-        draw_.AddRectFilled(rect, Fade(controlStyle.background, controlStyle.opacity),
-                            controlStyle.rounding);
-        DrawTextCentered(rect, label, controlStyle);
-    };
-    drawControl(finalMinimize, w.minimized ? "+" : "-", false, HashStr("##minimize", id));
-    drawControl(finalClose, "x", true, HashStr("##close", id));
+    const WidgetId closeId = HashStr("##close", id);
+    ComputedStyle closeStyle = Resolve("window-close", 0);
+    closeStyle = Animate(closeId, "window-close", State_None,
+                         windowInputEnabled_ && finalClose.Contains(in_.mousePos),
+                         active_ == closeId && in_.mouseDown[0]);
+    draw_.AddRectFilled(finalClose, Fade(closeStyle.background, closeStyle.opacity),
+                        closeStyle.rounding);
+    DrawTextCentered(finalClose, "x", closeStyle);
 
     if (w.dragging && dockingEnabled_) {
         constexpr float dockThreshold = 32.f;
@@ -362,18 +420,38 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         else if (in_.mousePos.y <= dockThreshold) previewSide = DockSide::Top;
         else if (in_.mousePos.y >= in_.displaySize.y - dockThreshold) previewSide = DockSide::Bottom;
         if (previewSide != DockSide::None) {
+            const bool verticalEdges = previewSide == DockSide::Left || previewSide == DockSide::Right ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty() ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
+            const bool horizontalEdges = previewSide == DockSide::Top || previewSide == DockSide::Bottom ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty() ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
+            const bool hasLeft = previewSide == DockSide::Left ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Left)].empty();
+            const bool hasRight = previewSide == DockSide::Right ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Right)].empty();
+            const bool hasTop = previewSide == DockSide::Top ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Top)].empty();
+            const bool hasBottom = previewSide == DockSide::Bottom ||
+                !dockedWindows_[static_cast<size_t>(DockSide::Bottom)].empty();
+            const float leftWidth = hasLeft ? in_.displaySize.x * (horizontalEdges ? 0.3f : 0.5f) : 0.f;
+            const float rightWidth = hasRight ? in_.displaySize.x * (horizontalEdges ? 0.3f : 0.5f) : 0.f;
+            const float centerWidth = std::max(0.f, in_.displaySize.x - leftWidth - rightWidth);
+            const float topHeight = hasTop ? in_.displaySize.y * (verticalEdges ? 0.3f : 0.5f) : 0.f;
+            const float bottomHeight = hasBottom ? in_.displaySize.y * (verticalEdges ? 0.3f : 0.5f) : 0.f;
             Rect preview;
-            const float halfW = in_.displaySize.x * 0.5f, halfH = in_.displaySize.y * 0.5f;
-            if (previewSide == DockSide::Left) preview = {0.f, 0.f, halfW, in_.displaySize.y};
-            else if (previewSide == DockSide::Right) preview = {halfW, 0.f, halfW, in_.displaySize.y};
-            else if (previewSide == DockSide::Top) preview = {0.f, 0.f, in_.displaySize.x, halfH};
-            else preview = {0.f, halfH, in_.displaySize.x, halfH};
+            if (previewSide == DockSide::Left)
+                preview = {0.f, 0.f, leftWidth, in_.displaySize.y};
+            else if (previewSide == DockSide::Right)
+                preview = {in_.displaySize.x - rightWidth, 0.f, rightWidth, in_.displaySize.y};
+            else if (previewSide == DockSide::Top)
+                preview = {leftWidth, 0.f, centerWidth, topHeight};
+            else
+                preview = {leftWidth, in_.displaySize.y - bottomHeight, centerWidth, bottomHeight};
             dockPreview_ = preview;
             hasDockPreview_ = true;
         }
     }
-
-    if (w.minimized) return false;
 
     if (w.dock == DockSide::None) {
         const ComputedStyle gripStyle = Resolve("window-resize", 0);
@@ -458,7 +536,12 @@ void Context::EndWindow() {
     draw_.PopClipRect();
     if (!interactionClips_.empty()) interactionClips_.pop_back();
     if (!idStack_.empty()) idStack_.pop_back();
+    if (currentWindowId_ != 0) {
+        WindowState& window = windows_[currentWindowId_];
+        draw_.EndLayer(window.drawLayer);
+    }
     currentWindowId_ = 0;
+    windowInputEnabled_ = true;
 }
 
 bool Context::BeginContainerImpl(Vec2 size, bool horizontal,
@@ -654,7 +737,7 @@ bool Context::Button(std::string_view label) {
     return b.pressed;
 }
 
-bool Context::ImageButton(std::string_view label, uint64_t texture, Vec2 imageSize) {
+bool Context::ImageButton(std::string_view label, GPUImageId imageId, Vec2 imageSize) {
     const WidgetId id = GetID(label);
     const ComputedStyle base = Resolve("image-button", 0);
     const Rect r = Place({imageSize.x + base.padding.Horizontal(), imageSize.y + base.padding.Vertical()},
@@ -663,7 +746,7 @@ bool Context::ImageButton(std::string_view label, uint64_t texture, Vec2 imageSi
     const ComputedStyle style = Animate(id, "image-button", State_None, b.hovered, b.held);
     DrawBox(r, style);
     draw_.AddQuad({r.x + style.padding.left, r.y + style.padding.top, imageSize.x, imageSize.y},
-                  {0.f, 0.f, 1.f, 1.f}, Fade(Color{}, style.opacity), texture);
+                  {0.f, 0.f, 1.f, 1.f}, Fade(Color{}, style.opacity), imageId);
     return b.pressed;
 }
 
@@ -777,18 +860,18 @@ bool Context::ValueSlider(std::string_view label, float* value, float lo, float 
     return SliderFloat(label, value, lo, hi);
 }
 
-void Context::Image(uint64_t texture, Vec2 size) {
+void Context::Image(GPUImageId imageId, Vec2 size) {
     const Rect r = Place(size, Resolve("image", 0).spacing);
-    draw_.AddQuad(r, {0.f, 0.f, 1.f, 1.f}, Color{}, texture);
+    draw_.AddQuad(r, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
 }
 
-void Context::ImageLabel(std::string_view label, uint64_t texture, Vec2 imageSize) {
+void Context::ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize) {
     const ComputedStyle style = Resolve("image-label", 0);
     const Vec2 textSize = text_->Measure(label, style.fontSize);
     const Rect r = Place({imageSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
                           std::max(imageSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
     draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - imageSize.y) * 0.5f,
-                   imageSize.x, imageSize.y}, {0.f, 0.f, 1.f, 1.f}, Color{}, texture);
+                   imageSize.x, imageSize.y}, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
     text_->Emit(draw_, {r.x + style.padding.left + imageSize.x + style.spacing,
                         r.y + (r.h - textSize.y) * 0.5f},
                 label, style.fontSize, Fade(style.foreground, style.opacity));

@@ -6,6 +6,7 @@
 namespace fluid {
 
 using WidgetId = uint32_t;
+using GPUImageId = uint64_t;
 
 constexpr uint32_t kHashSeed = 2166136261u;
 

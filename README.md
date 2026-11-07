@@ -13,8 +13,8 @@
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
 dropdown menus, text and image labels, image buttons, collapsible containers, containers,
 horizontal/vertical lists, and tabbed containers. Text/icon labels can be combined as needed.
-Images are caller-owned backend texture IDs rendered through `DrawList`; the UI does not
-load or manage image files.
+Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
+load, create, or destroy those image resources.
 
 ```cpp
 fluid::Context ui;
@@ -28,6 +28,7 @@ const std::vector<std::string_view> options{"One", "Two", "Three"};
 ui.Toggle("Enabled", &enabled);
 ui.ValueSlider("Value", &value, 0.0f, 1.0f);
 ui.Dropdown("Choice", options, &selected);
+ui.Image(myGpuImageId, {128.0f, 128.0f});
 
 if (ui.BeginContainer("Panel", {300.0f, 120.0f})) {
     ui.TextLabelLeft("Status", "*");
@@ -88,14 +89,36 @@ The `examples` target includes `theme.css` and a GLFW demo covering the controls
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible
 content.
 
+### Rendering API image IDs
+
+Use a nonzero `fluid::GPUImageId` for a GPU image that your application loaded or created.
+The image is sampled with the full `[0, 1]` UV range. `ImageLabel` and `ImageButton` accept
+the same ID and an explicit display size. The UI never takes ownership of that resource.
+
+```cpp
+// OpenGL texture name:
+fluid::GPUImageId imageId = static_cast<fluid::GPUImageId>(glTexture);
+ui.Image(imageId, {256.0f, 128.0f});
+ui.ImageLabel("Preview", imageId, {64.0f, 64.0f});
+if (ui.ImageButton("Use preview", imageId, {32.0f, 32.0f})) { /* ... */ }
+```
+
+The renderer consumes `DrawCmd::texture` and binds/resolves that ID in its own API. With
+OpenGL, bind the texture name; with Vulkan or another descriptor-based API, use a stable
+nonzero ID registered in your renderer and map it to the appropriate image view and sampler.
+ID `0` is reserved for untextured geometry. Keep externally supplied images alive until the
+draw list using them has been rendered.
+
 ## Windows and dynamic docking
 
-Window titles are centered in the title bar; the right-side controls minimize and close the
-window. Drag the bottom-right corner to resize it. Closed windows can be restored with
+Window titles are centered in the title bar; the right-side close control hides the window.
+Click a window to focus and bring it above the other windows. Drag the bottom-right corner
+to resize it. Closed windows can be restored with
 `Context::SetWindowOpen("Window title", true)`. Long content scrolls vertically with the
 mouse wheel or by dragging the scrollbar.
 
-Drag a window by its title bar toward a screen edge to see a live docking preview. Dropping within 32 pixels of an edge docks the window into that edge's region. Windows
-docked to the same edge tile together; drag the dividers between them to resize adjacent
-panels, and the group recalculates as the display changes size. Use
-`Context::DockWindows(false)` to disable edge snapping.
+Drag a window by its title bar toward a screen edge to see a live docking preview. Dropping
+within 32 pixels of an edge docks the window into that edge's region. Docked windows tile
+without overlapping; adding panels on other edges automatically adjusts the available
+regions. Drag dividers between same-edge panels to resize them, and groups adapt when the
+display size changes. Use `Context::DockWindows(false)` to disable edge snapping.

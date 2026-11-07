@@ -33,15 +33,11 @@ window-title {
     padding: 6px 10px;
 }
 
-window-control, window-close {
+window-close {
     background: #343539;
     color: #D9DEE7;
     border-radius: 4px;
     font-size: 13px;
-}
-
-window-control:hover {
-    background: #45464B;
 }
 
 window-close:hover {

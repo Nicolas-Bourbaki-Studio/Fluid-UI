@@ -34,6 +34,7 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, float rad) {
 
 void DrawList::Clear() {
     vtx_.clear(); idx_.clear(); cmds_.clear(); clipStack_.clear();
+    breakCommand_ = false;
 }
 
 Rect DrawList::CurrentClip() const {
@@ -48,15 +49,64 @@ void DrawList::PopClipRect() {
     if (!clipStack_.empty()) clipStack_.pop_back();
 }
 
-void DrawList::PrepareCmd(uint64_t texture) {
+DrawList::Layer DrawList::BeginLayer() {
+    breakCommand_ = true;
+    return {vtx_.size(), idx_.size(), cmds_.size(), 0, 0, 0};
+}
+
+void DrawList::EndLayer(Layer& layer) {
+    breakCommand_ = true;
+    layer.vertexEnd = vtx_.size();
+    layer.indexEnd = idx_.size();
+    layer.commandEnd = cmds_.size();
+}
+
+void DrawList::BringLayerToFront(const Layer& layer) {
+    if (layer.vertexStart > layer.vertexEnd || layer.vertexEnd > vtx_.size() ||
+        layer.indexStart > layer.indexEnd || layer.indexEnd > idx_.size() ||
+        layer.commandStart > layer.commandEnd || layer.commandEnd > cmds_.size()) return;
+
+    const size_t vertexCount = layer.vertexEnd - layer.vertexStart;
+    const size_t indexCount = layer.indexEnd - layer.indexStart;
+    if (vertexCount == 0 || indexCount == 0) return;
+
+    const size_t trailingVertices = vtx_.size() - layer.vertexEnd;
+    const size_t trailingIndices = idx_.size() - layer.indexEnd;
+    std::rotate(vtx_.begin() + static_cast<std::ptrdiff_t>(layer.vertexStart),
+                vtx_.begin() + static_cast<std::ptrdiff_t>(layer.vertexEnd), vtx_.end());
+    std::rotate(idx_.begin() + static_cast<std::ptrdiff_t>(layer.indexStart),
+                idx_.begin() + static_cast<std::ptrdiff_t>(layer.indexEnd), idx_.end());
+    std::rotate(cmds_.begin() + static_cast<std::ptrdiff_t>(layer.commandStart),
+                cmds_.begin() + static_cast<std::ptrdiff_t>(layer.commandEnd), cmds_.end());
+
+    const std::ptrdiff_t vertexShift = static_cast<std::ptrdiff_t>(trailingVertices);
+    for (uint32_t& index : idx_) {
+        const size_t oldIndex = index;
+        if (oldIndex >= layer.vertexStart && oldIndex < layer.vertexEnd)
+            index = static_cast<uint32_t>(static_cast<std::ptrdiff_t>(oldIndex) + vertexShift);
+        else if (oldIndex >= layer.vertexEnd)
+            index = static_cast<uint32_t>(oldIndex - vertexCount);
+    }
+
+    for (DrawCmd& command : cmds_) {
+        if (command.idxOffset >= layer.indexStart && command.idxOffset < layer.indexEnd)
+            command.idxOffset = static_cast<uint32_t>(command.idxOffset + trailingIndices);
+        else if (command.idxOffset >= layer.indexEnd)
+            command.idxOffset = static_cast<uint32_t>(command.idxOffset - indexCount);
+    }
+}
+
+void DrawList::PrepareCmd(GPUImageId imageId) {
     const Rect clip = CurrentClip();
-    if (cmds_.empty() || !(cmds_.back().clip == clip) || cmds_.back().texture != texture) {
+    if (breakCommand_ || cmds_.empty() ||
+        !(cmds_.back().clip == clip) || cmds_.back().texture != imageId) {
         DrawCmd c;
         c.clip = clip;
-        c.texture = texture;
+        c.texture = imageId;
         c.idxOffset = static_cast<uint32_t>(idx_.size());
         cmds_.push_back(c);
     }
+    breakCommand_ = false;
 }
 
 void DrawList::FinishPrimitive() {
@@ -109,8 +159,8 @@ void DrawList::AddTriangleFilled(Vec2 a, Vec2 b, Vec2 c, Color col) {
     AddConvexFill(p, 3, col);
 }
 
-void DrawList::AddQuad(Rect r, Rect uv, Color c, uint64_t texture) {
-    PrepareCmd(texture);
+void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
+    PrepareCmd(imageId);
     const uint32_t col = c.ToU32();
     const uint32_t base = static_cast<uint32_t>(vtx_.size());
     vtx_.push_back({{r.x,       r.y},       {uv.x,        uv.y},        col});

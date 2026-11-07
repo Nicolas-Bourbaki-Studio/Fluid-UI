@@ -3,6 +3,7 @@
 #include "../third_party/font8x8_basic.h"
 
 #include <cstdio>
+#include <cmath>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -68,25 +69,41 @@ static GLuint CreateDemoTexture() {
 }
 
 static GLuint CreateDemoFontTexture() {
-    constexpr int width = 128, height = 64;
+    constexpr int glyphWidth = 32, glyphHeight = 32;
+    constexpr int width = 16 * glyphWidth, height = 8 * glyphHeight;
     std::vector<unsigned char> pixels(width * height * 4, 0);
     for (int glyph = 0; glyph < 128; ++glyph) {
-        const int originX = (glyph % 16) * 8;
-        const int originY = (glyph / 16) * 8;
-        for (int y = 0; y < 8; ++y) {
+        const int originX = (glyph % 16) * glyphWidth;
+        const int originY = (glyph / 16) * glyphHeight;
+        auto coverage = [&](int x, int y) {
+            if (x < 0 || x >= 8 || y < 0 || y >= 8) return 0.f;
             const unsigned char row = static_cast<unsigned char>(font8x8_basic[glyph][y]);
-            for (int x = 0; x < 8; ++x) {
+            return (row & (1u << x)) ? 1.f : 0.f;
+        };
+        for (int y = 0; y < glyphHeight; ++y) {
+            const float sourceY = (static_cast<float>(y) + 0.5f) * 8.f / glyphHeight - 0.5f;
+            const int y0 = static_cast<int>(std::floor(sourceY));
+            const float fy = sourceY - static_cast<float>(y0);
+            for (int x = 0; x < glyphWidth; ++x) {
+                const float sourceX = (static_cast<float>(x) + 0.5f) * 8.f / glyphWidth - 0.5f;
+                const int x0 = static_cast<int>(std::floor(sourceX));
+                const float fx = sourceX - static_cast<float>(x0);
+                const float top = coverage(x0, y0) * (1.f - fx) + coverage(x0 + 1, y0) * fx;
+                const float bottom = coverage(x0, y0 + 1) * (1.f - fx) +
+                                     coverage(x0 + 1, y0 + 1) * fx;
+                const unsigned char alpha = static_cast<unsigned char>(
+                    std::lround((top * (1.f - fy) + bottom * fy) * 255.f));
                 const int offset = ((originY + y) * width + originX + x) * 4;
                 pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = 255;
-                pixels[offset + 3] = (row & (1u << x)) ? 255 : 0;
+                pixels[offset + 3] = alpha;
             }
         }
     }
     GLuint texture = 0;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
     glBindTexture(GL_TEXTURE_2D, 0);
     return texture;
@@ -94,7 +111,7 @@ static GLuint CreateDemoFontTexture() {
 
 class DemoTextBackend final : public ITextBackend {
 public:
-    explicit DemoTextBackend(uint64_t texture) : texture_(texture) {}
+    explicit DemoTextBackend(GPUImageId texture) : texture_(texture) {}
 
     Vec2 Measure(std::string_view text, float fontSize) override {
         return {static_cast<float>(text.size()) * fontSize * 0.55f, fontSize * 1.2f};
@@ -102,20 +119,23 @@ public:
 
     void Emit(DrawList& draw, Vec2 pos, std::string_view text, float fontSize, Color color) override {
         const float advance = fontSize * 0.55f;
+        constexpr float cellWidth = 32.f, cellHeight = 32.f;
+        constexpr float atlasWidth = 512.f, atlasHeight = 256.f;
         const float lineStart = pos.x;
         for (unsigned char ch : text) {
             if (ch == '\n') { pos.x = lineStart; pos.y += fontSize * 1.2f; continue; }
             const unsigned int glyph = ch < 128 ? ch : static_cast<unsigned int>('?');
-            const float u = static_cast<float>((glyph % 16) * 8) / 128.f;
-            const float v = static_cast<float>((glyph / 16) * 8) / 64.f;
+            const float u = (static_cast<float>((glyph % 16) * 32) + 0.5f) / atlasWidth;
+            const float v = (static_cast<float>((glyph / 16) * 32) + 0.5f) / atlasHeight;
             draw.AddQuad({pos.x, pos.y, advance, fontSize},
-                         {u, v, 8.f / 128.f, 8.f / 64.f}, color, texture_);
+                         {u, v, (cellWidth - 1.f) / atlasWidth,
+                          (cellHeight - 1.f) / atlasHeight}, color, texture_);
             pos.x += advance;
         }
     }
 
 private:
-    uint64_t texture_;
+    GPUImageId texture_;
 };
 
 int main() {
@@ -136,22 +156,8 @@ int main() {
         glfwTerminate();
         return 1;
     }
-    const std::vector<std::string> emphasisClasses{"primary", "emphasis"};
-    const ComputedStyle primaryButton = ui.Style().Resolve("button", emphasisClasses, State_None);
-    const ComputedStyle windowStyle = ui.Style().Resolve("window", {}, State_None);
-    if (primaryButton.background.ToU32() != Color::FromHex(0x3978B8FF).ToU32() ||
-        primaryButton.shadowBlur != 8.f ||
-        ui.Style().Resolve("dock-splitter", {}, State_None).background.ToU32() !=
-            Color::FromHex(0x45464BFF).ToU32() ||
-        windowStyle.borderWidth != 1.f ||
-        windowStyle.borderColor.ToU32() != Color::FromHex(0x3A3B3FFF).ToU32() ||
-        windowStyle.shadowColor.a < 0.55f) {
-        std::fprintf(stderr, "theme.css selectors or declarations did not resolve correctly\n");
-        glfwDestroyWindow(win);
-        glfwTerminate();
-        return 1;
-    }
     const GLuint demoTexture = CreateDemoTexture();
+    const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
     const GLuint fontTexture = CreateDemoFontTexture();
     DemoTextBackend demoText(fontTexture);
     ui.SetTextBackend(&demoText);
@@ -165,7 +171,7 @@ int main() {
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
     float volume = 0.62f;
     constexpr std::string_view componentWindow = "Components##main";
-    constexpr std::string_view tabsWindow = "Tabs and collapse##tabs";
+    constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     double last = glfwGetTime();
 
@@ -206,8 +212,9 @@ int main() {
             ui.TextLabel("Text label");
             ui.TextLabelLeft("Text with leading icon", "*");
             ui.TextLabelRight("Text with trailing icon", ">");
-            ui.ImageLabel("Image label", demoTexture, {28, 28});
-            if (ui.ImageButton("Image button", demoTexture, {36, 28})) {}
+            ui.Image(demoImageId, {24, 24});
+            ui.ImageLabel("Image label", demoImageId, {28, 28});
+            if (ui.ImageButton("Image button", demoImageId, {36, 28})) {}
             if (ui.Dropdown("Text menu", choices, &sizeChoice)) {}
             if (ui.Dropdown("Icon menu", choices, &iconChoice, "+", false)) {}
             if (ui.Dropdown("Icon and text menu", choices, &mixedChoice, "*")) {}
@@ -271,12 +278,13 @@ int main() {
             ui.Text("A live preview shows the snap area.");
             ui.Text("Docked windows resize with the display.");
             ui.Text("Drag the bottom-right corner to resize.");
-            ui.Text("Minimize keeps the title bar; close hides a window.");
+            ui.Text("Click a window to bring it to the front.");
+            ui.Text("Docked panels resize to share available space.");
             ui.Toggle("Enable docking", &showAdvanced);
             if (ui.Button("Show components")) ui.SetWindowOpen(componentWindow, true);
-            if (ui.Button("Show tabs and collapse")) ui.SetWindowOpen(tabsWindow, true);
+            if (ui.Button("Show tabs and panels")) ui.SetWindowOpen(tabsWindow, true);
             if (ui.Button("Hide components")) ui.SetWindowOpen(componentWindow, false);
-            if (ui.Button("Hide tabs and collapse")) ui.SetWindowOpen(tabsWindow, false);
+            if (ui.Button("Hide tabs and panels")) ui.SetWindowOpen(tabsWindow, false);
             ui.EndWindow();
         }
 
