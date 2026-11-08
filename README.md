@@ -89,7 +89,8 @@ if (ui.BeginMainMenuBar()) {
 ```
 
 Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu-item`
-CSS selectors. The GLFW demo includes a styled menu bar, nested menu, and child panel.
+CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network menus,
+a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
 
 ## CSS-like themes and classes
 

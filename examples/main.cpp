@@ -3,13 +3,17 @@
 #include <wincodec.h>
 #include <GLFW/glfw3.h>
 #include "../src/FluidUI/FluidUI.h"
-#include "../third_party/font8x8_basic.h"
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "../third_party/stb_truetype.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdio>
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <vector>
@@ -185,74 +189,136 @@ static GLuint CreateTextureFromImage(const std::filesystem::path& path, int& wid
     return texture;
 }
 
-static GLuint CreateDemoFontTexture() {
-    constexpr int glyphWidth = 32, glyphHeight = 32;
-    constexpr int width = 16 * glyphWidth, height = 8 * glyphHeight;
-    std::vector<unsigned char> pixels(width * height * 4, 0);
-    for (int glyph = 0; glyph < 128; ++glyph) {
-        const int originX = (glyph % 16) * glyphWidth;
-        const int originY = (glyph / 16) * glyphHeight;
-        auto coverage = [&](int x, int y) {
-            if (x < 0 || x >= 8 || y < 0 || y >= 8) return 0.f;
-            const unsigned char row = static_cast<unsigned char>(font8x8_basic[glyph][y]);
-            return (row & (1u << x)) ? 1.f : 0.f;
-        };
-        for (int y = 0; y < glyphHeight; ++y) {
-            const float sourceY = (static_cast<float>(y) + 0.5f) * 8.f / glyphHeight - 0.5f;
-            const int y0 = static_cast<int>(std::floor(sourceY));
-            const float fy = sourceY - static_cast<float>(y0);
-            for (int x = 0; x < glyphWidth; ++x) {
-                const float sourceX = (static_cast<float>(x) + 0.5f) * 8.f / glyphWidth - 0.5f;
-                const int x0 = static_cast<int>(std::floor(sourceX));
-                const float fx = sourceX - static_cast<float>(x0);
-                const float top = coverage(x0, y0) * (1.f - fx) + coverage(x0 + 1, y0) * fx;
-                const float bottom = coverage(x0, y0 + 1) * (1.f - fx) +
-                                     coverage(x0 + 1, y0 + 1) * fx;
-                const unsigned char alpha = static_cast<unsigned char>(
-                    std::lround((top * (1.f - fy) + bottom * fy) * 255.f));
-                const int offset = ((originY + y) * width + originX + x) * 4;
-                pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = 255;
-                pixels[offset + 3] = alpha;
-            }
-        }
-    }
+struct DemoFontAtlas {
+    static constexpr int Width = 512;
+    static constexpr int Height = 512;
+    static constexpr int FirstCharacter = 32;
+    static constexpr int CharacterCount = 96;
+    static constexpr float BakeSize = 32.f;
+
     GLuint texture = 0;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    std::array<stbtt_bakedchar, CharacterCount> glyphs{};
+};
+
+static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
+                                   DemoFontAtlas& atlas, std::string& error) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        error = "Could not open Open Sans font: " + path.string();
+        return false;
+    }
+    const std::istreambuf_iterator<char> fontBegin(file);
+    const std::istreambuf_iterator<char> fontEnd;
+    std::vector<unsigned char> fontData(fontBegin, fontEnd);
+    if (file.bad()) {
+        error = "Could not read Open Sans font: " + path.string();
+        return false;
+    }
+    if (fontData.empty() || fontData.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
+        error = "Open Sans font file is empty or too large";
+        return false;
+    }
+
+    std::vector<unsigned char> coverage(DemoFontAtlas::Width * DemoFontAtlas::Height);
+    const int packedRows = stbtt_BakeFontBitmap(
+        fontData.data(), 0, DemoFontAtlas::BakeSize, coverage.data(),
+        DemoFontAtlas::Width, DemoFontAtlas::Height, DemoFontAtlas::FirstCharacter,
+        DemoFontAtlas::CharacterCount, atlas.glyphs.data());
+    if (packedRows <= 0) {
+        error = "Could not bake Open Sans glyphs into the font atlas";
+        return false;
+    }
+
+    std::vector<unsigned char> pixels(coverage.size() * 4);
+    for (size_t i = 0; i < coverage.size(); ++i) {
+        pixels[i * 4] = pixels[i * 4 + 1] = pixels[i * 4 + 2] = 255;
+        pixels[i * 4 + 3] = coverage[i];
+    }
+    glGenTextures(1, &atlas.texture);
+    if (atlas.texture == 0) {
+        error = "OpenGL did not allocate a texture for the Open Sans font";
+        return false;
+    }
+    glBindTexture(GL_TEXTURE_2D, atlas.texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    constexpr GLint clampToEdge = 0x812F;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DemoFontAtlas::Width, DemoFontAtlas::Height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
     glBindTexture(GL_TEXTURE_2D, 0);
-    return texture;
+    const GLenum uploadError = glGetError();
+    if (uploadError != GL_NO_ERROR) {
+        glDeleteTextures(1, &atlas.texture);
+        atlas.texture = 0;
+        char message[96];
+        std::snprintf(message, sizeof(message), "OpenGL font texture upload failed (error 0x%04X)",
+                      static_cast<unsigned int>(uploadError));
+        error = message;
+        return false;
+    }
+    return true;
 }
 
 class DemoTextBackend final : public ITextBackend {
 public:
-    explicit DemoTextBackend(GPUImageId texture) : texture_(texture) {}
+    explicit DemoTextBackend(const DemoFontAtlas& atlas)
+        : texture_(atlas.texture), glyphs_(atlas.glyphs) {}
 
     Vec2 Measure(std::string_view text, float fontSize) override {
-        return {static_cast<float>(text.size()) * fontSize * 0.55f, fontSize * 1.2f};
+        const float scale = fontSize / DemoFontAtlas::BakeSize;
+        float lineWidth = 0.f, maxWidth = 0.f;
+        size_t lines = 1;
+        for (unsigned char ch : text) {
+            if (ch == '\n') {
+                maxWidth = std::max(maxWidth, lineWidth);
+                lineWidth = 0.f;
+                ++lines;
+                continue;
+            }
+            const unsigned int glyph = GlyphIndex(ch);
+            lineWidth += glyphs_[glyph].xadvance * scale;
+        }
+        maxWidth = std::max(maxWidth, lineWidth);
+        return {maxWidth, static_cast<float>(lines) * fontSize * 1.2f};
     }
 
     void Emit(DrawList& draw, Vec2 pos, std::string_view text, float fontSize, Color color) override {
-        const float advance = fontSize * 0.55f;
-        constexpr float cellWidth = 32.f, cellHeight = 32.f;
-        constexpr float atlasWidth = 512.f, atlasHeight = 256.f;
-        const float lineStart = pos.x;
+        const float scale = fontSize / DemoFontAtlas::BakeSize;
+        float penX = 0.f, lineOffset = 0.f;
         for (unsigned char ch : text) {
-            if (ch == '\n') { pos.x = lineStart; pos.y += fontSize * 1.2f; continue; }
-            const unsigned int glyph = ch < 128 ? ch : static_cast<unsigned int>('?');
-            const float u = (static_cast<float>((glyph % 16) * 32) + 0.5f) / atlasWidth;
-            const float v = (static_cast<float>((glyph / 16) * 32) + 0.5f) / atlasHeight;
-            draw.AddQuad({pos.x, pos.y, advance, fontSize},
-                         {u, v, (cellWidth - 1.f) / atlasWidth,
-                          (cellHeight - 1.f) / atlasHeight}, color, texture_);
-            pos.x += advance;
+            if (ch == '\n') {
+                penX = 0.f;
+                lineOffset += fontSize * 1.2f;
+                continue;
+            }
+            stbtt_aligned_quad quad{};
+            float glyphY = 0.f;
+            stbtt_GetBakedQuad(glyphs_.data(), DemoFontAtlas::Width, DemoFontAtlas::Height,
+                               static_cast<int>(GlyphIndex(ch)), &penX, &glyphY, &quad, 1);
+            const float baseline = pos.y + fontSize + lineOffset;
+            const float width = (quad.x1 - quad.x0) * scale;
+            const float height = (quad.y1 - quad.y0) * scale;
+            if (width > 0.f && height > 0.f) {
+                draw.AddQuad({pos.x + quad.x0 * scale, baseline + quad.y0 * scale,
+                              width, height},
+                             {quad.s0, quad.t0, quad.s1 - quad.s0, quad.t1 - quad.t0},
+                             color, texture_);
+            }
         }
     }
 
 private:
+    static unsigned int GlyphIndex(unsigned char ch) {
+        const unsigned int character = ch >= DemoFontAtlas::FirstCharacter &&
+            ch < DemoFontAtlas::FirstCharacter + DemoFontAtlas::CharacterCount
+            ? ch : static_cast<unsigned int>('?');
+        return character - DemoFontAtlas::FirstCharacter;
+    }
+
     GPUImageId texture_;
+    std::array<stbtt_bakedchar, DemoFontAtlas::CharacterCount> glyphs_;
 };
 
 int main() {
@@ -291,10 +357,20 @@ int main() {
     ui.Style().RegisterImage(iconImageSource, static_cast<GPUImageId>(iconTexture),
                              {static_cast<float>(iconImageWidth),
                               static_cast<float>(iconImageHeight)});
+    DemoFontAtlas fontAtlas;
+    std::string fontError;
+    const std::filesystem::path fontPath =
+        themePath.parent_path().parent_path() / "src" / "Fonts" / "OpenSans.ttf";
+    if (!CreateOpenSansFontAtlas(fontPath, fontAtlas, fontError)) {
+        std::fprintf(stderr, "%s\n", fontError.c_str());
+        glDeleteTextures(1, &iconTexture);
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
     const GLuint demoTexture = CreateDemoTexture();
     const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
-    const GLuint fontTexture = CreateDemoFontTexture();
-    DemoTextBackend demoText(fontTexture);
+    DemoTextBackend demoText(fontAtlas);
     ui.SetTextBackend(&demoText);
     const std::vector<std::string_view> choices{"Small", "Medium", "Large"};
     const std::vector<Context::TabItem> textTabs{{"Overview", {}}, {"Details", {}}, {"Preview", {}}};
@@ -302,12 +378,14 @@ int main() {
         {"Home", "H", false}, {"Files", "F", false}, {"Tools", "T", false}};
     const std::vector<Context::TabItem> mixedTabs{{"One", "1"}, {"Two", "2"}, {"Three", "3"}};
 
-    bool enabled = true, showAdvanced = true, expanded = true, showDanger = false;
+    bool enabled = true, dockingEnabled = true, expanded = true, showDanger = false;
+    bool networkConnected = false;
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
     float volume = 0.62f;
     constexpr std::string_view componentWindow = "Components##main";
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
+    constexpr std::string_view settingsWindow = "Settings##settings";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -325,25 +403,46 @@ int main() {
         in.displaySize = {static_cast<float>(w), static_cast<float>(h)};
         last = now;
         ui.NewFrame(in);
-        ui.DockWindows(showAdvanced);
+        ui.DockWindows(dockingEnabled);
 
         if (ui.BeginMainMenuBar()) {
             if (ui.BeginMenu("File")) {
+                if (ui.MenuItem("New demo window"))
+                    ui.SetWindowOpen(componentWindow, true);
+                if (ui.MenuItem("Settings..."))
+                    ui.SetWindowOpen(settingsWindow, true);
                 if (ui.MenuItem("Exit")) glfwSetWindowShouldClose(win, GLFW_TRUE);
+                ui.EndMenu();
+            }
+            if (ui.BeginMenu("Edit")) {
+                if (ui.MenuItem("Preferences..."))
+                    ui.SetWindowOpen(settingsWindow, true);
+                if (ui.MenuItem("Restore demo windows")) {
+                    ui.SetWindowOpen(componentWindow, true);
+                    ui.SetWindowOpen(tabsWindow, true);
+                    ui.SetWindowOpen(managerWindow, true);
+                }
                 ui.EndMenu();
             }
             if (ui.BeginMenu("View")) {
                 if (ui.MenuItem("Components")) ui.SetWindowOpen(componentWindow, true);
                 if (ui.MenuItem("Tabs and panels")) ui.SetWindowOpen(tabsWindow, true);
                 if (ui.MenuItem("Window manager")) ui.SetWindowOpen(managerWindow, true);
-                if (ui.BeginMenu("More")) {
-                    if (ui.MenuItem("Reset component window"))
-                        ui.SetWindowOpen(componentWindow, true);
-                    ui.EndMenu();
-                }
+                if (ui.MenuItem("Settings")) ui.SetWindowOpen(settingsWindow, true);
                 ui.EndMenu();
             }
-            if (ui.MenuItem("About")) {}
+            if (ui.BeginMenu("Project")) {
+                if (ui.MenuItem("Project settings..."))
+                    ui.SetWindowOpen(settingsWindow, true);
+                if (ui.MenuItem("Window manager"))
+                    ui.SetWindowOpen(managerWindow, true);
+                ui.EndMenu();
+            }
+            if (ui.BeginMenu("Network")) {
+                if (!networkConnected && ui.MenuItem("Connect")) networkConnected = true;
+                if (networkConnected && ui.MenuItem("Disconnect")) networkConnected = false;
+                ui.EndMenu();
+            }
             ui.EndMainMenuBar();
         }
 
@@ -452,11 +551,26 @@ int main() {
             ui.Text("Drag the bottom-right corner to resize.");
             ui.Text("Click a window to bring it to the front.");
             ui.Text("Docked panels resize to share available space.");
-            ui.Toggle("Enable docking", &showAdvanced);
+            ui.Toggle("Enable docking", &dockingEnabled);
             if (ui.Button("Show components")) ui.SetWindowOpen(componentWindow, true);
             if (ui.Button("Show tabs and panels")) ui.SetWindowOpen(tabsWindow, true);
             if (ui.Button("Hide components")) ui.SetWindowOpen(componentWindow, false);
             if (ui.Button("Hide tabs and panels")) ui.SetWindowOpen(tabsWindow, false);
+            ui.EndWindow();
+        }
+
+        if (ui.BeginWindow(settingsWindow, {360, 180, 480, 300})) {
+            ui.Text("General");
+            ui.Toggle("Enable docking", &dockingEnabled);
+            ui.Text("Font: Open Sans");
+            ui.Text("Project: Fluid-UI demo");
+            ui.Text(networkConnected ? "Network status: Connected"
+                                    : "Network status: Disconnected");
+            if (ui.Button("Restore demo windows")) {
+                ui.SetWindowOpen(componentWindow, true);
+                ui.SetWindowOpen(tabsWindow, true);
+                ui.SetWindowOpen(managerWindow, true);
+            }
             ui.EndWindow();
         }
 
@@ -468,7 +582,7 @@ int main() {
     }
     glDeleteTextures(1, &iconTexture);
     glDeleteTextures(1, &demoTexture);
-    glDeleteTextures(1, &fontTexture);
+    glDeleteTextures(1, &fontAtlas.texture);
     glfwDestroyWindow(win);
     glfwTerminate();
 }

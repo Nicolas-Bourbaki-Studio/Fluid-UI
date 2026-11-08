@@ -1,14 +1,37 @@
+/* ================= COLORS & VARIABLES ================= */
+
 :root {
     --ui-accent: #3978B8;
     --ui-accent-hover: #55A0E5;
-    --ui-panel: #1c1c1f;
-    --ui-border: #323336;
-    --ui-text: #D9DEE7;
+    --ui-accent-active: #2B5F91;
+
+    --ui-window: #080808;
+    --ui-panel: #171717;
+    --ui-panel-hover: #202020;
+    --ui-panel-active: #2A2A2A;
+
+    --ui-border: #171717;
+    --ui-border-hover: #414141;
+    --ui-border-active: #59667A;
+
+    --ui-text: #FFFFFF;
+    --ui-text-secondary: #BABABA;
+    --ui-text-muted: #C8CDD5;
+
+    --ui-danger: #713737;
+    --ui-danger-hover: #914545;
+    --ui-danger-border: #914747;
+
+    --ui-overlay: transparent;
+
+    --ui-radius: 6px;
 }
+
+/* ================= GLOBAL ================= */
 
 * {
     color: var(--ui-text);
-    font-size: 14px;
+    font-size: 18px;
     gap: 6px;
     transition-speed: 5;
 }
@@ -16,80 +39,76 @@
 /* ================= WINDOW ================= */
 
 window {
-    background: linear-gradient(120deg, #080808, #080808);
+    background: var(--ui-window);
     border-color: transparent;
     border-width: 2px;
-    border-radius: 6px;
+    border-radius: var(--ui-radius);
     padding: 5px;
 }
 
 window-title {
-    background: #141414;
-    color: #BABABA;
-    font-size: 10px;
+    background: var(--ui-panel);
+    color: var(--ui-text-secondary);
+    font-size: 16px;
     padding: 7px 7px;
-    border-radius-top-left: 6px;
-    border-radius-top-right: 6px;
+    border-radius-top-left: var(--ui-radius);
+    border-radius-top-right: var(--ui-radius);
     border-radius-bottom-left: 0px;
     border-radius-bottom-right: 0px;
 }
 
 window-close {
-    background: transparent;
-    color: #BABABA;
-    font-size: 10px;
+    background: var(--ui-overlay);
+    color: var(--ui-text-secondary);
+    font-size: 16px;
 }
 
 window-close:hover {
-    background: transparent;
-    color: #FFFFFF;
+    background: var(--ui-overlay);
+    color: var(--ui-text);
 }
 
 main-menu-bar {
-    background: #080808;
+    background: var(--ui-window);
     border-color: var(--ui-border);
-    border-width: 1px;
+    border-width: 0px;
     padding: 3px 8px;
-    /* shadow-color: rgba(0, 0, 0, 0.3); */
-    shadow-blur: 5px;
 }
 
 menu {
-    background: transparent;
-    color: #D9DEE7;
-    border-radius: 4px;
+    background: var(--ui-overlay);
+    color: var(--ui-text-muted);
+    border-radius: 0px;
     padding: 4px 10px;
 }
 
 menu:hover, menu:checked {
-    background: #34363B;
+    background: var(--ui-panel-hover);
 }
 
 menu-popup {
-    background: #252629;
+    background: var(--ui-panel);
     border: 1px solid var(--ui-border);
-    border-radius: 5px;
-    /* shadow-color: rgba(0, 0, 0, 0.5); */
-    shadow-blur: 12px;
+    border-radius: var(--ui-radius);
     padding: 4px;
 }
 
 menu-item {
-    background: transparent;
-    color: #D9DEE7;
-    border-radius: 3px;
+    background: var(--ui-overlay);
+    color: var(--ui-text-muted);
+    border-radius: var(--ui-radius);
     padding: 5px 10px;
 }
 
 menu-item:hover, menu-item:checked {
     background: var(--ui-accent);
-    color: #FFFFFF;
+    color: var(--ui-text);
 }
 
 /* ================= SCROLLING ================= */
 
 window-scrollbar {
-    background: #252629;
+    background: var(--ui-panel);
     accent: var(--ui-accent);
 }
 
@@ -100,27 +119,25 @@ window-resize {
 dock-preview {
     background: var(--ui-accent);
     accent: var(--ui-accent-hover);
-    border-radius: 6px;
+    border-radius: var(--ui-radius);
 }
 
 dock-splitter {
     background: rgba(112, 124, 144, 0.46);
     accent: var(--ui-accent-hover);
-    border-radius: 2px;
+    border-radius: var(--ui-radius);
 }
 
 dock-menu {
-    background: #202124;
+    background: var(--ui-panel);
     border: 1px solid var(--ui-border);
-    border-radius: 8px;
-    /* shadow-color: rgba(0, 0, 0, 0.56); */
-    shadow-blur: 14px;
+    border-radius: var(--ui-radius);
 }
 
 dock-target {
-    background: #343539;
-    border: 1px solid #55575D;
-    border-radius: 6px;
+    background: var(--ui-panel-hover);
+    border: 1px solid var(--ui-border-hover);
+    border-radius: var(--ui-radius);
     color: var(--ui-text);
     font-size: 13px;
 }
@@ -131,48 +148,46 @@ dock-target:hover {
 }
 
 empty-widget {
-    background: #12151B;
-    border: 1px solid #3A4150;
-    border-radius: 8px;
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
 }
 
 empty-widget.brand {
-    background: linear-gradient(120deg, #101319, #1D2B42);
+    background: var(--ui-panel);
     background-image: url("../src/Images/Icon.jpg");
     background-size: contain;
     background-position: center;
-    border: 1px solid #303846;
-    border-radius: 10px;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
 }
 
 image-widget {
-    background: linear-gradient(135deg, #172235, #263B5B);
-    border-color: linear-gradient(120deg, #6A8AC0, #BD86F4);
+    background: var(--ui-panel);
+    border-color: var(--ui-border);
     border-width: 2px;
-    border-radius: 12px;
+    border-radius: var(--ui-radius);
     padding: 8px;
     background-size: contain;
     background-position: center;
-    /* shadow-color: linear-gradient(135deg, rgba(89, 107, 206, 0.25), rgba(189, 134, 244, 0.15)); */
-    /* shadow-blur: 10px; */
 }
 
 image-widget.icon-card {
-    background: linear-gradient(135deg, #192537, #34264C);
-    border-color: linear-gradient(90deg, #C781F4, #6AD5EF);
+    background: var(--ui-panel);
+    border-color: var(--ui-border);
     padding: 8px;
 }
 
 empty-widget.gradient-demo {
-    background: linear-gradient(110deg, #213A67 0%, #3978B8 52%, #8A5CE6 100%);
-    border: 1px solid #648FD2;
-    border-radius: 9px;
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
 }
 
 /* ================= TEXT ================= */
 
 text {
-    color: #C8CDD5;
+    color: var(--ui-text-muted);
     padding: 2px 0;
 }
 
@@ -181,92 +196,89 @@ text-label, image-label {
 }
 
 text.gradient-text {
-    color: linear-gradient(90deg, #62D5FF, #A991FF, #FF86C8);
+    color: var(--ui-text);
 }
 
 /* ================= BUTTONS ================= */
 
 button, dropdown, image-button {
-    background: #2A303B;
-    color: #E8EDF5;
-    border-color: #414A59;
+    background: var(--ui-panel-hover);
+    color: var(--ui-text);
+    border-color: var(--ui-border);
     border-width: 1px;
-    border-radius: 4px;
+    border-radius: var(--ui-radius);
     padding: 6px 12px;
 }
 
 button:hover, dropdown:hover, image-button:hover {
-    background: #353D4A;
-    border-color: #59667A;
+    background: var(--ui-panel-active);
+    border-color: var(--ui-border-hover);
 }
 
 button:active {
-    background: #2B5F91;
+    background: var(--ui-accent-active);
 }
-
-/* Primary buttons */
 
 button.primary {
     background: var(--ui-accent);
-    border-color: #397FB8;
-    color: #FFFFFF;
+    border-color: var(--ui-accent);
+    color: var(--ui-text);
 }
 
 button.primary:hover {
     background: var(--ui-accent-hover);
-    border-color: #4A96D4;
+    border-color: var(--ui-accent-hover);
 }
 
 button.primary.emphasis {
-    /* shadow-color: rgba(40, 120, 184, 0.31); */
-    shadow-blur: 8px;
 }
 
 button.gradient-demo {
-    background: linear-gradient(100deg, #2467B2, #6D48C8);
-    border-color: linear-gradient(90deg, #8AA9F5, #D98CF7);
-    color: linear-gradient(90deg, #FFFFFF, #D4F5FF);
+    background: var(--ui-accent);
+    border-color: var(--ui-accent);
+    color: var(--ui-text);
 }
 
-/* Destructive buttons */
+/* ================= DESTRUCTIVE BUTTONS ================= */
 
 button.danger {
-    background: #713737;
-    border-color: #914747;
+    background: var(--ui-danger);
+    border-color: var(--ui-danger-border);
 }
 
 button.danger:hover {
-    background: #914545;
+    background: var(--ui-danger-hover);
 }
 
 /* ================= CHECKBOXES ================= */
 
 checkbox, radio {
-    background: #292A2D;
-    border-color: #55575D;
+    background: var(--ui-panel-hover);
+    border-color: var(--ui-border-hover);
     border-width: 1px;
+    border-radius: var(--ui-radius);
     accent: var(--ui-accent);
 }
 
 checkbox:hover, radio:hover {
-    border-color: #6BA9DF;
+    border-color: var(--ui-accent-hover);
 }
 
 /* ================= TOGGLES ================= */
 
 toggle {
-    background: #404146;
-    accent: linear-gradient(90deg, #3978B8, #A45CE0);
-    color: #E4E7EC;
+    background: var(--ui-panel-active);
+    accent: var(--ui-accent);
+    color: var(--ui-text);
     gap: 8px;
 }
 
 /* ================= SLIDERS ================= */
 
 slider {
-    background: #303136;
+    background: var(--ui-panel-hover);
     accent: var(--ui-accent);
-    border-radius: 4px;
+    border-radius: var(--ui-radius);
     padding: 4px 8px;
 }
 
@@ -278,10 +290,10 @@ slider:hover {
 
 container, collapsible-container,
 horizontal-list, vertical-list {
-    background: #212630;
-    border-color: #363E4B;
+    background: var(--ui-panel);
+    border-color: var(--ui-border);
     border-width: 1px;
-    border-radius: 5px;
+    border-radius: var(--ui-radius);
     padding: 8px;
     gap: 6px;
 }
@@ -289,15 +301,15 @@ horizontal-list, vertical-list {
 /* ================= TABS ================= */
 
 tab {
-    background: #303136;
-    border-color: #3D3E43;
+    background: var(--ui-panel-hover);
+    border-color: var(--ui-border);
     border-width: 1px;
-    border-radius: 4px;
+    border-radius: var(--ui-radius);
     padding: 6px 10px;
 }
 
 tab:checked {
     background: var(--ui-accent);
     border-color: var(--ui-accent);
-    color: #FFFFFF;
+    color: var(--ui-text);
 }

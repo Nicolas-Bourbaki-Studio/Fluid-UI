@@ -368,7 +368,8 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/intcmp.h \
  C:/msys64/ucrt64/include/c++/16.2.0/array \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/font8x8_basic.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/math.h \
  C:/msys64/ucrt64/include/c++/16.2.0/cmath \
  C:/msys64/ucrt64/include/math.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/specfun.h \
@@ -384,6 +385,7 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_hermite.tcc \
  C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_laguerre.tcc \
  C:/msys64/ucrt64/include/c++/16.2.0/tr1/riemann_zeta.tcc \
+ C:/msys64/ucrt64/include/assert.h \
  C:/msys64/ucrt64/include/c++/16.2.0/filesystem \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_fwd.h \
  C:/msys64/ucrt64/include/c++/16.2.0/system_error \
@@ -455,4 +457,10 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/align.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_dir.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_ops.h
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_ops.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/fstream \
+ C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/basic_file.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++io.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/fstream.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/iterator \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/stream_iterator.h
