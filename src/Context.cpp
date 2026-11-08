@@ -112,16 +112,17 @@ const DrawList& Context::EndFrame() {
     if (hasDockPreview_) {
         const ComputedStyle previewStyle = Resolve("dock-preview", 0);
         DrawStyledColor(dockPreview_, previewStyle.accent, previewStyle.accentGradient,
-                        previewStyle.opacity * 0.24f, previewStyle.rounding);
+                        previewStyle.opacity * 0.24f, previewStyle.cornerRadii);
         draw_.AddRectFilledGradient(dockPreview_, previewStyle.backgroundGradient,
-                                    previewStyle.opacity * 0.08f, previewStyle.rounding);
+                                    previewStyle.opacity * 0.08f, previewStyle.cornerRadii);
         if (!previewStyle.accentGradient.Empty())
             draw_.AddBorderGradient(dockPreview_, previewStyle.accentGradient,
-                                    previewStyle.opacity * 0.95f, 2.f, previewStyle.rounding);
+                                    previewStyle.opacity * 0.95f, 2.f,
+                                    previewStyle.cornerRadii);
         else
             draw_.AddBox(dockPreview_, {0.f, 0.f, 0.f, 0.f},
                          Fade(previewStyle.accent, 0.95f),
-                         2.f, previewStyle.rounding);
+                         2.f, previewStyle.cornerRadii);
         DrawTextCentered(dockPreview_, "Dock preview", previewStyle);
     }
     if (dockCompassVisible_) {
@@ -129,10 +130,11 @@ const DrawList& Context::EndFrame() {
         const ComputedStyle targetStyle = Resolve("dock-target", 0);
         if (!menuStyle.shadowColorGradient.Empty())
             draw_.AddShadowGradient(dockCompassRect_, menuStyle.shadowColorGradient,
-                                    menuStyle.opacity, menuStyle.shadowBlur, menuStyle.rounding);
+                                    menuStyle.opacity, menuStyle.shadowBlur,
+                                    menuStyle.cornerRadii);
         else
             draw_.AddShadow(dockCompassRect_, Fade(menuStyle.shadowColor, menuStyle.opacity),
-                            menuStyle.shadowBlur, menuStyle.rounding);
+                            menuStyle.shadowBlur, menuStyle.cornerRadii);
         DrawBox(dockCompassRect_, menuStyle);
         constexpr DockSide sides[] = {
             DockSide::Left, DockSide::Right, DockSide::Top,
@@ -238,7 +240,7 @@ Rect Context::Place(Vec2 size, float spacing) {
 }
 
 void Context::DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
-                              float opacity, float rounding) {
+                              float opacity, CornerRadii rounding) {
     if (gradient.Empty()) draw_.AddRectFilled(r, Fade(color, opacity), rounding);
     else draw_.AddRectFilledGradient(r, gradient, opacity, rounding);
 }
@@ -246,18 +248,18 @@ void Context::DrawStyledColor(Rect r, Color color, const LinearGradient& gradien
 void Context::DrawBox(Rect r, const ComputedStyle& s) {
     if (!s.shadowColorGradient.Empty())
         draw_.AddShadowGradient(r, s.shadowColorGradient, s.opacity,
-                                s.shadowBlur, s.rounding);
+                                s.shadowBlur, s.cornerRadii);
     else
-        draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.rounding);
-    draw_.AddRectFilled(r, Fade(s.background, s.opacity), s.rounding);
-    draw_.AddRectFilledGradient(r, s.backgroundGradient, s.opacity, s.rounding);
+        draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.cornerRadii);
+    draw_.AddRectFilled(r, Fade(s.background, s.opacity), s.cornerRadii);
+    draw_.AddRectFilledGradient(r, s.backgroundGradient, s.opacity, s.cornerRadii);
     DrawBackgroundImage(r, s);
     if (!s.borderColorGradient.Empty())
         draw_.AddBorderGradient(r, s.borderColorGradient, s.opacity,
-                                s.borderWidth, s.rounding);
+                                s.borderWidth, s.cornerRadii);
     else if (s.borderWidth > 0.f && s.borderColor.a > 0.f)
         draw_.AddBox(r, {0.f, 0.f, 0.f, 0.f}, Fade(s.borderColor, s.opacity),
-                     s.borderWidth, s.rounding);
+                     s.borderWidth, s.cornerRadii);
 }
 
 void Context::EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style) {
@@ -914,7 +916,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     w.drawLayer = draw_.BeginLayer();
     w.hasDrawLayer = true;
     DrawBox(frame, ws);
-    DrawStyledColor(bar, ts.background, ts.backgroundGradient, ts.opacity, ws.rounding);
+    DrawStyledColor(bar, ts.background, ts.backgroundGradient, ts.opacity, ts.cornerRadii);
     DrawBackgroundImage(bar, ts);
     const Rect titleRect{bar.x + ts.padding.left, bar.y,
                          std::max(0.f, bar.w - ts.padding.Horizontal()), bar.h};
@@ -1238,7 +1240,9 @@ bool Context::Checkbox(std::string_view label, bool* value) {
     DrawBox(boxR, s);
     if (*value)
         DrawStyledColor(boxR.Expanded(-box * 0.25f), s.accent, s.accentGradient,
-                        s.opacity, s.rounding * 0.5f);
+                        s.opacity,
+                        {s.cornerRadii.topLeft * 0.5f, s.cornerRadii.topRight * 0.5f,
+                         s.cornerRadii.bottomRight * 0.5f, s.cornerRadii.bottomLeft * 0.5f});
     EmitText({boxR.x + box + s.spacing, r.y + (r.h - ts.y) * 0.5f}, text, s);
 
     if (b.pressed) *value = !*value;
@@ -1321,7 +1325,7 @@ bool Context::SliderFloat(std::string_view label, float* value, float lo, float 
     DrawBox(r, s);
     if (t > 0.f)
         DrawStyledColor({r.x, r.y, r.w * t, r.h}, s.accent, s.accentGradient,
-                        s.opacity, s.rounding);
+                        s.opacity, s.cornerRadii);
 
     char buf[128];
     std::snprintf(buf, sizeof(buf), "%.*s: %.2f", static_cast<int>(text.size()), text.data(), *value);

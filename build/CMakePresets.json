@@ -20,7 +20,7 @@
                 "CMAKE_BUILD_TYPE": "Debug"
             },
             "toolchainFile": "conan_toolchain.cmake",
-            "binaryDir": "C:\\Users\\mike1\\source\\repos\\FluidUI Liberary\\build"
+            "binaryDir": "C:\\Users\\mike1\\OneDrive\\Documents\\GitHub\\Fluid-UI\\build"
         }
     ],
     "buildPresets": [

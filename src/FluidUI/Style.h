@@ -16,7 +16,8 @@ enum class Prop : uint8_t {
     BorderWidth, Rounding, FontSize, Spacing, ShadowBlur, Opacity,
     Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
-    BorderColorGradient, ShadowColorGradient
+    BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
+    RoundingBottomRight, RoundingBottomLeft
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
@@ -38,6 +39,7 @@ struct ComputedStyle {
     Color shadowColor {0.f, 0.f, 0.f, 0.f};
     float borderWidth = 0.f;
     float rounding    = 4.f;
+    CornerRadii cornerRadii{4.f};
     float fontSize    = 16.f;
     float spacing     = 6.f;
     float shadowBlur  = 0.f;

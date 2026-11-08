@@ -100,7 +100,9 @@ in `:root` and referenced with `var(--name)` (including a fallback). Colors supp
 digit hex, common named colors, `rgb()`/`rgba()`, `hsl()`/`hsla()`, and `transparent`;
 numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
-`shadow-color`, `border-width`, `border-radius`, `font-size`, `gap`, `shadow-blur`,
+`shadow-color`, `border-width`, `border-radius` and its `border-radius-top-left`,
+`border-radius-top-right`, `border-radius-bottom-left`, and `border-radius-bottom-right`
+corner overrides, `font-size`, `gap`, `shadow-blur`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
 `padding`. Background images are supported with `background-image: url("...")`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
@@ -111,8 +113,9 @@ multiple color stops, and percentage stops. Gradients are accepted anywhere a co
 accepted (backgrounds, foreground/text, accent, borders, and shadows), with explicit
 `text-gradient`, `accent-gradient`, `border-color-gradient`, and `shadow-color-gradient`
 aliases available. Unsupported
-selectors and declarations report an error, and failed stylesheet loads do not partially
-modify the active theme.
+declarations are ignored so themes can include properties not implemented by Fluid UI.
+Unsupported selectors and invalid values for supported properties report an error, and
+failed stylesheet loads do not partially modify the active theme.
 
 ```css
 button.primary {

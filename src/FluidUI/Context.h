@@ -126,7 +126,7 @@ private:
     bool IsFloatingWindowAt(Vec2 position) const;
     Rect Place(Vec2 size, float spacing);
     void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
-                         float opacity, float rounding = 0.f);
+                         float opacity, CornerRadii rounding = {});
     void DrawBox(Rect r, const ComputedStyle& s);
     void DrawBackgroundImage(Rect r, const ComputedStyle& s);
     void EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style);

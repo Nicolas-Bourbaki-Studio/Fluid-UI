@@ -79,6 +79,17 @@ struct Edges { // top, right, bottom, left
     constexpr float Vertical() const { return top + bottom; }
 };
 
+struct CornerRadii { // top-left, top-right, bottom-right, bottom-left
+    float topLeft = 0, topRight = 0, bottomRight = 0, bottomLeft = 0;
+    constexpr CornerRadii() = default;
+    constexpr CornerRadii(float all)
+        : topLeft(all), topRight(all), bottomRight(all), bottomLeft(all) {}
+    constexpr CornerRadii(float topLeft_, float topRight_,
+                          float bottomRight_, float bottomLeft_)
+        : topLeft(topLeft_), topRight(topRight_),
+          bottomRight(bottomRight_), bottomLeft(bottomLeft_) {}
+};
+
 inline float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 inline Color Lerp(Color a, Color b, float t) {
     return {Lerp(a.r, b.r, t), Lerp(a.g, b.g, t), Lerp(a.b, b.b, t), Lerp(a.a, b.a, t)};
@@ -86,6 +97,10 @@ inline Color Lerp(Color a, Color b, float t) {
 inline Edges Lerp(Edges a, Edges b, float t) {
     return {Lerp(a.top, b.top, t), Lerp(a.right, b.right, t),
             Lerp(a.bottom, b.bottom, t), Lerp(a.left, b.left, t)};
+}
+inline CornerRadii Lerp(CornerRadii a, CornerRadii b, float t) {
+    return {Lerp(a.topLeft, b.topLeft, t), Lerp(a.topRight, b.topRight, t),
+            Lerp(a.bottomRight, b.bottomRight, t), Lerp(a.bottomLeft, b.bottomLeft, t)};
 }
 
 }

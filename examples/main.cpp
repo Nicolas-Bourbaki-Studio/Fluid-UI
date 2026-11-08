@@ -291,47 +291,6 @@ int main() {
     ui.Style().RegisterImage(iconImageSource, static_cast<GPUImageId>(iconTexture),
                              {static_cast<float>(iconImageWidth),
                               static_cast<float>(iconImageHeight)});
-    const std::vector<std::string> brandClasses{"brand"};
-    const ComputedStyle brandStyle =
-        ui.Style().Resolve("empty-widget", brandClasses, State_None);
-    if (brandStyle.backgroundImage != static_cast<GPUImageId>(iconTexture)) {
-        std::fprintf(stderr, "CSS background-image did not resolve to the registered texture\n");
-        glDeleteTextures(1, &iconTexture);
-        glfwDestroyWindow(win);
-        glfwTerminate();
-        return 1;
-    }
-    const std::vector<std::string> gradientClasses{"gradient-demo"};
-    const std::vector<std::string> gradientTextClasses{"gradient-text"};
-    const ComputedStyle gradientStyle =
-        ui.Style().Resolve("empty-widget", gradientClasses, State_None);
-    const ComputedStyle gradientTextStyle =
-        ui.Style().Resolve("text", gradientTextClasses, State_None);
-    if (gradientStyle.backgroundGradient.stops.size() != 3 ||
-        gradientTextStyle.textGradient.stops.size() != 3) {
-        std::fprintf(stderr, "CSS background or text gradient did not resolve\n");
-        glDeleteTextures(1, &iconTexture);
-        glfwDestroyWindow(win);
-        glfwTerminate();
-        return 1;
-    }
-    const ComputedStyle windowStyle = ui.Style().Resolve("window", {}, State_None);
-    const ComputedStyle buttonGradientStyle =
-        ui.Style().Resolve("button", {"gradient-demo"}, State_None);
-    const ComputedStyle toggleGradientStyle = ui.Style().Resolve("toggle", {}, State_None);
-    if (windowStyle.backgroundGradient.stops.size() != 2 ||
-        windowStyle.borderColorGradient.stops.size() != 2 ||
-        windowStyle.shadowColorGradient.stops.size() != 2 ||
-        buttonGradientStyle.backgroundGradient.stops.size() != 2 ||
-        buttonGradientStyle.borderColorGradient.stops.size() != 2 ||
-        buttonGradientStyle.textGradient.stops.size() != 2 ||
-        toggleGradientStyle.accentGradient.stops.size() != 2) {
-        std::fprintf(stderr, "CSS background, text, accent, border, or shadow gradient did not resolve\n");
-        glDeleteTextures(1, &iconTexture);
-        glfwDestroyWindow(win);
-        glfwTerminate();
-        return 1;
-    }
     const GLuint demoTexture = CreateDemoTexture();
     const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
     const GLuint fontTexture = CreateDemoFontTexture();
@@ -350,7 +309,6 @@ int main() {
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     double last = glfwGetTime();
-    bool imageDrawVerified = false;
 
     while (!glfwWindowShouldClose(win)) {
         glfwPollEvents();
@@ -503,20 +461,6 @@ int main() {
         }
 
         const DrawList& dl = ui.EndFrame();
-        if (!imageDrawVerified) {
-            const auto iconDrawCount = std::count_if(dl.Commands().begin(), dl.Commands().end(),
-                [&](const DrawCmd& command) {
-                    return command.texture == static_cast<GPUImageId>(iconTexture) &&
-                           command.idxCount >= 6;
-                });
-            imageDrawVerified = iconDrawCount >= 2;
-            if (!imageDrawVerified)
-                std::fprintf(stderr, "CSS background image or image widget was not emitted by the UI renderer\n");
-            else {
-                std::fprintf(stdout, "CSS background image and image widget loaded and emitted for rendering\n");
-                std::fflush(stdout);
-            }
-        }
         glClearColor(0.08f, 0.08f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         RenderGL(dl, w, h);

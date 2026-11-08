@@ -35,14 +35,23 @@ public:
     void BringLayerToFront(const Layer& layer);
 
     void AddRectFilled(Rect r, Color c, float rounding = 0.f);
+    void AddRectFilled(Rect r, Color c, CornerRadii rounding);
     void AddRectFilledGradient(Rect r, const LinearGradient& gradient,
                                float opacity = 1.f, float rounding = 0.f);
+    void AddRectFilledGradient(Rect r, const LinearGradient& gradient,
+                               float opacity, CornerRadii rounding);
     void AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
                            float blur, float rounding = 0.f);
+    void AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float blur, CornerRadii rounding);
     void AddBox(Rect r, Color bg, Color border, float borderWidth, float rounding);
+    void AddBox(Rect r, Color bg, Color border, float borderWidth, CornerRadii rounding);
     void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
                            float borderWidth, float rounding);
+    void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float borderWidth, CornerRadii rounding);
     void AddShadow(Rect r, Color c, float blur, float rounding);
+    void AddShadow(Rect r, Color c, float blur, CornerRadii rounding);
     void AddTriangleFilled(Vec2 a, Vec2 b, Vec2 c, Color col);
     void AddTriangleFilledGradient(Vec2 a, Vec2 b, Vec2 c,
                                    const LinearGradient& gradient, float opacity = 1.f);

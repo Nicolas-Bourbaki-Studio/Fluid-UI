@@ -16,26 +16,28 @@
 /* ================= WINDOW ================= */
 
 window {
-    background: linear-gradient(120deg, #101319, hsl(217, 100%, 81%));
-    border-color: linear-gradient(90deg, #353B47, #638CC2);
+    background: linear-gradient(120deg, #080808, #080808);
+    border-color: transparent;
     border-width: 2px;
-    border-radius: 3px;
+    border-radius: 6px;
     padding: 5px;
-    shadow-color: linear-gradient(135deg, rgba(20, 25, 40, 0), rgba(90, 110, 220, 0.2));
-    shadow-blur: 15px;
 }
 
 window-title {
-    background: #222630;
-    color: #F3F6FC;
-    font-size: 14px;
-    padding: 6px 10px;
+    background: #141414;
+    color: #BABABA;
+    font-size: 10px;
+    padding: 7px 7px;
+    border-radius-top-left: 6px;
+    border-radius-top-right: 6px;
+    border-radius-bottom-left: 0px;
+    border-radius-bottom-right: 0px;
 }
 
 window-close {
     background: transparent;
-    color: #9BA6B7;
-    font-size: 16px;
+    color: #BABABA;
+    font-size: 10px;
 }
 
 window-close:hover {
@@ -44,11 +46,11 @@ window-close:hover {
 }
 
 main-menu-bar {
-    background: #191A1D;
+    background: #080808;
     border-color: var(--ui-border);
     border-width: 1px;
     padding: 3px 8px;
-    shadow-color: rgba(0, 0, 0, 0.3);
+    /* shadow-color: rgba(0, 0, 0, 0.3); */
     shadow-blur: 5px;
 }
 
@@ -67,7 +69,7 @@ menu-popup {
     background: #252629;
     border: 1px solid var(--ui-border);
     border-radius: 5px;
-    shadow-color: rgba(0, 0, 0, 0.5);
+    /* shadow-color: rgba(0, 0, 0, 0.5); */
     shadow-blur: 12px;
     padding: 4px;
 }
@@ -111,7 +113,7 @@ dock-menu {
     background: #202124;
     border: 1px solid var(--ui-border);
     border-radius: 8px;
-    shadow-color: rgba(0, 0, 0, 0.56);
+    /* shadow-color: rgba(0, 0, 0, 0.56); */
     shadow-blur: 14px;
 }
 
@@ -151,8 +153,8 @@ image-widget {
     padding: 8px;
     background-size: contain;
     background-position: center;
-    shadow-color: linear-gradient(135deg, rgba(89, 107, 206, 0.25), rgba(189, 134, 244, 0.15));
-    shadow-blur: 10px;
+    /* shadow-color: linear-gradient(135deg, rgba(89, 107, 206, 0.25), rgba(189, 134, 244, 0.15)); */
+    /* shadow-blur: 10px; */
 }
 
 image-widget.icon-card {
@@ -216,7 +218,7 @@ button.primary:hover {
 }
 
 button.primary.emphasis {
-    shadow-color: rgba(40, 120, 184, 0.31);
+    /* shadow-color: rgba(40, 120, 184, 0.31); */
     shadow-blur: 8px;
 }
 

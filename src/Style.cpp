@@ -21,6 +21,7 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.shadowColor = Lerp(a.shadowColor, b.shadowColor, t);
     o.borderWidth = Lerp(a.borderWidth, b.borderWidth, t);
     o.rounding    = Lerp(a.rounding,    b.rounding,    t);
+    o.cornerRadii = Lerp(a.cornerRadii, b.cornerRadii, t);
     o.fontSize    = Lerp(a.fontSize,    b.fontSize,    t);
     o.spacing     = Lerp(a.spacing,     b.spacing,     t);
     o.shadowBlur  = Lerp(a.shadowBlur,  b.shadowBlur,  t);
@@ -132,6 +133,22 @@ bool ValidSelector(std::string_view selector) {
 
 bool ParseLinearGradient(std::string_view text, LinearGradient& gradient);
 
+bool IsSupportedDeclaration(std::string_view name) {
+    return name == "background" || name == "background-color" ||
+        name == "color" || name == "foreground" || name == "accent" ||
+        name == "border-color" || name == "shadow-color" ||
+        name == "border-width" || name == "border-radius" || name == "rounding" ||
+        name == "border-radius-top-left" || name == "border-radius-top-right" ||
+        name == "border-radius-bottom-left" || name == "border-radius-bottom-right" ||
+        name == "font-size" || name == "gap" || name == "spacing" ||
+        name == "shadow-blur" || name == "opacity" || name == "transition-speed" ||
+        name == "padding" || name == "border" || name == "background-image" ||
+        name == "text-gradient" || name == "foreground-gradient" ||
+        name == "accent-gradient" || name == "border-color-gradient" ||
+        name == "shadow-color-gradient" || name == "background-size" ||
+        name == "background-position";
+}
+
 void Apply(ComputedStyle& s, const StyleDecl& d) {
     const float* v = d.value.v;
     const Color col{v[0], v[1], v[2], v[3]};
@@ -161,8 +178,15 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.shadowColor = col;
             s.shadowColorGradient = {};
             break;
-        case Prop::BorderWidth:     s.borderWidth = v[0]; break;
-        case Prop::Rounding:        s.rounding = v[0]; break;
+        case Prop::BorderWidth: s.borderWidth = v[0]; break;
+        case Prop::Rounding:
+            s.rounding = v[0];
+            s.cornerRadii = CornerRadii(v[0]);
+            break;
+        case Prop::RoundingTopLeft:     s.cornerRadii.topLeft = v[0]; break;
+        case Prop::RoundingTopRight:    s.cornerRadii.topRight = v[0]; break;
+        case Prop::RoundingBottomRight: s.cornerRadii.bottomRight = v[0]; break;
+        case Prop::RoundingBottomLeft:  s.cornerRadii.bottomLeft = v[0]; break;
         case Prop::FontSize:        s.fontSize = v[0]; break;
         case Prop::Spacing:         s.spacing = v[0]; break;
         case Prop::ShadowBlur:      s.shadowBlur = v[0]; break;
@@ -455,6 +479,10 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         return colorOrGradient(Prop::ShadowColor, Prop::ShadowColorGradient);
     if (name == "border-width") return number(Prop::BorderWidth);
     if (name == "border-radius" || name == "rounding") return number(Prop::Rounding);
+    if (name == "border-radius-top-left") return number(Prop::RoundingTopLeft);
+    if (name == "border-radius-top-right") return number(Prop::RoundingTopRight);
+    if (name == "border-radius-bottom-right") return number(Prop::RoundingBottomRight);
+    if (name == "border-radius-bottom-left") return number(Prop::RoundingBottomLeft);
     if (name == "font-size") return number(Prop::FontSize);
     if (name == "gap" || name == "spacing") return number(Prop::Spacing);
     if (name == "shadow-blur") return number(Prop::ShadowBlur);
@@ -729,14 +757,15 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
                 const size_t colon = decl.find(':');
                 const std::string_view name = colon == std::string_view::npos
                     ? std::string_view{} : Trim(decl.substr(0, colon));
+                const bool supported = IsSupportedDeclaration(name);
                 std::string value;
                 if (colon == std::string_view::npos ||
-                    (!name.starts_with("--") &&
+                    (!name.starts_with("--") && supported &&
                      !ResolveVariables(decl.substr(colon + 1), variables, value))) {
                     if (error) *error = "Invalid CSS variable in declaration: " + std::string(decl);
                     return false;
                 }
-                if (!name.starts_with("--")) {
+                if (!name.starts_with("--") && supported) {
                     std::vector<StyleDecl> parsed;
                     if (name == "border") {
                         std::string_view parts = Trim(value);

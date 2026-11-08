@@ -16,18 +16,53 @@ void Arc(std::vector<Vec2>& out, Vec2 c, float r, float a0, float a1, int seg) {
     }
 }
 
-void BuildRoundedRect(std::vector<Vec2>& out, Rect r, float rad) {
+CornerRadii ExpandRadii(CornerRadii radii, float amount) {
+    return {std::max(0.f, radii.topLeft + amount),
+            std::max(0.f, radii.topRight + amount),
+            std::max(0.f, radii.bottomRight + amount),
+            std::max(0.f, radii.bottomLeft + amount)};
+}
+
+void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
     out.clear();
-    rad = std::min({rad, r.w * 0.5f, r.h * 0.5f});
-    if (rad < 0.5f) {
+    radii.topLeft = std::max(0.f, radii.topLeft);
+    radii.topRight = std::max(0.f, radii.topRight);
+    radii.bottomRight = std::max(0.f, radii.bottomRight);
+    radii.bottomLeft = std::max(0.f, radii.bottomLeft);
+    float scale = 1.f;
+    auto constrain = [&](float extent, float sum) {
+        if (sum > extent && sum > 0.f) scale = std::min(scale, extent / sum);
+    };
+    constrain(r.w, radii.topLeft + radii.topRight);
+    constrain(r.w, radii.bottomLeft + radii.bottomRight);
+    constrain(r.h, radii.topLeft + radii.bottomLeft);
+    constrain(r.h, radii.topRight + radii.bottomRight);
+    radii.topLeft *= scale;
+    radii.topRight *= scale;
+    radii.bottomRight *= scale;
+    radii.bottomLeft *= scale;
+
+    if (radii.topLeft < 0.5f && radii.topRight < 0.5f &&
+        radii.bottomRight < 0.5f && radii.bottomLeft < 0.5f) {
         out = {{r.x, r.y}, {r.x + r.w, r.y}, {r.x + r.w, r.y + r.h}, {r.x, r.y + r.h}};
         return;
     }
-    const int seg = std::clamp(static_cast<int>(rad * 0.6f) + 3, 4, 12);
-    Arc(out, {r.x + r.w - rad, r.y + rad},       rad, -kPi * 0.5f, 0.f,        seg);
-    Arc(out, {r.x + r.w - rad, r.y + r.h - rad}, rad, 0.f,         kPi * 0.5f, seg);
-    Arc(out, {r.x + rad,       r.y + r.h - rad}, rad, kPi * 0.5f,  kPi,        seg);
-    Arc(out, {r.x + rad,       r.y + rad},       rad, kPi,         kPi * 1.5f, seg);
+    auto addArc = [&](Vec2 center, float radius, float start, float end, Vec2 squareCorner) {
+        if (radius < 0.5f) {
+            out.push_back(squareCorner);
+            return;
+        }
+        const int seg = std::clamp(static_cast<int>(radius * 0.6f) + 3, 4, 12);
+        Arc(out, center, radius, start, end, seg);
+    };
+    addArc({r.x + r.w - radii.topRight, r.y + radii.topRight}, radii.topRight,
+           -kPi * 0.5f, 0.f, {r.x + r.w, r.y});
+    addArc({r.x + r.w - radii.bottomRight, r.y + r.h - radii.bottomRight},
+           radii.bottomRight, 0.f, kPi * 0.5f, {r.x + r.w, r.y + r.h});
+    addArc({r.x + radii.bottomLeft, r.y + r.h - radii.bottomLeft}, radii.bottomLeft,
+           kPi * 0.5f, kPi, {r.x, r.y + r.h});
+    addArc({r.x + radii.topLeft, r.y + radii.topLeft}, radii.topLeft,
+           kPi, kPi * 1.5f, {r.x, r.y});
 }
 
 Color SampleGradient(const LinearGradient& gradient, Vec2 point, Rect bounds) {
@@ -154,6 +189,10 @@ void DrawList::AddConvexFill(const Vec2* p, int n, Color c) {
 }
 
 void DrawList::AddRectFilled(Rect r, Color c, float rounding) {
+    AddRectFilled(r, c, CornerRadii(rounding));
+}
+
+void DrawList::AddRectFilled(Rect r, Color c, CornerRadii rounding) {
     if (r.w <= 0.f || r.h <= 0.f) return;
     std::vector<Vec2> pts;
     BuildRoundedRect(pts, r, rounding);
@@ -162,6 +201,11 @@ void DrawList::AddRectFilled(Rect r, Color c, float rounding) {
 
 void DrawList::AddRectFilledGradient(Rect r, const LinearGradient& gradient,
                                      float opacity, float rounding) {
+    AddRectFilledGradient(r, gradient, opacity, CornerRadii(rounding));
+}
+
+void DrawList::AddRectFilledGradient(Rect r, const LinearGradient& gradient,
+                                     float opacity, CornerRadii rounding) {
     if (r.w <= 0.f || r.h <= 0.f || gradient.Empty()) return;
     std::vector<Vec2> pts;
     BuildRoundedRect(pts, r, rounding);
@@ -170,24 +214,36 @@ void DrawList::AddRectFilledGradient(Rect r, const LinearGradient& gradient,
 
 void DrawList::AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
                                  float blur, float rounding) {
+    AddShadowGradient(r, gradient, opacity, blur, CornerRadii(rounding));
+}
+
+void DrawList::AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
+                                 float blur, CornerRadii rounding) {
     if (blur <= 0.f || gradient.Empty()) return;
     constexpr int steps = 6;
     for (int i = 0; i < steps; ++i) {
         const float t = static_cast<float>(i + 1) / steps;
         const float fade = (1.f - t) * 0.35f;
         AddRectFilledGradient(r.Expanded(blur * t), gradient, opacity * fade,
-                              rounding + blur * t);
+                              ExpandRadii(rounding, blur * t));
     }
 }
 
 void DrawList::AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
                                  float borderWidth, float rounding) {
+    AddBorderGradient(r, gradient, opacity, borderWidth, CornerRadii(rounding));
+}
+
+void DrawList::AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
+                                 float borderWidth, CornerRadii rounding) {
     if (borderWidth <= 0.f || gradient.Empty()) return;
     const float horizontalInset = std::min(borderWidth, r.w * 0.5f);
     const float verticalInset = std::min(borderWidth, r.h * 0.5f);
-    AddRectFilledGradient({r.x, r.y, r.w, borderWidth}, gradient, opacity, rounding);
+    AddRectFilledGradient({r.x, r.y, r.w, borderWidth}, gradient, opacity,
+                          {rounding.topLeft, rounding.topRight, 0.f, 0.f});
     AddRectFilledGradient({r.x, r.y + r.h - borderWidth, r.w, borderWidth},
-                          gradient, opacity, rounding);
+                          gradient, opacity,
+                          {0.f, 0.f, rounding.bottomRight, rounding.bottomLeft});
     const float sideHeight = std::max(0.f, r.h - 2.f * borderWidth);
     AddRectFilledGradient({r.x, r.y + borderWidth, horizontalInset, sideHeight},
                           gradient, opacity);
@@ -215,22 +271,31 @@ void DrawList::AddConvexFillGradient(const Vec2* points, int count,
 }
 
 void DrawList::AddBox(Rect r, Color bg, Color border, float bw, float rounding) {
+    AddBox(r, bg, border, bw, CornerRadii(rounding));
+}
+
+void DrawList::AddBox(Rect r, Color bg, Color border, float bw, CornerRadii rounding) {
     if (bw > 0.f && border.a > 0.f) {
         AddRectFilled(r, border, rounding);
-        AddRectFilled({r.x + bw, r.y + bw, r.w - 2 * bw, r.h - 2 * bw}, bg, std::max(0.f, rounding - bw));
+        AddRectFilled({r.x + bw, r.y + bw, r.w - 2 * bw, r.h - 2 * bw},
+                      bg, ExpandRadii(rounding, -bw));
     } else {
         AddRectFilled(r, bg, rounding);
     }
 }
 
 void DrawList::AddShadow(Rect r, Color c, float blur, float rounding) {
+    AddShadow(r, c, blur, CornerRadii(rounding));
+}
+
+void DrawList::AddShadow(Rect r, Color c, float blur, CornerRadii rounding) {
     if (blur <= 0.f || c.a <= 0.f) return;
     constexpr int steps = 6;
     for (int i = 0; i < steps; ++i) {
         const float t = static_cast<float>(i + 1) / steps;
         Color cc = c;
         cc.a = c.a * (1.f - t) * 0.35f;
-        AddRectFilled(r.Expanded(blur * t), cc, rounding + blur * t);
+        AddRectFilled(r.Expanded(blur * t), cc, ExpandRadii(rounding, blur * t));
     }
 }
 
