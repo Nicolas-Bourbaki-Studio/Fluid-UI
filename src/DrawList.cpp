@@ -260,6 +260,32 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
     vtx_.push_back({{r.x,       r.y + r.h}, {uv.x,        uv.y + uv.h}, col});
     const uint32_t i[6] = {0, 1, 2, 0, 2, 3};
     for (uint32_t k : i) idx_.push_back(base + k);
+
+    if (imageId != 0 && r.w > 0.f && r.h > 0.f) {
+        constexpr float fringe = 1.f;
+        const uint32_t fringeBase = static_cast<uint32_t>(vtx_.size());
+        const Vec2 outerPositions[] = {
+            {r.x - fringe, r.y - fringe},
+            {r.x + r.w + fringe, r.y - fringe},
+            {r.x + r.w + fringe, r.y + r.h + fringe},
+            {r.x - fringe, r.y + r.h + fringe}
+        };
+        for (size_t corner = 0; corner < 4; ++corner) {
+            Vertex outer = vtx_[base + static_cast<uint32_t>(corner)];
+            outer.pos = outerPositions[corner];
+            outer.col &= 0x00FFFFFFu;
+            vtx_.push_back(outer);
+        }
+        for (uint32_t edge = 0; edge < 4; ++edge) {
+            const uint32_t next = (edge + 1) % 4;
+            const uint32_t inner = base + edge;
+            const uint32_t innerNext = base + next;
+            const uint32_t outer = fringeBase + edge;
+            const uint32_t outerNext = fringeBase + next;
+            idx_.insert(idx_.end(),
+                        {inner, innerNext, outerNext, inner, outerNext, outer});
+        }
+    }
     FinishPrimitive();
 }
 
