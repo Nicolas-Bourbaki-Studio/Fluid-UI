@@ -467,6 +467,12 @@ int main() {
                 if (networkConnected && ui.MenuItem("Disconnect")) networkConnected = false;
                 ui.EndMenu();
             }
+
+            if (ui.BeginMenu("Clouds")) {
+                if (ui.MenuItem("Create Clouds")) std::puts("Clouds created");
+                if (ui.MenuItem("Configure Clouds and Sky"))
+                ui.EndMenu();
+            }
             ui.EndMainMenuBar();
         }
 
@@ -506,9 +512,9 @@ int main() {
             ui.ValueSlider("Volume", &volume, 0.f, 1.f);
             ui.TextLabel("Text label");
             ui.TextLabelLeft("Text with leading icon",
-                             static_cast<GPUImageId>(folderIconTexture), {20, 20});
+                             static_cast<GPUImageId>(folderIconTexture), {30, 30});
             ui.TextLabelRight("Text with trailing icon",
-                              static_cast<GPUImageId>(emptyIconTexture), {20, 20});
+                              static_cast<GPUImageId>(emptyIconTexture), {30, 30});
             ui.Image(static_cast<GPUImageId>(productImageTexture), {24, 24});
             ui.ImageLabel("Image label", static_cast<GPUImageId>(productImageTexture), {28, 28});
             if (ui.ImageButton("Image button",

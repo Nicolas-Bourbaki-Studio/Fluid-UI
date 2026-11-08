@@ -1,30 +1,62 @@
 /* ================= COLORS & VARIABLES ================= */
 
-:root {
+*:root {
+    /* Accent */
     --ui-accent: #0e6fff;
     --ui-accent-hover: #217aff;
     --ui-accent-active: #1967db;
 
+    /* Backgrounds */
     --ui-window: #080808;
     --ui-panel: #171717;
     --ui-panel-hover: #202020;
     --ui-panel-active: #2A2A2A;
+    --ui-overlay: transparent;
 
+    /* Borders */
     --ui-border: #171717;
     --ui-border-hover: #414141;
     --ui-border-active: #59667A;
 
+    /* Text */
     --ui-text: #FFFFFF;
     --ui-text-secondary: #BABABA;
     --ui-text-muted: #C8CDD5;
 
+    /* Danger */
     --ui-danger: #e62626;
     --ui-danger-hover: #f74848;
     --ui-danger-border: #be1c1c;
 
-    --ui-overlay: transparent;
+    /* Gradients */
+    --ui-window-gradient: linear-gradient(
+        180deg,
+        #080808 0%,
+        #181717 100%
+    );
 
+    --ui-demo-gradient: linear-gradient(
+        90deg,
+        #0E6FFF 0%,
+        #3E66E8 25%,
+        #7D4FE0 50%,
+        #C44DC8 75%,
+        #F26A85 100%
+    );
+
+    --ui-text-gradient: linear-gradient(
+        90deg,
+        #62D5FF 0%,
+        #789EFF 25%,
+        #A991FF 50%,
+        #D78AE8 75%,
+        #FF86C8 100%
+    );
+
+    /* Miscellaneous */
     --ui-radius: 6px;
+    --ui-dock-splitter: rgba(112, 124, 144, 0.46);
+    --ui-dock-shadow: rgba(0, 0, 0, 0.9);
 }
 
 /* ================= GLOBAL ================= */
@@ -39,8 +71,7 @@
 /* ================= WINDOW ================= */
 
 window {
-    background: linear-gradient(180deg, #080808 0%, #101010 22%, #171717 48%,
-        #121212 74%, #0c0c0c 100%);
+    background: var(--ui-window-gradient);
     border-color: transparent;
     border-width: 2px;
     border-radius: var(--ui-radius);
@@ -126,26 +157,36 @@ dock-preview {
 }
 
 dock-splitter {
-    background: rgba(112, 124, 144, 0.46);
+    background: var(--ui-dock-splitter);
     accent: var(--ui-accent-hover);
     border-radius: var(--ui-radius);
 }
 
 dock-menu {
-    background: var(--ui-panel);
+    background: var(--ui-window);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
+    shadow-color: var(--ui-dock-shadow);
+    shadow-blur: 12px;
+}
+
+dock-menu.docking-options {
+    border-color: var(--ui-border-hover);
 }
 
 dock-target {
-    background: var(--ui-panel-hover);
+    background: var(--ui-window);
     border: 1px solid var(--ui-border-hover);
     border-radius: var(--ui-radius);
     color: var(--ui-text);
     font-size: 13px;
 }
 
-dock-target:hover {
+dock-target.docking-options {
+    accent: var(--ui-accent);
+}
+
+dock-target.docking-options:hover {
     background: var(--ui-accent-hover);
     border-color: var(--ui-accent);
 }
@@ -158,7 +199,7 @@ empty-widget {
 
 empty-widget.brand {
     background: var(--ui-panel);
-    background-image: url("../src/Images/Icon.jpg");
+    background-image: url("../src/Icons/FolderIcn.png");
     background-size: contain;
     background-position: center;
     border: 1px solid var(--ui-border);
@@ -182,8 +223,7 @@ image-widget.icon-card {
 }
 
 empty-widget.gradient-demo {
-    background: linear-gradient(90deg, #0E6FFF 0%, #3E66E8 25%, #7D4FE0 50%,
-        #C44DC8 75%, #F26A85 100%);
+    background: var(--ui-demo-gradient);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
@@ -200,8 +240,7 @@ text-label, image-label {
 }
 
 text.gradient-text {
-    text-gradient: linear-gradient(90deg, #62D5FF 0%, #789EFF 25%, #A991FF 50%,
-        #D78AE8 75%, #FF86C8 100%);
+    text-gradient: var(--ui-text-gradient);
 }
 
 /* ================= BUTTONS ================= */
@@ -239,8 +278,7 @@ button.primary.emphasis {
 }
 
 button.gradient-demo {
-    background: linear-gradient(90deg, #0E6FFF 0%, #3E66E8 25%, #7D4FE0 50%,
-        #C44DC8 75%, #F26A85 100%);
+    background: var(--ui-demo-gradient);
     border-color: var(--ui-accent);
     color: var(--ui-text);
 }

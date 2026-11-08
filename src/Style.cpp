@@ -58,7 +58,7 @@ uint8_t StateFromName(std::string_view n) {
 
 void ParseSelector(std::string_view s, std::string& widget,
                    std::vector<std::string>& classes, uint8_t& mask) {
-    if (s == ":root") {
+    if (s == ":root" || s == "*:root") {
         widget.clear();
         classes.clear();
         mask = 0;
@@ -90,7 +90,7 @@ void ParseSelector(std::string_view s, std::string& widget,
 }
 
 bool ValidSelector(std::string_view selector) {
-    if (selector == ":root") return true;
+    if (selector == ":root" || selector == "*:root") return true;
     if (selector.empty()) return false;
     for (char ch : selector)
         if (std::isspace(static_cast<unsigned char>(ch))) return false;
@@ -683,7 +683,8 @@ void CollectVariables(std::string_view source,
         while (!selectorList.empty()) {
             const size_t comma = selectorList.find(',');
             const std::string_view selector = Trim(selectorList.substr(0, comma));
-            global = global || selector == ":root" || selector == "*";
+            global = global || selector == ":root" || selector == "*:root" ||
+                     selector == "*";
             if (comma == std::string_view::npos) break;
             selectorList.remove_prefix(comma + 1);
         }

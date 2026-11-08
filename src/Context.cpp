@@ -19,6 +19,9 @@ constexpr uint8_t kResizeLeft = 1u << 0;
 constexpr uint8_t kResizeRight = 1u << 1;
 constexpr uint8_t kResizeTop = 1u << 2;
 constexpr uint8_t kResizeBottom = 1u << 3;
+constexpr float kDockTargetSize = 28.f;
+constexpr float kDockTargetGap = 4.f;
+constexpr float kDockCompassSize = 104.f;
 
 uint8_t ResizeEdgesAt(Rect frame, Vec2 position) {
     constexpr float edgeSize = 8.f;
@@ -137,7 +140,9 @@ const DrawList& Context::EndFrame() {
         draw_.PopClipRect();
     }
     if (dockCompassVisible_) {
-        const ComputedStyle menuStyle = Resolve("dock-menu", 0);
+        std::vector<std::string> dockClasses = classStack_;
+        dockClasses.emplace_back("docking-options");
+        const ComputedStyle menuStyle = style_.Resolve("dock-menu", dockClasses, 0);
         DrawBox(dockCompassRect_, menuStyle);
         constexpr DockSide sides[] = {
             DockSide::TopLeft, DockSide::Top, DockSide::TopRight,
@@ -147,7 +152,8 @@ const DrawList& Context::EndFrame() {
         for (DockSide side : sides) {
             const Rect target = DockTargetRect(side);
             const bool hovered = target.Contains(in_.mousePos);
-            ComputedStyle style = Resolve("dock-target", hovered ? State_Hovered : State_None);
+            ComputedStyle style = style_.Resolve(
+                "dock-target", dockClasses, hovered ? State_Hovered : State_None);
             DrawBox(target, style);
             const Rect icon{target.x + 5.f, target.y + 5.f,
                             target.w - 10.f, target.h - 10.f};
@@ -561,9 +567,7 @@ bool Context::MenuItem(std::string_view label) {
 }
 
 Rect Context::DockTargetRect(DockSide side) const {
-    constexpr float buttonSize = 24.f;
-    constexpr float buttonGap = 3.f;
-    const float gridSize = buttonSize * 3.f + buttonGap * 2.f;
+    const float gridSize = kDockTargetSize * 3.f + kDockTargetGap * 2.f;
     const float originX = in_.displaySize.x * 0.5f - gridSize * 0.5f;
     const float originY = in_.displaySize.y * 0.5f - gridSize * 0.5f;
     int column = 0, row = 0;
@@ -579,8 +583,9 @@ Rect Context::DockTargetRect(DockSide side) const {
         case DockSide::BottomRight: row = 2; column = 2; break;
         case DockSide::None: break;
     }
-    return {originX + column * (buttonSize + buttonGap),
-            originY + row * (buttonSize + buttonGap), buttonSize, buttonSize};
+    return {originX + column * (kDockTargetSize + kDockTargetGap),
+            originY + row * (kDockTargetSize + kDockTargetGap),
+            kDockTargetSize, kDockTargetSize};
 }
 
 Context::DockSide Context::DockTargetAt(Vec2 position) const {
@@ -969,10 +974,9 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             w.dragOff = in_.mousePos - w.pos;
         }
         w.pos = in_.mousePos - w.dragOff;
-        constexpr float compassSize = 84.f;
-        dockCompassRect_ = {in_.displaySize.x * 0.5f - compassSize * 0.5f,
-                            in_.displaySize.y * 0.5f - compassSize * 0.5f,
-                            compassSize, compassSize};
+        dockCompassRect_ = {in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
+                            in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
+                            kDockCompassSize, kDockCompassSize};
         dockCompassVisible_ = dockingEnabled_;
         dockCompassSelection_ = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
         SetDockPreview(dockCompassSelection_);
