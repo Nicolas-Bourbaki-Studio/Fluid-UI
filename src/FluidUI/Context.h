@@ -71,6 +71,7 @@ public:
     void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
     void Image(GPUImageId imageId, Vec2 size);
+    void EmptyWidget(std::string_view id, Vec2 size);
 
     // Layout
     void SameLine();
@@ -103,10 +104,17 @@ private:
         bool sameLine = false, horizontal = false;
     };
     struct ContainerState { LayoutState outer; };
+    struct DockSplitter {
+        Rect rect;
+        WidgetId id = 0;
+    };
     struct MenuState {
         WidgetId id = 0;
         Rect popup;
+        Rect parentPopup;
         float cursorY = 0.f;
+        float contentWidth = 0.f;
+        bool hasParentPopup = false;
     };
 
     WidgetId GetID(std::string_view label) const;
@@ -114,8 +122,11 @@ private:
     ComputedStyle Animate(WidgetId id, std::string_view widget, uint8_t extraState,
                           bool hovered, bool held);
     Interaction Behavior(WidgetId id, Rect r);
+    bool IsFloatingWindowAt(Vec2 position) const;
     Rect Place(Vec2 size, float spacing);
     void DrawBox(Rect r, const ComputedStyle& s);
+    void DrawBackgroundImage(Rect r, const ComputedStyle& s);
+    void EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style);
     Interaction DrawMenuButton(Rect rect, std::string_view label, WidgetId id,
                                std::string_view widget, bool selected = false);
     std::array<Rect, 6> DockRegions() const;
@@ -125,7 +136,7 @@ private:
     void LayoutDockedWindows();
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
-    Rect BeginMenuPopup(Rect anchor, size_t depth);
+    Rect BeginMenuPopup(WidgetId id, Rect anchor, size_t depth);
     void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
 
     StyleSheet style_;
@@ -157,7 +168,8 @@ private:
     std::vector<MenuState> menuStack_;
     std::vector<WidgetId> openMenus_;
     std::vector<Rect> menuPopupRects_;
-    std::vector<Rect> dockSplitters_;
+    std::unordered_map<WidgetId, Vec2> menuPopupSizes_;
+    std::vector<DockSplitter> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;

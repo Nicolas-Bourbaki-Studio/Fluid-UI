@@ -30,6 +30,32 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, float rad) {
     Arc(out, {r.x + rad,       r.y + rad},       rad, kPi,         kPi * 1.5f, seg);
 }
 
+Color SampleGradient(const LinearGradient& gradient, Vec2 point, Rect bounds) {
+    if (gradient.Empty()) return {};
+    const float radians = gradient.angleDegrees * (kPi / 180.f);
+    const Vec2 direction{std::sin(radians), -std::cos(radians)};
+    const Vec2 center{bounds.x + bounds.w * 0.5f, bounds.y + bounds.h * 0.5f};
+    const float halfExtent = std::abs(direction.x) * bounds.w * 0.5f +
+                            std::abs(direction.y) * bounds.h * 0.5f;
+    const float projection = (point.x - center.x) * direction.x +
+                             (point.y - center.y) * direction.y;
+    const float t = halfExtent > 0.f
+        ? std::clamp((projection + halfExtent) / (halfExtent * 2.f), 0.f, 1.f)
+        : 0.f;
+    if (t <= gradient.stops.front().position) return gradient.stops.front().color;
+    for (size_t i = 1; i < gradient.stops.size(); ++i) {
+        const GradientStop& previous = gradient.stops[i - 1];
+        const GradientStop& current = gradient.stops[i];
+        if (t <= current.position) {
+            const float span = current.position - previous.position;
+            const float local = span > 0.f
+                ? (t - previous.position) / span : 1.f;
+            return Lerp(previous.color, current.color, local);
+        }
+    }
+    return gradient.stops.back().color;
+}
+
 } // namespace
 
 void DrawList::Clear() {
@@ -134,6 +160,33 @@ void DrawList::AddRectFilled(Rect r, Color c, float rounding) {
     AddConvexFill(pts.data(), static_cast<int>(pts.size()), c);
 }
 
+void DrawList::AddRectFilledGradient(Rect r, const LinearGradient& gradient,
+                                     float opacity, float rounding) {
+    if (r.w <= 0.f || r.h <= 0.f || gradient.Empty()) return;
+    std::vector<Vec2> pts;
+    BuildRoundedRect(pts, r, rounding);
+    AddConvexFillGradient(pts.data(), static_cast<int>(pts.size()), gradient, r, opacity);
+}
+
+void DrawList::AddConvexFillGradient(const Vec2* points, int count,
+                                    const LinearGradient& gradient, Rect bounds,
+                                    float opacity) {
+    if (count < 3 || gradient.Empty()) return;
+    PrepareCmd(0);
+    const uint32_t base = static_cast<uint32_t>(vtx_.size());
+    for (int i = 0; i < count; ++i) {
+        Color color = SampleGradient(gradient, points[i], bounds);
+        color.a *= opacity;
+        vtx_.push_back({points[i], {0.f, 0.f}, color.ToU32()});
+    }
+    for (int i = 1; i < count - 1; ++i) {
+        idx_.push_back(base);
+        idx_.push_back(base + static_cast<uint32_t>(i));
+        idx_.push_back(base + static_cast<uint32_t>(i + 1));
+    }
+    FinishPrimitive();
+}
+
 void DrawList::AddBox(Rect r, Color bg, Color border, float bw, float rounding) {
     if (bw > 0.f && border.a > 0.f) {
         AddRectFilled(r, border, rounding);
@@ -170,6 +223,24 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
     const uint32_t i[6] = {0, 1, 2, 0, 2, 3};
     for (uint32_t k : i) idx_.push_back(base + k);
     FinishPrimitive();
+}
+
+void DrawList::ApplyLinearGradient(size_t vertexStart, size_t vertexEnd, Rect bounds,
+                                   const LinearGradient& gradient, float opacity) {
+    if (gradient.Empty()) return;
+    vertexEnd = std::min(vertexEnd, vtx_.size());
+    vertexStart = std::min(vertexStart, vertexEnd);
+    for (size_t i = vertexStart; i < vertexEnd; ++i) {
+        const Color original{
+            static_cast<float>(vtx_[i].col & 0xFFu) / 255.f,
+            static_cast<float>((vtx_[i].col >> 8) & 0xFFu) / 255.f,
+            static_cast<float>((vtx_[i].col >> 16) & 0xFFu) / 255.f,
+            static_cast<float>((vtx_[i].col >> 24) & 0xFFu) / 255.f
+        };
+        Color color = SampleGradient(gradient, vtx_[i].pos, bounds);
+        color.a *= original.a * opacity;
+        vtx_[i].col = color.ToU32();
+    }
 }
 
 } // namespace fluid

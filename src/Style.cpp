@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <sstream>
 
 namespace fluid {
@@ -26,6 +27,18 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
     o.padding     = Lerp(a.padding,     b.padding,     t);
+    o.backgroundImage = t < 0.5f ? a.backgroundImage : b.backgroundImage;
+    o.backgroundImageSize = {
+        Lerp(a.backgroundImageSize.x, b.backgroundImageSize.x, t),
+        Lerp(a.backgroundImageSize.y, b.backgroundImageSize.y, t)
+    };
+    o.backgroundFit = t < 0.5f ? a.backgroundFit : b.backgroundFit;
+    o.backgroundPosition = {
+        Lerp(a.backgroundPosition.x, b.backgroundPosition.x, t),
+        Lerp(a.backgroundPosition.y, b.backgroundPosition.y, t)
+    };
+    o.backgroundGradient = t < 0.5f ? a.backgroundGradient : b.backgroundGradient;
+    o.textGradient = t < 0.5f ? a.textGradient : b.textGradient;
     return o;
 }
 
@@ -114,11 +127,21 @@ bool ValidSelector(std::string_view selector) {
     return true;
 }
 
+bool ParseLinearGradient(std::string_view text, LinearGradient& gradient);
+
 void Apply(ComputedStyle& s, const StyleDecl& d) {
     const float* v = d.value.v;
     const Color col{v[0], v[1], v[2], v[3]};
     switch (d.prop) {
-        case Prop::Background:      s.background = col; break;
+        case Prop::Background:
+            s.background = col;
+            break;
+        case Prop::BackgroundReset:
+            s.background = col;
+            s.backgroundGradient = {};
+            s.backgroundImage = 0;
+            s.backgroundImageSize = {};
+            break;
         case Prop::Foreground:      s.foreground = col; break;
         case Prop::Accent:          s.accent = col; break;
         case Prop::BorderColor:     s.borderColor = col; break;
@@ -131,6 +154,23 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::Opacity:         s.opacity = v[0]; break;
         case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
+        case Prop::BackgroundSize:
+            s.backgroundFit = static_cast<BackgroundFit>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::BackgroundPosition:
+            s.backgroundPosition = {v[0], v[1]};
+            break;
+        case Prop::BackgroundGradient:
+            s.backgroundImage = 0;
+            s.backgroundImageSize = {};
+            if (!d.text.empty()) ParseLinearGradient(d.text, s.backgroundGradient);
+            break;
+        case Prop::TextGradient:
+            if (d.text.empty()) s.textGradient = {};
+            else ParseLinearGradient(d.text, s.textGradient);
+            break;
+        case Prop::BackgroundImage:
+            break;
     }
 }
 
@@ -213,25 +253,119 @@ bool ParseColor(std::string_view text, Color& color) {
     return true;
 }
 
-bool ParseDeclaration(std::string_view name, std::string_view value,
-                      Prop& prop, StyleValue& out) {
+bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
+    text = Trim(text);
+    if (!text.starts_with("linear-gradient(") || text.back() != ')') return false;
+    std::string_view body = Trim(text.substr(16, text.size() - 17));
+    std::vector<std::string_view> parts;
+    int depth = 0;
+    size_t start = 0;
+    for (size_t i = 0; i < body.size(); ++i) {
+        if (body[i] == '(') ++depth;
+        else if (body[i] == ')') --depth;
+        else if (body[i] == ',' && depth == 0) {
+            parts.push_back(Trim(body.substr(start, i - start)));
+            start = i + 1;
+        }
+    }
+    parts.push_back(Trim(body.substr(start)));
+    if (parts.size() < 2) return false;
+
+    LinearGradient parsed;
+    auto angle = [](std::string_view token, float& degrees) {
+        if (token.starts_with("to ")) {
+            const std::string_view direction = token.substr(3);
+            if (direction == "top") degrees = 0.f;
+            else if (direction == "right") degrees = 90.f;
+            else if (direction == "bottom") degrees = 180.f;
+            else if (direction == "left") degrees = 270.f;
+            else if (direction == "top right" || direction == "right top") degrees = 45.f;
+            else if (direction == "bottom right" || direction == "right bottom") degrees = 135.f;
+            else if (direction == "bottom left" || direction == "left bottom") degrees = 225.f;
+            else if (direction == "top left" || direction == "left top") degrees = 315.f;
+            else return false;
+            return true;
+        }
+        if (!token.ends_with("deg")) return false;
+        token.remove_suffix(3);
+        return ParseNumber(token, degrees);
+    };
+
+    float degrees = 0.f;
+    size_t firstStop = 0;
+    if (angle(parts.front(), degrees)) {
+        parsed.angleDegrees = std::fmod(degrees, 360.f);
+        if (parsed.angleDegrees < 0.f) parsed.angleDegrees += 360.f;
+        firstStop = 1;
+    }
+    if (parts.size() - firstStop < 2) return false;
+
+    std::vector<float> positions;
+    for (size_t i = firstStop; i < parts.size(); ++i) {
+        std::string_view stop = parts[i];
+        float position = std::numeric_limits<float>::quiet_NaN();
+        if (!stop.empty() && stop.back() == '%') {
+            size_t whitespace = stop.find_last_of(" \t\r\n");
+            if (whitespace != std::string_view::npos) {
+                std::string_view percent = stop.substr(whitespace + 1);
+                percent.remove_suffix(1);
+                if (!ParseNumber(percent, position)) return false;
+                position = std::clamp(position / 100.f, 0.f, 1.f);
+                stop = Trim(stop.substr(0, whitespace));
+            }
+        }
+        Color color;
+        if (!ParseColor(stop, color)) return false;
+        parsed.stops.push_back({color, 0.f});
+        positions.push_back(position);
+    }
+    if (std::isnan(positions.front())) positions.front() = 0.f;
+    if (std::isnan(positions.back())) positions.back() = 1.f;
+    for (size_t left = 0; left + 1 < positions.size();) {
+        size_t right = left + 1;
+        while (right < positions.size() && std::isnan(positions[right])) ++right;
+        if (right == positions.size()) return false;
+        if (positions[right] < positions[left]) return false;
+        const float span = positions[right] - positions[left];
+        const size_t count = right - left;
+        for (size_t i = 1; i < count; ++i)
+            positions[left + i] = positions[left] + span *
+                (static_cast<float>(i) / static_cast<float>(count));
+        left = right;
+    }
+    for (size_t i = 0; i < parsed.stops.size(); ++i)
+        parsed.stops[i].position = positions[i];
+    gradient = std::move(parsed);
+    return true;
+}
+
+bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& out) {
     name = Trim(name);
     value = Trim(value);
     auto color = [&](Prop p) {
         Color c;
         if (!ParseColor(value, c)) return false;
-        prop = p;
-        out = {{c.r, c.g, c.b, c.a}};
+        out.prop = p;
+        out.value = {{c.r, c.g, c.b, c.a}};
         return true;
     };
     auto number = [&](Prop p) {
         float v = 0.f;
         if (!ParseNumber(value, v)) return false;
-        prop = p;
-        out = {{v, 0.f, 0.f, 0.f}};
+        out.prop = p;
+        out.value = {{v, 0.f, 0.f, 0.f}};
         return true;
     };
-    if (name == "background" || name == "background-color") return color(Prop::Background);
+    if (name == "background" || name == "background-color") {
+        if (color(name == "background" ? Prop::BackgroundReset : Prop::Background)) return true;
+        LinearGradient parsed;
+        if (name == "background" && ParseLinearGradient(value, parsed)) {
+            out.prop = Prop::BackgroundGradient;
+            out.text = std::string(value);
+            return true;
+        }
+        return false;
+    }
     if (name == "color" || name == "foreground") return color(Prop::Foreground);
     if (name == "accent") return color(Prop::Accent);
     if (name == "border-color") return color(Prop::BorderColor);
@@ -257,8 +391,105 @@ bool ParseDeclaration(std::string_view name, std::string_view value,
         if (count == 2) { right = left = values[1]; }
         if (count == 3) { right = left = values[1]; bottom = values[2]; }
         if (count == 4) { right = values[1]; bottom = values[2]; left = values[3]; }
-        prop = Prop::Padding;
-        out = {{top, right, bottom, left}};
+        out.prop = Prop::Padding;
+        out.value = {{top, right, bottom, left}};
+        return true;
+    }
+    if (name == "background-image") {
+        if (value == "none") {
+            out.prop = Prop::BackgroundImage;
+            out.text.clear();
+            return true;
+        }
+        LinearGradient parsed;
+        if (ParseLinearGradient(value, parsed)) {
+            out.prop = Prop::BackgroundGradient;
+            out.text = std::string(value);
+            return true;
+        }
+        if (!value.starts_with("url(") || value.back() != ')') return false;
+        std::string_view source = Trim(value.substr(4, value.size() - 5));
+        if (source.size() >= 2 &&
+            ((source.front() == '"' && source.back() == '"') ||
+             (source.front() == '\'' && source.back() == '\''))) {
+            source.remove_prefix(1);
+            source.remove_suffix(1);
+        }
+        if (source.empty()) return false;
+        out.prop = Prop::BackgroundImage;
+        out.text = std::string(source);
+        return true;
+    }
+    if (name == "text-gradient") {
+        if (value == "none") {
+            out.prop = Prop::TextGradient;
+            out.text.clear();
+            return true;
+        }
+        LinearGradient parsed;
+        if (!ParseLinearGradient(value, parsed)) return false;
+        out.prop = Prop::TextGradient;
+        out.text = std::string(value);
+        return true;
+    }
+    if (name == "background-size") {
+        BackgroundFit fit;
+        if (value == "cover") fit = BackgroundFit::Cover;
+        else if (value == "contain") fit = BackgroundFit::Contain;
+        else if (value == "stretch" || value == "auto" || value == "100% 100%")
+            fit = BackgroundFit::Stretch;
+        else return false;
+        out.prop = Prop::BackgroundSize;
+        out.value = {{static_cast<float>(fit), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "background-position") {
+        auto parseAxis = [](std::string_view token, bool horizontal, float& position) {
+            if (token == "center") { position = 0.5f; return true; }
+            if (token == "left" || token == "top") {
+                if ((horizontal && token == "left") || (!horizontal && token == "top")) {
+                    position = 0.f;
+                    return true;
+                }
+                return false;
+            }
+            if (token == "right" || token == "bottom") {
+                if ((horizontal && token == "right") || (!horizontal && token == "bottom")) {
+                    position = 1.f;
+                    return true;
+                }
+                return false;
+            }
+            if (!token.empty() && token.back() == '%') {
+                token.remove_suffix(1);
+                float percent = 0.f;
+                if (!ParseNumber(token, percent) || percent < 0.f || percent > 100.f) return false;
+                position = percent / 100.f;
+                return true;
+            }
+            return false;
+        };
+        std::string_view tokens[2]{};
+        size_t count = 0;
+        while (!value.empty() && count < 2) {
+            const size_t split = value.find_first_of(" \t\r\n");
+            tokens[count++] = Trim(value.substr(0, split));
+            value = split == std::string_view::npos ? std::string_view{} : Trim(value.substr(split));
+        }
+        if (!value.empty() || count == 0) return false;
+        float x = 0.5f, y = 0.5f;
+        if (count == 1) {
+            if (tokens[0] == "top" || tokens[0] == "bottom") {
+                if (!parseAxis(tokens[0], false, y)) return false;
+            } else if (!parseAxis(tokens[0], true, x)) {
+                return false;
+            }
+        } else if (!parseAxis(tokens[0], true, x) || !parseAxis(tokens[1], false, y)) {
+            if (!parseAxis(tokens[0], false, y) || !parseAxis(tokens[1], true, x))
+                return false;
+        }
+        out.prop = Prop::BackgroundPosition;
+        out.value = {{x, y, 0.f, 0.f}};
         return true;
     }
     return false;
@@ -335,11 +566,26 @@ StyleSheet::RuleBuilder StyleSheet::Rule(std::string_view selector) {
     return RuleBuilder(this, rules_.size() - 1);
 }
 
-void StyleSheet::SetProp(size_t ruleIndex, Prop p, StyleValue v) {
+void StyleSheet::SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string text) {
     if (ruleIndex >= rules_.size()) return;
     auto& decls = rules_[ruleIndex].decls;
     auto it = std::find_if(decls.begin(), decls.end(), [&](const StyleDecl& d) { return d.prop == p; });
-    if (it != decls.end()) it->value = v; else decls.push_back({p, v});
+    if (it != decls.end()) {
+        it->value = v;
+        it->text = std::move(text);
+    } else {
+        decls.push_back({p, v, std::move(text)});
+    }
+    cache_.clear();
+    ++version_;
+}
+
+void StyleSheet::RegisterImage(std::string_view source, GPUImageId image, Vec2 size) {
+    if (image == 0) {
+        images_.erase(std::string(source));
+    } else {
+        images_[std::string(source)] = {image, size};
+    }
     cache_.clear();
     ++version_;
 }
@@ -374,7 +620,7 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
             return false;
         }
         std::string_view body = rest.substr(open + 1, close - open - 1);
-        std::vector<std::pair<Prop, StyleValue>> declarations;
+        std::vector<StyleDecl> declarations;
         while (!Trim(body).empty()) {
             const size_t semi = body.find(';');
             const std::string_view decl = Trim(body.substr(0, semi));
@@ -390,7 +636,7 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
                     return false;
                 }
                 if (!name.starts_with("--")) {
-                    std::vector<std::pair<Prop, StyleValue>> parsed;
+                    std::vector<StyleDecl> parsed;
                     if (name == "border") {
                         std::string_view parts = Trim(value);
                         bool valid = true, foundWidth = false, foundColor = false;
@@ -399,16 +645,16 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
                             const std::string_view token = Trim(parts.substr(0, split));
                             if (token == "solid") {
                             } else if (token == "none") {
-                                parsed.emplace_back(Prop::BorderWidth, StyleValue{{0.f, 0.f, 0.f, 0.f}});
+                                parsed.push_back({Prop::BorderWidth, StyleValue{{0.f, 0.f, 0.f, 0.f}}});
                                 foundWidth = true;
                             } else if (Color color; ParseColor(token, color)) {
-                                parsed.emplace_back(Prop::BorderColor,
-                                                    StyleValue{{color.r, color.g, color.b, color.a}});
+                                parsed.push_back({Prop::BorderColor,
+                                                  StyleValue{{color.r, color.g, color.b, color.a}}});
                                 foundColor = true;
                             } else {
                                 float width = 0.f;
                                 if (!ParseNumber(token, width)) { valid = false; break; }
-                                parsed.emplace_back(Prop::BorderWidth, StyleValue{{width, 0.f, 0.f, 0.f}});
+                                parsed.push_back({Prop::BorderWidth, StyleValue{{width, 0.f, 0.f, 0.f}}});
                                 foundWidth = true;
                             }
                             if (split == std::string_view::npos) break;
@@ -416,10 +662,9 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
                         }
                         if (!valid || (!foundWidth && !foundColor)) parsed.clear();
                     } else {
-                        Prop prop{};
-                        StyleValue parsedValue{};
-                        if (ParseDeclaration(name, value, prop, parsedValue))
-                            parsed.emplace_back(prop, parsedValue);
+                        StyleDecl parsedValue{};
+                        if (ParseDeclaration(name, value, parsedValue))
+                            parsed.push_back(std::move(parsedValue));
                     }
                     if (parsed.empty()) {
                         if (error) *error = "Invalid or unsupported CSS declaration: " + std::string(decl);
@@ -441,7 +686,7 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
             }
             auto rule = candidate.Rule(selector);
             for (const auto& declaration : declarations)
-                rule.Set(declaration.first, declaration.second);
+                rule.Set(declaration.prop, declaration.value, declaration.text);
             if (comma == std::string_view::npos) break;
             remainingSelectors.remove_prefix(comma + 1);
         }
@@ -490,8 +735,28 @@ ComputedStyle StyleSheet::Resolve(std::string_view widget,
                      [](const auto& a, const auto& b) { return a.first < b.first; });
 
     ComputedStyle out;
-    for (const auto& h : hits)
-        for (const StyleDecl& d : h.second->decls) Apply(out, d);
+    for (const auto& h : hits) {
+        for (const StyleDecl& d : h.second->decls) {
+            if (d.prop == Prop::BackgroundImage) {
+                if (d.text.empty()) {
+                    out.backgroundImage = 0;
+                    out.backgroundImageSize = {};
+                    out.backgroundGradient = {};
+                } else {
+                    const auto image = images_.find(d.text);
+                    if (image != images_.end()) {
+                        out.backgroundImage = image->second.id;
+                        out.backgroundImageSize = image->second.size;
+                    } else {
+                        out.backgroundImage = 0;
+                        out.backgroundImageSize = {};
+                    }
+                }
+            } else {
+                Apply(out, d);
+            }
+        }
+    }
 
     cache_[key] = out;
     return out;
@@ -511,9 +776,25 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x1A2637FF)).Foreground(C::FromHex(0xF1F5FCFF))
         .Padding(Edges(7, 12)).FontSize(15);
     s.Rule("window-close")
-        .Background(C::FromHex(0x29374AFF)).Foreground(C::FromHex(0xF1F5FCFF))
-        .Rounding(6).FontSize(15);
-    s.Rule("window-close:hover").Background(C::FromHex(0xD94B5AFF));
+        .Background({0.f, 0.f, 0.f, 0.f}).Foreground(C::FromHex(0xAEBBD0FF))
+        .FontSize(16);
+    s.Rule("window-close:hover")
+        .Background({0.f, 0.f, 0.f, 0.f}).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("main-menu-bar").Background(C::FromHex(0x151C28FF))
+        .BorderColor(C::FromHex(0x30425CFF)).BorderWidth(1).Padding(Edges(4, 8));
+    s.Rule("menu").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(4, 10)).Rounding(5);
+    s.Rule("menu:hover").Background(C::FromHex(0x2C3D54FF));
+    s.Rule("menu:checked").Background(C::FromHex(0x2C3D54FF));
+    s.Rule("menu-popup").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(5)).ShadowColor(C::FromHex(0x00000088)).ShadowBlur(14);
+    s.Rule("menu-item").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(5, 10)).Rounding(4);
+    s.Rule("menu-item:hover")
+        .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("menu-item:checked")
+        .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("window-scrollbar")
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
@@ -546,6 +827,8 @@ StyleSheet StyleSheet::Dark() {
     s.Rule("container")
         .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
         .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);
+    s.Rule("empty-widget").Background(C::FromHex(0x111A27FF))
+        .BorderColor(C::FromHex(0x34445AFF)).BorderWidth(1).Rounding(8);
     s.Rule("collapsible-container")
         .Background(C::FromHex(0x172231FF)).BorderColor(C::FromHex(0x2C4058FF))
         .BorderWidth(1).Rounding(9).Padding(Edges(10)).Spacing(9);

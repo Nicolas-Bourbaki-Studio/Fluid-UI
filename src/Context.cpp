@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <utility>
 
 namespace fluid {
 
@@ -62,12 +63,49 @@ const DrawList& Context::EndFrame() {
     }
     if (menuBarLayerActive_) draw_.BringLayerToFront(menuBarLayer_);
     const ComputedStyle splitterStyle = Resolve("dock-splitter", 0);
-    for (const Rect& splitter : dockSplitters_) {
-        const bool hovered = splitter.Expanded(3.f).Contains(in_.mousePos);
-        const Color color = hovered || activeDockSplitter_ != 0
+    for (const DockSplitter& dockSplitter : dockSplitters_) {
+        const Rect& splitter = dockSplitter.rect;
+        const bool vertical = splitter.h >= splitter.w;
+        const float start = vertical ? splitter.y : splitter.x;
+        const float end = start + (vertical ? splitter.h : splitter.w);
+        std::vector<std::pair<float, float>> occlusions;
+        for (const auto& [id, window] : windows_) {
+            (void)id;
+            if (!window.open || !window.init || window.dock != DockSide::None) continue;
+            const Rect frame{window.pos.x, window.pos.y, window.size.x, window.size.y};
+            const bool crossesSplitter = vertical
+                ? frame.x < splitter.x + splitter.w && frame.x + frame.w > splitter.x
+                : frame.y < splitter.y + splitter.h && frame.y + frame.h > splitter.y;
+            if (!crossesSplitter) continue;
+            const float coveredStart = vertical ? frame.y : frame.x;
+            const float coveredEnd = coveredStart + (vertical ? frame.h : frame.w);
+            const float clippedStart = std::max(start, coveredStart);
+            const float clippedEnd = std::min(end, coveredEnd);
+            if (clippedStart < clippedEnd) occlusions.emplace_back(clippedStart, clippedEnd);
+        }
+        std::sort(occlusions.begin(), occlusions.end());
+
+        const bool active = activeDockSplitter_ == dockSplitter.id;
+        const bool hovered = splitter.Expanded(4.f).Contains(in_.mousePos) &&
+                             !IsFloatingWindowAt(in_.mousePos);
+        const Color color = hovered || active
             ? splitterStyle.accent : splitterStyle.background;
-        draw_.AddRectFilled(splitter, Fade(color, splitterStyle.opacity),
-                            std::min(splitter.w, splitter.h) * 0.5f);
+        const float thickness = hovered || active ? 3.f : 2.f;
+        auto drawSegment = [&](float segmentStart, float segmentEnd) {
+            if (segmentEnd <= segmentStart) return;
+            const Rect line = vertical
+                ? Rect{splitter.x + (splitter.w - thickness) * 0.5f,
+                       segmentStart, thickness, segmentEnd - segmentStart}
+                : Rect{segmentStart, splitter.y + (splitter.h - thickness) * 0.5f,
+                       segmentEnd - segmentStart, thickness};
+            draw_.AddRectFilled(line, Fade(color, splitterStyle.opacity), thickness * 0.5f);
+        };
+        float visibleStart = start;
+        for (const auto& [coveredStart, coveredEnd] : occlusions) {
+            if (coveredStart > visibleStart) drawSegment(visibleStart, coveredStart);
+            visibleStart = std::max(visibleStart, coveredEnd);
+        }
+        drawSegment(visibleStart, end);
     }
     if (hasDockPreview_) {
         const ComputedStyle previewStyle = Resolve("dock-preview", 0);
@@ -157,6 +195,16 @@ Context::Interaction Context::Behavior(WidgetId id, Rect r) {
     return res;
 }
 
+bool Context::IsFloatingWindowAt(Vec2 position) const {
+    for (const auto& [id, window] : windows_) {
+        (void)id;
+        if (!window.open || !window.init || window.dock != DockSide::None) continue;
+        if (Rect{window.pos.x, window.pos.y, window.size.x, window.size.y}.Contains(position))
+            return true;
+    }
+    return false;
+}
+
 Rect Context::Place(Vec2 size, float spacing) {
     Vec2 pos;
     if (horizontalLayout_) {
@@ -178,8 +226,58 @@ Rect Context::Place(Vec2 size, float spacing) {
 
 void Context::DrawBox(Rect r, const ComputedStyle& s) {
     draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.rounding);
-    draw_.AddBox(r, Fade(s.background, s.opacity), Fade(s.borderColor, s.opacity),
-                 s.borderWidth, s.rounding);
+    draw_.AddRectFilled(r, Fade(s.background, s.opacity), s.rounding);
+    draw_.AddRectFilledGradient(r, s.backgroundGradient, s.opacity, s.rounding);
+    DrawBackgroundImage(r, s);
+    if (s.borderWidth > 0.f && s.borderColor.a > 0.f)
+        draw_.AddBox(r, {0.f, 0.f, 0.f, 0.f}, Fade(s.borderColor, s.opacity),
+                     s.borderWidth, s.rounding);
+}
+
+void Context::EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style) {
+    if (style.textGradient.Empty()) {
+        text_->Emit(draw_, pos, text, style.fontSize, Fade(style.foreground, style.opacity));
+        return;
+    }
+
+    const Vec2 size = text_->Measure(text, style.fontSize);
+    const size_t vertexStart = draw_.Vertices().size();
+    text_->Emit(draw_, pos, text, style.fontSize, Color{1.f, 1.f, 1.f, 1.f});
+    draw_.ApplyLinearGradient(vertexStart, draw_.Vertices().size(),
+                              {pos.x, pos.y, size.x, size.y},
+                              style.textGradient, style.opacity);
+}
+
+void Context::DrawBackgroundImage(Rect r, const ComputedStyle& s) {
+    if (s.backgroundImage == 0 || r.w <= 0.f || r.h <= 0.f) return;
+
+    Rect imageRect = r;
+    Rect uv{0.f, 0.f, 1.f, 1.f};
+    const float imageW = s.backgroundImageSize.x;
+    const float imageH = s.backgroundImageSize.y;
+    if (imageW > 0.f && imageH > 0.f) {
+        const float imageAspect = imageW / imageH;
+        const float regionAspect = r.w / r.h;
+        if (s.backgroundFit == BackgroundFit::Cover) {
+            if (imageAspect > regionAspect) {
+                uv.w = regionAspect / imageAspect;
+                uv.x = (1.f - uv.w) * s.backgroundPosition.x;
+            } else {
+                uv.h = imageAspect / regionAspect;
+                uv.y = (1.f - uv.h) * s.backgroundPosition.y;
+            }
+        } else if (s.backgroundFit == BackgroundFit::Contain) {
+            const float scale = std::min(r.w / imageW, r.h / imageH);
+            imageRect.w = imageW * scale;
+            imageRect.h = imageH * scale;
+            imageRect.x += (r.w - imageRect.w) * s.backgroundPosition.x;
+            imageRect.y += (r.h - imageRect.h) * s.backgroundPosition.y;
+        }
+    }
+
+    draw_.PushClipRect(r);
+    draw_.AddQuad(imageRect, uv, {1.f, 1.f, 1.f, s.opacity}, s.backgroundImage);
+    draw_.PopClipRect();
 }
 
 Context::Interaction Context::DrawMenuButton(Rect rect, std::string_view label, WidgetId id,
@@ -280,22 +378,29 @@ void Context::EndMainMenuBar() {
     menuBarActive_ = false;
 }
 
-Rect Context::BeginMenuPopup(Rect anchor, size_t depth) {
+Rect Context::BeginMenuPopup(WidgetId id, Rect anchor, size_t depth) {
     const ComputedStyle style = Resolve("menu-popup", 0);
-    const float width = std::min(std::max(180.f, in_.displaySize.x * 0.18f),
-                                 std::max(1.f, in_.displaySize.x));
     const ComputedStyle itemStyle = Resolve("menu-item", 0);
     const float rowHeight = itemStyle.fontSize * 1.4f + itemStyle.padding.Vertical();
+    const auto size = menuPopupSizes_.find(id);
+    const float width = std::clamp(size == menuPopupSizes_.end() ? 160.f : size->second.x,
+                                   1.f, std::max(1.f, in_.displaySize.x));
+    const float height = std::clamp(size == menuPopupSizes_.end() ? rowHeight : size->second.y,
+                                    rowHeight, std::max(rowHeight, in_.displaySize.y));
     float x = anchor.x;
     float y = anchor.y + anchor.h;
     if (depth > 0) {
-        x = anchor.x + anchor.w;
-        if (x + width > in_.displaySize.x) x = std::max(0.f, anchor.x - width);
+        if (!menuStack_.empty()) {
+            const Rect parentPopup = menuStack_.back().popup;
+            draw_.PopClipRect();
+            if (!interactionClips_.empty()) interactionClips_.pop_back();
+            x = parentPopup.x + parentPopup.w;
+            if (x + width > in_.displaySize.x) x = parentPopup.x - width;
+        }
         y = anchor.y;
     }
     x = std::clamp(x, 0.f, std::max(0.f, in_.displaySize.x - width));
-    const float height = std::min(in_.displaySize.y - std::max(0.f, y), rowHeight * 12.f);
-    Rect popup{x, y, width, std::max(rowHeight, height)};
+    Rect popup{x, y, width, height};
     if (y + popup.h > in_.displaySize.y) popup.y = std::max(0.f, in_.displaySize.y - popup.h);
     draw_.AddShadow(popup, Fade(style.shadowColor, style.opacity), style.shadowBlur, style.rounding);
     draw_.AddBox(popup, Fade(style.background, style.opacity),
@@ -322,8 +427,14 @@ bool Context::BeginMenu(std::string_view label) {
         menuBarCursorX_ += width;
     } else {
         MenuState& parent = menuStack_.back();
-        row = {parent.popup.x, parent.cursorY, parent.popup.w, rowHeight};
+        const ComputedStyle popupStyle = Resolve("menu-popup", 0);
+        row = {parent.popup.x + popupStyle.padding.left, parent.cursorY,
+               std::max(0.f, parent.popup.w - popupStyle.padding.Horizontal()), rowHeight};
         parent.cursorY += rowHeight;
+        const float arrowWidth = Resolve("menu-item", 0).fontSize * 1.2f;
+        parent.contentWidth = std::max(parent.contentWidth,
+            text_->Measure(label, style.fontSize).x + style.padding.Horizontal() +
+            arrowWidth + Resolve("menu-popup", 0).padding.Horizontal());
     }
 
     const bool selected = depth < openMenus_.size() && openMenus_[depth] == id;
@@ -332,9 +443,8 @@ bool Context::BeginMenu(std::string_view label) {
     if (depth > 0) {
         const ComputedStyle arrowStyle = Resolve("menu-item", 0);
         const Vec2 arrowSize = text_->Measure(">", arrowStyle.fontSize);
-        text_->Emit(draw_, {row.x + row.w - arrowSize.x - arrowStyle.padding.right,
-                            row.y + (row.h - arrowSize.y) * 0.5f},
-                    ">", arrowStyle.fontSize, Fade(arrowStyle.foreground, arrowStyle.opacity));
+        EmitText({row.x + row.w - arrowSize.x - arrowStyle.padding.right,
+                  row.y + (row.h - arrowSize.y) * 0.5f}, ">", arrowStyle);
     }
 
     if (interaction.pressed) {
@@ -351,17 +461,34 @@ bool Context::BeginMenu(std::string_view label) {
     }
 
     if (depth >= openMenus_.size() || openMenus_[depth] != id) return false;
-    const Rect popup = BeginMenuPopup(row, depth);
+    const Rect parentPopup = depth > 0 && !menuStack_.empty() ? menuStack_.back().popup : Rect{};
+    const Rect popup = BeginMenuPopup(id, row, depth);
     const ComputedStyle popupStyle = Resolve("menu-popup", 0);
-    menuStack_.push_back({id, popup, popup.y + popupStyle.padding.top});
+    menuStack_.push_back({id, popup, parentPopup,
+                          popup.y + popupStyle.padding.top,
+                          popupStyle.padding.Horizontal(), depth > 0});
     return true;
 }
 
 void Context::EndMenu() {
     if (menuStack_.empty()) return;
+    const MenuState state = menuStack_.back();
+    const ComputedStyle popupStyle = Resolve("menu-popup", 0);
+    const float contentHeight = std::max(
+        Resolve("menu-item", 0).fontSize * 1.4f + Resolve("menu-item", 0).padding.Vertical(),
+        state.cursorY - state.popup.y + popupStyle.padding.bottom);
+    const float contentWidth = std::max(state.contentWidth, 1.f);
+    menuPopupSizes_[state.id] = {
+        std::min(contentWidth, in_.displaySize.x),
+        std::min(contentHeight, in_.displaySize.y)
+    };
     menuStack_.pop_back();
     draw_.PopClipRect();
     if (!interactionClips_.empty()) interactionClips_.pop_back();
+    if (state.hasParentPopup) {
+        draw_.PushClipRect(state.parentPopup);
+        interactionClips_.push_back(state.parentPopup);
+    }
 }
 
 bool Context::MenuItem(std::string_view label) {
@@ -377,8 +504,13 @@ bool Context::MenuItem(std::string_view label) {
         menuBarCursorX_ += width;
     } else {
         MenuState& parent = menuStack_.back();
-        row = {parent.popup.x, parent.cursorY, parent.popup.w, rowHeight};
+        const ComputedStyle popupStyle = Resolve("menu-popup", 0);
+        row = {parent.popup.x + popupStyle.padding.left, parent.cursorY,
+               std::max(0.f, parent.popup.w - popupStyle.padding.Horizontal()), rowHeight};
         parent.cursorY += rowHeight;
+        parent.contentWidth = std::max(parent.contentWidth,
+            text_->Measure(label, style.fontSize).x + style.padding.Horizontal() +
+            Resolve("menu-popup", 0).padding.Horizontal());
     }
     const WidgetId parentId = depth == 0 ? GetID("##main-menu") : menuStack_.back().id;
     const WidgetId id = HashStr(label, parentId);
@@ -498,7 +630,8 @@ void Context::LayoutDockedWindows() {
     auto addBoundarySplitter = [&](DockSide side, Rect rect, bool horizontalAxis,
                                   float& ratio) {
         const WidgetId id = HashStr("##dock-edge-splitter", static_cast<WidgetId>(side));
-        const Interaction interaction = Behavior(id, rect.Expanded(4.f));
+        const Interaction interaction = IsFloatingWindowAt(in_.mousePos) && active_ != id
+            ? Interaction{} : Behavior(id, rect.Expanded(4.f));
         const float mouse = horizontalAxis ? in_.mousePos.x : in_.mousePos.y;
         if (interaction.held) {
             if (activeDockSplitter_ != id) {
@@ -523,7 +656,7 @@ void Context::LayoutDockedWindows() {
         } else if (activeDockSplitter_ == id && !in_.mouseDown[0]) {
             activeDockSplitter_ = 0;
         }
-        dockSplitters_.push_back(rect);
+        dockSplitters_.push_back({rect, id});
     };
 
     std::array<Rect, 6> regions = DockRegions();
@@ -582,7 +715,9 @@ void Context::LayoutDockedWindows() {
                        6.f, region.h};
             const WidgetId splitterId = HashStr("##dock-splitter",
                 static_cast<WidgetId>((side << 24) ^ (i + 1)));
-            const Interaction interaction = Behavior(splitterId, splitter.Expanded(4.f));
+            const Interaction interaction = IsFloatingWindowAt(in_.mousePos) &&
+                                           active_ != splitterId
+                ? Interaction{} : Behavior(splitterId, splitter.Expanded(4.f));
             const bool verticalAxis = verticalSplit;
             const float currentMouse = verticalAxis ? in_.mousePos.y : in_.mousePos.x;
             if (interaction.held) {
@@ -603,7 +738,7 @@ void Context::LayoutDockedWindows() {
             } else if (activeDockSplitter_ == splitterId && !in_.mouseDown[0]) {
                 activeDockSplitter_ = 0;
             }
-            dockSplitters_.push_back(splitter);
+            dockSplitters_.push_back({splitter, splitterId});
             offset += first.dockSpan;
         }
 
@@ -765,9 +900,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     closeStyle = Animate(closeId, "window-close", State_None,
                          windowInputEnabled_ && finalClose.Contains(in_.mousePos),
                          active_ == closeId && in_.mouseDown[0]);
-    draw_.AddRectFilled(finalClose, Fade(closeStyle.background, closeStyle.opacity),
-                        closeStyle.rounding);
-    DrawTextCentered(finalClose, "x", closeStyle);
+    DrawTextCentered(finalClose, "X", closeStyle);
 
     if (w.dock == DockSide::None) {
         const ComputedStyle gripStyle = Resolve("window-resize", 0);
@@ -917,8 +1050,8 @@ void Context::EndContainer() {
 
 void Context::DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& style) {
     const Vec2 measured = text_->Measure(text, style.fontSize);
-    text_->Emit(draw_, {r.x + (r.w - measured.x) * 0.5f, r.y + (r.h - measured.y) * 0.5f},
-                text, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({r.x + (r.w - measured.x) * 0.5f, r.y + (r.h - measured.y) * 0.5f},
+             text, style);
 }
 
 bool Context::BeginTabContainer(std::string_view label, Vec2 size,
@@ -1004,8 +1137,7 @@ void Context::Text(std::string_view text) {
     const ComputedStyle s = Resolve("text", 0);
     const Vec2 ts = text_->Measure(text, s.fontSize);
     const Rect r = Place({ts.x + s.padding.Horizontal(), ts.y + s.padding.Vertical()}, s.spacing);
-    text_->Emit(draw_, {r.x + s.padding.left, r.y + s.padding.top}, text,
-                s.fontSize, Fade(s.foreground, s.opacity));
+    EmitText({r.x + s.padding.left, r.y + s.padding.top}, text, s);
 }
 
 void Context::TextLabel(std::string_view text) { Text(text); }
@@ -1016,11 +1148,9 @@ void Context::TextLabelLeft(std::string_view text, std::string_view icon) {
     const Vec2 textSize = text_->Measure(text, style.fontSize);
     const Rect r = Place({iconSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
                           std::max(iconSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
-    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f},
-                icon, style.fontSize, Fade(style.foreground, style.opacity));
-    text_->Emit(draw_, {r.x + style.padding.left + iconSize.x + style.spacing,
-                        r.y + (r.h - textSize.y) * 0.5f},
-                text, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f}, icon, style);
+    EmitText({r.x + style.padding.left + iconSize.x + style.spacing,
+              r.y + (r.h - textSize.y) * 0.5f}, text, style);
 }
 
 void Context::TextLabelRight(std::string_view text, std::string_view icon) {
@@ -1029,11 +1159,9 @@ void Context::TextLabelRight(std::string_view text, std::string_view icon) {
     const Vec2 iconSize = text_->Measure(icon, style.fontSize);
     const Rect r = Place({textSize.x + style.spacing + iconSize.x + style.padding.Horizontal(),
                           std::max(textSize.y, iconSize.y) + style.padding.Vertical()}, style.spacing);
-    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f},
-                text, style.fontSize, Fade(style.foreground, style.opacity));
-    text_->Emit(draw_, {r.x + style.padding.left + textSize.x + style.spacing,
-                        r.y + (r.h - iconSize.y) * 0.5f},
-                icon, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f}, text, style);
+    EmitText({r.x + style.padding.left + textSize.x + style.spacing,
+              r.y + (r.h - iconSize.y) * 0.5f}, icon, style);
 }
 
 bool Context::Button(std::string_view label) {
@@ -1048,8 +1176,7 @@ bool Context::Button(std::string_view label) {
     const ComputedStyle s = Animate(id, "button", State_None, b.hovered, b.held);
 
     DrawBox(r, s);
-    text_->Emit(draw_, {r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, text,
-                s.fontSize, Fade(s.foreground, s.opacity));
+    EmitText({r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, text, s);
     return b.pressed;
 }
 
@@ -1084,8 +1211,7 @@ bool Context::Checkbox(std::string_view label, bool* value) {
     DrawBox(boxR, s);
     if (*value)
         draw_.AddRectFilled(boxR.Expanded(-box * 0.25f), Fade(s.accent, s.opacity), s.rounding * 0.5f);
-    text_->Emit(draw_, {boxR.x + box + s.spacing, r.y + (r.h - ts.y) * 0.5f}, text,
-                s.fontSize, Fade(s.foreground, s.opacity));
+    EmitText({boxR.x + box + s.spacing, r.y + (r.h - ts.y) * 0.5f}, text, s);
 
     if (b.pressed) *value = !*value;
     return b.pressed;
@@ -1109,8 +1235,8 @@ bool Context::Toggle(std::string_view label, bool* value) {
     const float knobX = *value ? track.x + track.w - trackH * 0.89f : track.x + trackH * 0.11f;
     draw_.AddRectFilled({knobX, track.y + (trackH - knob) * 0.5f, knob, knob},
                         Fade(style.foreground, style.opacity), knob * 0.5f);
-    text_->Emit(draw_, {track.x + track.w + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
-                text, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({track.x + track.w + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
+             text, style);
     if (interaction.pressed) *value = !*value;
     return interaction.pressed;
 }
@@ -1135,8 +1261,8 @@ bool Context::Radio(std::string_view label, int* value, int option) {
         draw_.AddRectFilled(circle.Expanded(-inset), Fade(style.accent, style.opacity),
                             diameter * 0.5f);
     }
-    text_->Emit(draw_, {circle.x + diameter + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
-                text, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({circle.x + diameter + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
+             text, style);
     if (interaction.pressed) *value = option;
     return interaction.pressed;
 }
@@ -1167,8 +1293,7 @@ bool Context::SliderFloat(std::string_view label, float* value, float lo, float 
     char buf[128];
     std::snprintf(buf, sizeof(buf), "%.*s: %.2f", static_cast<int>(text.size()), text.data(), *value);
     const Vec2 ts = text_->Measure(buf, s.fontSize);
-    text_->Emit(draw_, {r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, buf,
-                s.fontSize, Fade(s.foreground, s.opacity));
+    EmitText({r.x + (r.w - ts.x) * 0.5f, r.y + (r.h - ts.y) * 0.5f}, buf, s);
     return changed;
 }
 
@@ -1181,6 +1306,16 @@ void Context::Image(GPUImageId imageId, Vec2 size) {
     draw_.AddQuad(r, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
 }
 
+void Context::EmptyWidget(std::string_view id, Vec2 size) {
+    PushID(id);
+    const ComputedStyle style = Resolve("empty-widget", 0);
+    if (size.x <= 0.f) size.x = content_.w;
+    if (size.y <= 0.f) size.y = style.fontSize * 6.f + style.padding.Vertical();
+    const Rect rect = Place(size, style.spacing);
+    DrawBox(rect, style);
+    PopID();
+}
+
 void Context::ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize) {
     const ComputedStyle style = Resolve("image-label", 0);
     const Vec2 textSize = text_->Measure(label, style.fontSize);
@@ -1188,9 +1323,8 @@ void Context::ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageS
                           std::max(imageSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
     draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - imageSize.y) * 0.5f,
                    imageSize.x, imageSize.y}, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
-    text_->Emit(draw_, {r.x + style.padding.left + imageSize.x + style.spacing,
-                        r.y + (r.h - textSize.y) * 0.5f},
-                label, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({r.x + style.padding.left + imageSize.x + style.spacing,
+              r.y + (r.h - textSize.y) * 0.5f}, label, style);
 }
 
 bool Context::Dropdown(std::string_view label, const std::vector<std::string_view>& items,
@@ -1209,8 +1343,7 @@ bool Context::Dropdown(std::string_view label, const std::vector<std::string_vie
     const Interaction interaction = Behavior(id, r);
     const ComputedStyle style = Animate(id, "dropdown", State_None, interaction.hovered, interaction.held);
     DrawBox(r, style);
-    text_->Emit(draw_, {r.x + style.padding.left, r.y + (r.h - fullSize.y) * 0.5f},
-                display, style.fontSize, Fade(style.foreground, style.opacity));
+    EmitText({r.x + style.padding.left, r.y + (r.h - fullSize.y) * 0.5f}, display, style);
     const float arrowX = r.x + r.w - style.padding.right - style.fontSize * 0.35f;
     draw_.AddTriangleFilled({arrowX - 4.f, r.y + r.h * 0.42f},
                             {arrowX + 4.f, r.y + r.h * 0.42f},

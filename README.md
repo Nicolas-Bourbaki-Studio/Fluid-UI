@@ -12,7 +12,8 @@
 
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
 dropdown menus, text and image labels, image buttons, collapsible containers, containers,
-horizontal/vertical lists, and tabbed containers. Text/icon labels can be combined as needed.
+horizontal/vertical lists, tabbed containers, and class-styleable empty widgets.
+Text/icon labels can be combined as needed.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
 
@@ -34,6 +35,10 @@ if (ui.BeginContainer("Panel", {300.0f, 120.0f})) {
     ui.TextLabelLeft("Status", "*");
     ui.EndContainer();
 }
+
+ui.PushClass("brand");
+ui.EmptyWidget("Brand preview", {360.0f, 120.0f});
+ui.PopClass();
 ```
 
 Call `EndContainer()` for each successful `BeginContainer`, `BeginList`,
@@ -97,8 +102,15 @@ numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius`, `font-size`, `gap`, `shadow-blur`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
-`padding`. Unsupported selectors and declarations report an error, and failed stylesheet
-loads do not partially modify the active theme.
+`padding`. Background images are supported with `background-image: url("...")`,
+`background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
+`background-position`. Image URLs resolve to caller-owned GPU resources registered with
+`StyleSheet::RegisterImage`; Fluid UI does not load image files itself. Linear gradients
+support CSS `linear-gradient(...)` syntax, including angles or `to right`-style directions,
+multiple color stops, and percentage stops. Use `background`/`background-image` for widget
+backgrounds and `text-gradient` on text-bearing widgets for gradient-colored text. Unsupported
+selectors and declarations report an error, and failed stylesheet loads do not partially
+modify the active theme.
 
 ```css
 button.primary {
@@ -109,6 +121,21 @@ button.primary {
 
 button.primary:hover {
     background: #4A6CF7;
+}
+
+empty-widget.brand {
+    background: linear-gradient(120deg, #101319, #1D2B42);
+    background-image: url("../Github Assets/Images/FluidUI Brush.png");
+    background-size: contain;
+    background-position: center;
+}
+
+empty-widget.gradient-demo {
+    background: linear-gradient(110deg, #213A67 0%, #3978B8 52%, #8A5CE6 100%);
+}
+
+text.gradient-text {
+    text-gradient: linear-gradient(90deg, #62D5FF, #A991FF, #FF86C8);
 }
 
 window-title {
@@ -127,7 +154,16 @@ if (!ui.Style().LoadCSSFile("ui.css", &error)) {
 ui.PushClass("primary");
 ui.Button("Save");
 ui.PopClass();
+
+ui.Style().RegisterImage("../Github Assets/Images/FluidUI Brush.png",
+                         myGpuImageId, {1490.0f, 494.0f});
 ```
+
+`EmptyWidget(id, size)` reserves and paints a class-styleable region without drawing
+content. The GLFW demo registers the repository Brush PNG with its GPU texture and displays
+it near the top of the component window so it is immediately visible. The registered source
+must exactly match the `url(...)` value in CSS. The demo also shows background and text
+gradient examples.
 
 The `examples` target includes `theme.css` and a GLFW demo covering the controls, container
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible

@@ -1,8 +1,8 @@
 :root {
     --ui-accent: #3978B8;
     --ui-accent-hover: #55A0E5;
-    --ui-panel: #292A2D;
-    --ui-border: #3A3B3F;
+    --ui-panel: #1c1c1f;
+    --ui-border: #323336;
     --ui-text: #D9DEE7;
 }
 
@@ -10,36 +10,36 @@
     color: var(--ui-text);
     font-size: 14px;
     gap: 6px;
-    transition-speed: 12;
+    transition-speed: 5;
 }
 
 /* ================= WINDOW ================= */
 
 window {
-    background: #202124;
-    border: 1px solid var(--ui-border);
-    border-radius: 5px;
-    padding: 8px;
+    background: #0f1114;
+    border: 1px solid #353B47;
+    border-radius: 3px;
+    padding: 5px;
     shadow-color: rgba(0, 0, 0, 0);
-    shadow-blur: 20px;
+    shadow-blur: 15px;
 }
 
 window-title {
-    background: #292A2D;
-    color: #F0F0F0;
+    background: #222630;
+    color: #F3F6FC;
     font-size: 14px;
     padding: 6px 10px;
 }
 
 window-close {
-    background: #343539;
-    color: #D9DEE7;
-    border-radius: 4px;
-    font-size: 13px;
+    background: transparent;
+    color: #9BA6B7;
+    font-size: 16px;
 }
 
 window-close:hover {
-    background: #C74747;
+    background: transparent;
+    color: #FFFFFF;
 }
 
 main-menu-bar {
@@ -101,9 +101,9 @@ dock-preview {
 }
 
 dock-splitter {
-    background: #45464B;
+    background: rgba(112, 124, 144, 0.46);
     accent: var(--ui-accent-hover);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 dock-menu {
@@ -127,6 +127,27 @@ dock-target:hover {
     border-color: var(--ui-accent);
 }
 
+empty-widget {
+    background: #12151B;
+    border: 1px solid #3A4150;
+    border-radius: 8px;
+}
+
+empty-widget.brand {
+    background: linear-gradient(120deg, #101319, #1D2B42);
+    background-image: url("../Github Assets/Images/FluidUI Brush.png");
+    background-size: contain;
+    background-position: center;
+    border: 1px solid #303846;
+    border-radius: 10px;
+}
+
+empty-widget.gradient-demo {
+    background: linear-gradient(110deg, #213A67 0%, #3978B8 52%, #8A5CE6 100%);
+    border: 1px solid #648FD2;
+    border-radius: 9px;
+}
+
 /* ================= TEXT ================= */
 
 text {
@@ -138,20 +159,24 @@ text-label, image-label {
     gap: 6px;
 }
 
+text.gradient-text {
+    text-gradient: linear-gradient(90deg, #62D5FF, #A991FF, #FF86C8);
+}
+
 /* ================= BUTTONS ================= */
 
 button, dropdown, image-button {
-    background: #35363A;
-    color: #E0E3E8;
-    border-color: #45464B;
+    background: #2A303B;
+    color: #E8EDF5;
+    border-color: #414A59;
     border-width: 1px;
     border-radius: 4px;
     padding: 6px 12px;
 }
 
 button:hover, dropdown:hover, image-button:hover {
-    background: #414348;
-    border-color: #5B5D63;
+    background: #353D4A;
+    border-color: #59667A;
 }
 
 button:active {
@@ -174,6 +199,13 @@ button.primary:hover {
 button.primary.emphasis {
     shadow-color: rgba(40, 120, 184, 0.31);
     shadow-blur: 8px;
+}
+
+button.gradient-demo {
+    background: linear-gradient(100deg, #2467B2, #6D48C8);
+    border-color: #8AA9F5;
+    color: #FFFFFF;
+    text-gradient: linear-gradient(90deg, #FFFFFF, #D4F5FF);
 }
 
 /* Destructive buttons */
@@ -226,8 +258,8 @@ slider:hover {
 
 container, collapsible-container,
 horizontal-list, vertical-list {
-    background: var(--ui-panel);
-    border-color: var(--ui-border);
+    background: #212630;
+    border-color: #363E4B;
     border-width: 1px;
     border-radius: 5px;
     padding: 8px;

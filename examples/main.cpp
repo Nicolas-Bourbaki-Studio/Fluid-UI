@@ -1,10 +1,15 @@
+#define NOMINMAX
+#include <windows.h>
+#include <wincodec.h>
 #include <GLFW/glfw3.h>
 #include "../src/FluidUI/FluidUI.h"
 #include "../third_party/font8x8_basic.h"
 
 #include <cstdio>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -65,6 +70,69 @@ static GLuint CreateDemoTexture() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     glBindTexture(GL_TEXTURE_2D, 0);
+    return texture;
+}
+
+static GLuint CreateTextureFromPng(const std::filesystem::path& path, int& width, int& height) {
+    HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    const bool uninitialize = SUCCEEDED(result);
+    if (FAILED(result) && result != RPC_E_CHANGED_MODE) return 0;
+
+    IWICImagingFactory* factory = nullptr;
+    IWICBitmapDecoder* decoder = nullptr;
+    IWICBitmapFrameDecode* frame = nullptr;
+    IWICFormatConverter* converter = nullptr;
+    auto release = [&]() {
+        if (converter) converter->Release();
+        if (frame) frame->Release();
+        if (decoder) decoder->Release();
+        if (factory) factory->Release();
+        if (uninitialize) CoUninitialize();
+    };
+
+    result = CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                              IID_PPV_ARGS(&factory));
+    if (SUCCEEDED(result))
+        result = factory->CreateDecoderFromFilename(path.c_str(), nullptr, GENERIC_READ,
+                    WICDecodeMetadataCacheOnLoad, &decoder);
+    if (SUCCEEDED(result)) result = decoder->GetFrame(0, &frame);
+    UINT imageWidth = 0, imageHeight = 0;
+    if (SUCCEEDED(result)) result = frame->GetSize(&imageWidth, &imageHeight);
+    if (SUCCEEDED(result)) result = factory->CreateFormatConverter(&converter);
+    if (SUCCEEDED(result))
+        result = converter->Initialize(frame, GUID_WICPixelFormat32bppRGBA,
+                    WICBitmapDitherTypeNone, nullptr, 0.f, WICBitmapPaletteTypeCustom);
+    if (FAILED(result) || imageWidth == 0 || imageHeight == 0 ||
+        imageWidth > static_cast<UINT>(std::numeric_limits<GLsizei>::max() / 4) ||
+        imageHeight > static_cast<UINT>(std::numeric_limits<GLsizei>::max())) {
+        release();
+        return 0;
+    }
+
+    const uint64_t pixelBytes = static_cast<uint64_t>(imageWidth) * imageHeight * 4u;
+    if (pixelBytes > std::numeric_limits<UINT>::max()) {
+        release();
+        return 0;
+    }
+    std::vector<unsigned char> pixels(static_cast<size_t>(pixelBytes));
+    result = converter->CopyPixels(nullptr, imageWidth * 4,
+                                   static_cast<UINT>(pixels.size()), pixels.data());
+    release();
+    if (FAILED(result)) return 0;
+
+    GLuint texture = 0;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    constexpr GLint clampToEdge = 0x812F;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(imageWidth),
+                 static_cast<GLsizei>(imageHeight), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    glBindTexture(GL_TEXTURE_2D, 0);
+    width = static_cast<int>(imageWidth);
+    height = static_cast<int>(imageHeight);
     return texture;
 }
 
@@ -156,6 +224,45 @@ int main() {
         glfwTerminate();
         return 1;
     }
+    const std::string brandImageSource = "../Github Assets/Images/FluidUI Brush.png";
+    const std::filesystem::path brandImagePath =
+        themePath.parent_path().parent_path() / "Github Assets" / "Images" / "FluidUI Brush.png";
+    int brandImageWidth = 0, brandImageHeight = 0;
+    const GLuint brandTexture = CreateTextureFromPng(
+        brandImagePath, brandImageWidth, brandImageHeight);
+    if (brandTexture == 0) {
+        std::fprintf(stderr, "Could not load background image: %s\n", brandImagePath.string().c_str());
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
+    ui.Style().RegisterImage(brandImageSource, static_cast<GPUImageId>(brandTexture),
+                             {static_cast<float>(brandImageWidth),
+                              static_cast<float>(brandImageHeight)});
+    const std::vector<std::string> brandClasses{"brand"};
+    const ComputedStyle brandStyle =
+        ui.Style().Resolve("empty-widget", brandClasses, State_None);
+    if (brandStyle.backgroundImage != static_cast<GPUImageId>(brandTexture)) {
+        std::fprintf(stderr, "CSS background-image did not resolve to the registered texture\n");
+        glDeleteTextures(1, &brandTexture);
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
+    const std::vector<std::string> gradientClasses{"gradient-demo"};
+    const std::vector<std::string> gradientTextClasses{"gradient-text"};
+    const ComputedStyle gradientStyle =
+        ui.Style().Resolve("empty-widget", gradientClasses, State_None);
+    const ComputedStyle gradientTextStyle =
+        ui.Style().Resolve("text", gradientTextClasses, State_None);
+    if (gradientStyle.backgroundGradient.stops.size() != 3 ||
+        gradientTextStyle.textGradient.stops.size() != 3) {
+        std::fprintf(stderr, "CSS background or text gradient did not resolve\n");
+        glDeleteTextures(1, &brandTexture);
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
     const GLuint demoTexture = CreateDemoTexture();
     const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
     const GLuint fontTexture = CreateDemoFontTexture();
@@ -214,6 +321,19 @@ int main() {
 
         if (ui.BeginWindow(componentWindow, {24, 40, 500, 720})) {
             ui.Text("Core controls");
+            ui.Text("CSS background image and gradients");
+            ui.PushClass("brand");
+            ui.EmptyWidget("CSS background image", {360, 120});
+            ui.PopClass();
+            ui.PushClass("gradient-demo");
+            ui.EmptyWidget("CSS background gradient", {360, 56});
+            ui.PopClass();
+            ui.PushClass("gradient-text");
+            ui.Text("CSS text gradient");
+            ui.PopClass();
+            ui.PushClass("gradient-demo");
+            if (ui.Button("Gradient button")) {}
+            ui.PopClass();
             if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);
             ui.PushClass("primary");
             ui.PushClass("emphasis");
@@ -314,6 +434,7 @@ int main() {
         RenderGL(dl, w, h);
         glfwSwapBuffers(win);
     }
+    glDeleteTextures(1, &brandTexture);
     glDeleteTextures(1, &demoTexture);
     glDeleteTextures(1, &fontTexture);
     glfwDestroyWindow(win);

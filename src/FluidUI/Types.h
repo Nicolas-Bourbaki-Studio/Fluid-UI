@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <string_view>
+#include <vector>
 
 namespace fluid {
 
@@ -54,6 +55,18 @@ struct Color {
         auto c = [](float v) { return static_cast<uint32_t>(std::clamp(v, 0.f, 1.f) * 255.f + 0.5f); };
         return c(r) | (c(g) << 8) | (c(b) << 16) | (c(a) << 24);
     }
+};
+
+struct GradientStop {
+    Color color;
+    float position = 0.f;
+};
+
+struct LinearGradient {
+    float angleDegrees = 180.f;
+    std::vector<GradientStop> stops;
+
+    bool Empty() const { return stops.size() < 2; }
 };
 
 struct Edges { // top, right, bottom, left
