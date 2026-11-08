@@ -372,6 +372,14 @@ int main() {
     const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
     DemoTextBackend demoText(fontAtlas);
     ui.SetTextBackend(&demoText);
+    std::array<GLFWcursor*, 5> cursors{
+        glfwCreateStandardCursor(GLFW_ARROW_CURSOR),
+        glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR),
+        glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR),
+        glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR),
+        glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR)
+    };
+    GLFWcursor* currentCursor = nullptr;
     const std::vector<std::string_view> choices{"Small", "Medium", "Large"};
     const std::vector<Context::TabItem> textTabs{{"Overview", {}}, {"Details", {}}, {"Preview", {}}};
     const std::vector<Context::TabItem> iconTabs{
@@ -545,10 +553,11 @@ int main() {
 
         if (ui.BeginWindow(managerWindow, {1120, 40, 390, 350})) {
             ui.Text("Window management");
-            ui.Text("Drag a title bar to a screen edge.");
+            ui.Text("Drag a title bar and choose a 3x3 dock target.");
+            ui.Text("Double-click a docked title bar to undock.");
             ui.Text("A live preview shows the snap area.");
             ui.Text("Docked windows resize with the display.");
-            ui.Text("Drag the bottom-right corner to resize.");
+            ui.Text("Resize floating windows from any edge or corner.");
             ui.Text("Click a window to bring it to the front.");
             ui.Text("Docked panels resize to share available space.");
             ui.Toggle("Enable docking", &dockingEnabled);
@@ -575,6 +584,18 @@ int main() {
         }
 
         const DrawList& dl = ui.EndFrame();
+        GLFWcursor* requestedCursor = nullptr;
+        switch (ui.Cursor()) {
+            case CursorShape::Arrow: requestedCursor = cursors[0]; break;
+            case CursorShape::ResizeHorizontal: requestedCursor = cursors[1]; break;
+            case CursorShape::ResizeVertical: requestedCursor = cursors[2]; break;
+            case CursorShape::ResizeDiagonalNWSE: requestedCursor = cursors[3]; break;
+            case CursorShape::ResizeDiagonalNESW: requestedCursor = cursors[4]; break;
+        }
+        if (requestedCursor != currentCursor) {
+            glfwSetCursor(win, requestedCursor);
+            currentCursor = requestedCursor;
+        }
         glClearColor(0.08f, 0.08f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         RenderGL(dl, w, h);
@@ -583,6 +604,8 @@ int main() {
     glDeleteTextures(1, &iconTexture);
     glDeleteTextures(1, &demoTexture);
     glDeleteTextures(1, &fontAtlas.texture);
+    for (GLFWcursor* cursor : cursors)
+        if (cursor) glfwDestroyCursor(cursor);
     glfwDestroyWindow(win);
     glfwTerminate();
 }

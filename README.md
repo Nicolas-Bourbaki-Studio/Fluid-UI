@@ -91,6 +91,9 @@ if (ui.BeginMainMenuBar()) {
 Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu-item`
 CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network menus,
 a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
+Floating windows can be resized from any edge or corner. Docking offers a 3x3 target
+grid with a live pane preview; docked windows hide their close control and require a
+double-click on the title bar to undock.
 
 ## CSS-like themes and classes
 

@@ -43,6 +43,8 @@ window {
     border-color: transparent;
     border-width: 2px;
     border-radius: var(--ui-radius);
+    shadow-color: transparent;
+    shadow-blur: 0px;
     padding: 5px;
 }
 

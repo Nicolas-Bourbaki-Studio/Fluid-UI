@@ -5,6 +5,14 @@
 
 namespace fluid {
 
+enum class CursorShape : uint8_t {
+    Arrow,
+    ResizeHorizontal,
+    ResizeVertical,
+    ResizeDiagonalNWSE,
+    ResizeDiagonalNESW
+};
+
 struct InputState {
     Vec2  mousePos;
     bool  mouseDown[3] = {false, false, false};

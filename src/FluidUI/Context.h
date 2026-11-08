@@ -21,6 +21,7 @@ public:
 
     StyleSheet& Style() { return style_; }
     void SetTextBackend(ITextBackend* backend); // not owned; nullptr restores the fallback
+    CursorShape Cursor() const { return cursorShape_; }
 
     // Frame
     void NewFrame(const InputState& input);
@@ -87,13 +88,19 @@ public:
 
 private:
     struct Interaction { bool hovered = false, held = false, pressed = false; };
-    enum class DockSide : uint8_t { None, Left, Right, Top, Bottom, Center };
+    enum class DockSide : uint8_t {
+        None, Left, Right, Top, Bottom, Center,
+        TopLeft, TopRight, BottomLeft, BottomRight
+    };
     struct WindowState {
-        Vec2 pos, size, dragOff, resizeStart, startSize;
+        Vec2 pos, size, dragOff, resizeStart, startSize, resizeStartPos;
+        Vec2 dockRestoreSize, lastTitleClickPos;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
+        double lastTitleClickTime = -1.0;
         uint64_t zOrder = 0;
         DrawList::Layer drawLayer;
         DockSide dock = DockSide::None;
+        uint8_t resizeEdges = 0;
         bool init = false, open = true, hasDrawLayer = false;
         bool dragging = false, resizing = false, scrolling = false;
     };
@@ -132,7 +139,7 @@ private:
     void EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style);
     Interaction DrawMenuButton(Rect rect, std::string_view label, WidgetId id,
                                std::string_view widget, bool selected = false);
-    std::array<Rect, 6> DockRegions() const;
+    std::array<Rect, 10> DockRegions(DockSide extraSide = DockSide::None) const;
     Rect DockTargetRect(DockSide side) const;
     DockSide DockTargetAt(Vec2 position) const;
     void SetDockPreview(DockSide side, WidgetId newWindow = 0);
@@ -152,6 +159,8 @@ private:
     WidgetId active_ = 0;
     WidgetId currentWindowId_ = 0;
     WidgetId activeDockSplitter_ = 0;
+    float timeSeconds_ = 0.f;
+    CursorShape cursorShape_ = CursorShape::Arrow;
     float dockSplitterMouseStart_ = 0.f, dockSplitterSpanStart_ = 0.f;
     float dockSplitterPairSpan_ = 0.f;
     float dockBoundaryStart_ = 0.f;
@@ -163,7 +172,7 @@ private:
     std::vector<std::string> classStack_;
     std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
-    std::array<std::vector<WidgetId>, 6> dockedWindows_;
+    std::array<std::vector<WidgetId>, 10> dockedWindows_;
     WidgetId focusedWindow_ = 0;
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
