@@ -1329,6 +1329,29 @@ void Context::TextLabelRight(std::string_view text, std::string_view icon) {
               r.y + (r.h - iconSize.y) * 0.5f}, icon, style);
 }
 
+void Context::TextLabelLeft(std::string_view text, GPUImageId icon, Vec2 iconSize) {
+    const ComputedStyle style = Resolve("text-label", 0);
+    const Vec2 textSize = text_->Measure(text, style.fontSize);
+    const Rect r = Place({iconSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
+                          std::max(iconSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f,
+                   iconSize.x, iconSize.y}, {0.f, 0.f, 1.f, 1.f},
+                  Fade(Color{}, style.opacity), icon);
+    EmitText({r.x + style.padding.left + iconSize.x + style.spacing,
+              r.y + (r.h - textSize.y) * 0.5f}, text, style);
+}
+
+void Context::TextLabelRight(std::string_view text, GPUImageId icon, Vec2 iconSize) {
+    const ComputedStyle style = Resolve("text-label", 0);
+    const Vec2 textSize = text_->Measure(text, style.fontSize);
+    const Rect r = Place({textSize.x + style.spacing + iconSize.x + style.padding.Horizontal(),
+                          std::max(textSize.y, iconSize.y) + style.padding.Vertical()}, style.spacing);
+    EmitText({r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f}, text, style);
+    draw_.AddQuad({r.x + style.padding.left + textSize.x + style.spacing,
+                   r.y + (r.h - iconSize.y) * 0.5f, iconSize.x, iconSize.y},
+                  {0.f, 0.f, 1.f, 1.f}, Fade(Color{}, style.opacity), icon);
+}
+
 bool Context::Button(std::string_view label) {
     const WidgetId id = GetID(label);
     const std::string_view text = DisplayLabel(label);

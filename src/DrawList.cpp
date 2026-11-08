@@ -52,7 +52,7 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
             out.push_back(squareCorner);
             return;
         }
-        const int seg = std::clamp(static_cast<int>(radius * 0.6f) + 3, 4, 12);
+        const int seg = static_cast<int>(std::clamp(radius * 0.6f + 3.f, 4.f, 64.f));
         Arc(out, center, radius, start, end, seg);
     };
     addArc({r.x + r.w - radii.topRight, r.y + radii.topRight}, radii.topRight,

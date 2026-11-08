@@ -60,6 +60,8 @@ public:
     void TextLabel(std::string_view text);
     void TextLabelLeft(std::string_view text, std::string_view icon);
     void TextLabelRight(std::string_view text, std::string_view icon);
+    void TextLabelLeft(std::string_view text, GPUImageId icon, Vec2 iconSize);
+    void TextLabelRight(std::string_view text, GPUImageId icon, Vec2 iconSize);
     bool Button(std::string_view label);
     bool ImageButton(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool Checkbox(std::string_view label, bool* value);

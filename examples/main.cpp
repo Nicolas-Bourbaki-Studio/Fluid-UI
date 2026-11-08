@@ -20,6 +20,8 @@
 
 using namespace fluid;
 
+constexpr GLenum kGlMultisample = 0x809D;
+
 static float gMouseWheel = 0.f;
 
 static void OnScroll(GLFWwindow*, double, double yOffset) {
@@ -54,34 +56,22 @@ static void RenderGL(const DrawList& dl, int fbW, int fbH) {
         glScissor((GLint)c.clip.x, fbH - (GLint)(c.clip.y + c.clip.h),
                   (GLsizei)c.clip.w, (GLsizei)c.clip.h);
         if (c.texture) {
+            glDisable(kGlMultisample);
             glEnable(GL_TEXTURE_2D);
             glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
             glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(c.texture));
         } else {
+            glEnable(kGlMultisample);
             glDisable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
         glDrawElements(GL_TRIANGLES, (GLsizei)c.idxCount, GL_UNSIGNED_INT, idx.data() + c.idxOffset);
     }
+    glDisable(kGlMultisample);
     glDisableClientState(GL_COLOR_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisable(GL_SCISSOR_TEST);
-}
-
-static GLuint CreateDemoTexture() {
-    const unsigned char pixels[] = {
-        0x4A, 0x6C, 0xF7, 0xFF, 0xE6, 0x6B, 0x5C, 0xFF,
-        0xE6, 0x6B, 0x5C, 0xFF, 0x4A, 0x6C, 0xF7, 0xFF
-    };
-    GLuint texture = 0;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return texture;
 }
 
 static GLuint CreateTextureFromImage(const std::filesystem::path& path, int& width, int& height,
@@ -323,6 +313,7 @@ private:
 
 int main() {
     if (!glfwInit()) return 1;
+    glfwWindowHint(GLFW_SAMPLES, 4);
     GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI component and docking demo", nullptr, nullptr);
     if (!win) { glfwTerminate(); return 1; }
     glfwMakeContextCurrent(win);
@@ -357,19 +348,44 @@ int main() {
     ui.Style().RegisterImage(iconImageSource, static_cast<GPUImageId>(iconTexture),
                              {static_cast<float>(iconImageWidth),
                               static_cast<float>(iconImageHeight)});
+    const std::filesystem::path repositoryPath = themePath.parent_path().parent_path();
+    int folderIconWidth = 0, folderIconHeight = 0;
+    int emptyIconWidth = 0, emptyIconHeight = 0;
+    int productImageWidth = 0, productImageHeight = 0;
+    std::string assetError;
+    const GLuint folderIconTexture = CreateTextureFromImage(
+        repositoryPath / "src" / "Icons" / "FolderIcn.png",
+        folderIconWidth, folderIconHeight, assetError);
+    const GLuint emptyIconTexture = folderIconTexture != 0 ? CreateTextureFromImage(
+        repositoryPath / "src" / "Icons" / "EmptyIcn.png",
+        emptyIconWidth, emptyIconHeight, assetError) : 0;
+    const GLuint productImageTexture = emptyIconTexture != 0 ? CreateTextureFromImage(
+        repositoryPath / "src" / "Images" / "Pr.png",
+        productImageWidth, productImageHeight, assetError) : 0;
+    if (folderIconTexture == 0 || emptyIconTexture == 0 || productImageTexture == 0) {
+        std::fprintf(stderr, "Could not load demo image asset: %s\n", assetError.c_str());
+        if (folderIconTexture) glDeleteTextures(1, &folderIconTexture);
+        if (emptyIconTexture) glDeleteTextures(1, &emptyIconTexture);
+        if (productImageTexture) glDeleteTextures(1, &productImageTexture);
+        glDeleteTextures(1, &iconTexture);
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
     DemoFontAtlas fontAtlas;
     std::string fontError;
     const std::filesystem::path fontPath =
         themePath.parent_path().parent_path() / "src" / "Fonts" / "OpenSans.ttf";
     if (!CreateOpenSansFontAtlas(fontPath, fontAtlas, fontError)) {
         std::fprintf(stderr, "%s\n", fontError.c_str());
+        glDeleteTextures(1, &folderIconTexture);
+        glDeleteTextures(1, &emptyIconTexture);
+        glDeleteTextures(1, &productImageTexture);
         glDeleteTextures(1, &iconTexture);
         glfwDestroyWindow(win);
         glfwTerminate();
         return 1;
     }
-    const GLuint demoTexture = CreateDemoTexture();
-    const GPUImageId demoImageId = static_cast<GPUImageId>(demoTexture);
     DemoTextBackend demoText(fontAtlas);
     ui.SetTextBackend(&demoText);
     std::array<GLFWcursor*, 5> cursors{
@@ -489,11 +505,14 @@ int main() {
             ui.Radio("Radio option B", &radioValue, 1);
             ui.ValueSlider("Volume", &volume, 0.f, 1.f);
             ui.TextLabel("Text label");
-            ui.TextLabelLeft("Text with leading icon", "*");
-            ui.TextLabelRight("Text with trailing icon", ">");
-            ui.Image(demoImageId, {24, 24});
-            ui.ImageLabel("Image label", demoImageId, {28, 28});
-            if (ui.ImageButton("Image button", demoImageId, {36, 28})) {}
+            ui.TextLabelLeft("Text with leading icon",
+                             static_cast<GPUImageId>(folderIconTexture), {20, 20});
+            ui.TextLabelRight("Text with trailing icon",
+                              static_cast<GPUImageId>(emptyIconTexture), {20, 20});
+            ui.Image(static_cast<GPUImageId>(productImageTexture), {24, 24});
+            ui.ImageLabel("Image label", static_cast<GPUImageId>(productImageTexture), {28, 28});
+            if (ui.ImageButton("Image button",
+                               static_cast<GPUImageId>(productImageTexture), {36, 28})) {}
             if (ui.Dropdown("Text menu", choices, &sizeChoice)) {}
             if (ui.Dropdown("Icon menu", choices, &iconChoice, "+", false)) {}
             if (ui.Dropdown("Icon and text menu", choices, &mixedChoice, "*")) {}
@@ -602,7 +621,9 @@ int main() {
         glfwSwapBuffers(win);
     }
     glDeleteTextures(1, &iconTexture);
-    glDeleteTextures(1, &demoTexture);
+    glDeleteTextures(1, &folderIconTexture);
+    glDeleteTextures(1, &emptyIconTexture);
+    glDeleteTextures(1, &productImageTexture);
     glDeleteTextures(1, &fontAtlas.texture);
     for (GLFWcursor* cursor : cursors)
         if (cursor) glfwDestroyCursor(cursor);

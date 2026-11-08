@@ -135,7 +135,8 @@ bool ParseLinearGradient(std::string_view text, LinearGradient& gradient);
 
 bool IsSupportedDeclaration(std::string_view name) {
     return name == "background" || name == "background-color" ||
-        name == "color" || name == "foreground" || name == "accent" ||
+        name == "background-gradient" || name == "color" || name == "text-color" ||
+        name == "foreground" || name == "foreground-color" || name == "accent" ||
         name == "border-color" || name == "shadow-color" ||
         name == "border-width" || name == "border-radius" || name == "rounding" ||
         name == "border-radius-top-left" || name == "border-radius-top-right" ||
@@ -143,7 +144,8 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "font-size" || name == "gap" || name == "spacing" ||
         name == "shadow-blur" || name == "opacity" || name == "transition-speed" ||
         name == "padding" || name == "border" || name == "background-image" ||
-        name == "text-gradient" || name == "foreground-gradient" ||
+        name == "text-gradient" || name == "color-gradient" ||
+        name == "foreground-gradient" ||
         name == "accent-gradient" || name == "border-color-gradient" ||
         name == "shadow-color-gradient" || name == "background-size" ||
         name == "background-position";
@@ -155,6 +157,7 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
     switch (d.prop) {
         case Prop::Background:
             s.background = col;
+            s.backgroundGradient = {};
             break;
         case Prop::BackgroundReset:
             s.background = col;
@@ -200,6 +203,7 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.backgroundPosition = {v[0], v[1]};
             break;
         case Prop::BackgroundGradient:
+            s.backgroundGradient = {};
             if (!d.text.empty()) ParseLinearGradient(d.text, s.backgroundGradient);
             break;
         case Prop::TextGradient:
@@ -357,8 +361,12 @@ bool ParseColor(std::string_view text, Color& color) {
 
 bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
     text = Trim(text);
-    if (!text.starts_with("linear-gradient(") || text.back() != ')') return false;
-    std::string_view body = Trim(text.substr(16, text.size() - 17));
+    size_t prefixLength = 0;
+    if (text.starts_with("linear-gradient(")) prefixLength = 16;
+    else if (text.starts_with("gradient(")) prefixLength = 9;
+    else return false;
+    if (text.size() <= prefixLength || text.back() != ')') return false;
+    std::string_view body = Trim(text.substr(prefixLength, text.size() - prefixLength - 1));
     std::vector<std::string_view> parts;
     int depth = 0;
     size_t start = 0;
@@ -470,7 +478,19 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         return colorOrGradient(name == "background" ? Prop::BackgroundReset : Prop::Background,
                                Prop::BackgroundGradient);
     }
-    if (name == "color" || name == "foreground")
+    if (name == "background-gradient") {
+        if (value == "none") {
+            out.prop = Prop::BackgroundGradient;
+            return true;
+        }
+        LinearGradient parsed;
+        if (!ParseLinearGradient(value, parsed)) return false;
+        out.prop = Prop::BackgroundGradient;
+        out.text = std::string(value);
+        return true;
+    }
+    if (name == "color" || name == "text-color" ||
+        name == "foreground" || name == "foreground-color")
         return colorOrGradient(Prop::Foreground, Prop::ForegroundGradient);
     if (name == "accent") return colorOrGradient(Prop::Accent, Prop::AccentGradient);
     if (name == "border-color")
@@ -531,7 +551,8 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         out.text = NormalizeImageSource(source);
         return true;
     }
-    if (name == "text-gradient" || name == "foreground-gradient") {
+    if (name == "text-gradient" || name == "color-gradient" ||
+        name == "foreground-gradient") {
         if (value == "none") {
             out.prop = Prop::TextGradient;
             out.text.clear();

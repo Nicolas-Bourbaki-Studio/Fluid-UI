@@ -1,9 +1,9 @@
 /* ================= COLORS & VARIABLES ================= */
 
 :root {
-    --ui-accent: #3978B8;
-    --ui-accent-hover: #55A0E5;
-    --ui-accent-active: #2B5F91;
+    --ui-accent: #0e6fff;
+    --ui-accent-hover: #217aff;
+    --ui-accent-active: #1967db;
 
     --ui-window: #080808;
     --ui-panel: #171717;
@@ -18,9 +18,9 @@
     --ui-text-secondary: #BABABA;
     --ui-text-muted: #C8CDD5;
 
-    --ui-danger: #713737;
-    --ui-danger-hover: #914545;
-    --ui-danger-border: #914747;
+    --ui-danger: #e62626;
+    --ui-danger-hover: #f74848;
+    --ui-danger-border: #be1c1c;
 
     --ui-overlay: transparent;
 
@@ -39,7 +39,8 @@
 /* ================= WINDOW ================= */
 
 window {
-    background: var(--ui-window);
+    background: linear-gradient(180deg, #080808 0%, #101010 22%, #171717 48%,
+        #121212 74%, #0c0c0c 100%);
     border-color: transparent;
     border-width: 2px;
     border-radius: var(--ui-radius);
@@ -181,7 +182,8 @@ image-widget.icon-card {
 }
 
 empty-widget.gradient-demo {
-    background: var(--ui-panel);
+    background: linear-gradient(90deg, #0E6FFF 0%, #3E66E8 25%, #7D4FE0 50%,
+        #C44DC8 75%, #F26A85 100%);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
@@ -198,7 +200,8 @@ text-label, image-label {
 }
 
 text.gradient-text {
-    color: var(--ui-text);
+    text-gradient: linear-gradient(90deg, #62D5FF 0%, #789EFF 25%, #A991FF 50%,
+        #D78AE8 75%, #FF86C8 100%);
 }
 
 /* ================= BUTTONS ================= */
@@ -236,7 +239,8 @@ button.primary.emphasis {
 }
 
 button.gradient-demo {
-    background: var(--ui-accent);
+    background: linear-gradient(90deg, #0E6FFF 0%, #3E66E8 25%, #7D4FE0 50%,
+        #C44DC8 75%, #F26A85 100%);
     border-color: var(--ui-accent);
     color: var(--ui-text);
 }

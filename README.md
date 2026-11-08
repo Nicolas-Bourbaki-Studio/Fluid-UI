@@ -93,7 +93,10 @@ CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network men
 a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
 Floating windows can be resized from any edge or corner. Docking offers a 3x3 target
 grid with a live pane preview; docked windows hide their close control and require a
-double-click on the title bar to undock.
+double-click on the title bar to undock. The GLFW demo smooths rounded geometry with
+multisampling and higher-resolution corner tessellation, and uses linear filtering for
+images; multisampling is kept off for textured draws so it does not add antialiasing
+to the text.
 
 ## CSS-like themes and classes
 
@@ -112,7 +115,8 @@ corner overrides, `font-size`, `gap`, `shadow-blur`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
 `StyleSheet::RegisterImage`; Fluid UI does not load image files itself. Linear gradients
-support CSS `linear-gradient(...)` syntax, including angles or `to right`-style directions,
+support `linear-gradient(...)` and `gradient(...)` syntax, including angles or
+`to right`-style directions,
 multiple color stops, and percentage stops. Gradients are accepted anywhere a color is
 accepted (backgrounds, foreground/text, accent, borders, and shadows), with explicit
 `text-gradient`, `accent-gradient`, `border-color-gradient`, and `shadow-color-gradient`
@@ -184,6 +188,8 @@ content.
 Use a nonzero `fluid::GPUImageId` for a GPU image that your application loaded or created.
 The image is sampled with the full `[0, 1]` UV range. `ImageLabel` and `ImageButton` accept
 the same ID and an explicit display size. The UI never takes ownership of that resource.
+`TextLabelLeft` and `TextLabelRight` also accept an image ID and display size for image
+icons; the existing text-icon overloads remain available.
 
 ```cpp
 // OpenGL texture name:
