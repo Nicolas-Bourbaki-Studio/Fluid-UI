@@ -5,6 +5,14 @@
 
 namespace fluid {
 
+enum class CursorShape : uint8_t {
+    Arrow,
+    ResizeHorizontal,
+    ResizeVertical,
+    ResizeDiagonalNWSE,
+    ResizeDiagonalNESW
+};
+
 struct InputState {
     Vec2  mousePos;
     bool  mouseDown[3] = {false, false, false};
@@ -32,12 +40,13 @@ public:
 };
 
 // Optional convenience interface for rendering backends (OpenGL, Vulkan, Metal, D3D...).
+// Render() resolves each nonzero DrawCmd::texture as a caller-owned GPUImageId.
 class IRenderBackend {
 public:
     virtual ~IRenderBackend() = default;
     virtual void Render(const DrawList& dl, Vec2 displaySize) = 0;
-    virtual uint64_t CreateTexture(const void* rgba8, int w, int h) = 0;
-    virtual void DestroyTexture(uint64_t id) = 0;
+    virtual GPUImageId CreateTexture(const void* rgba8, int w, int h) = 0;
+    virtual void DestroyTexture(GPUImageId id) = 0;
 };
 
 } // namespace fluid

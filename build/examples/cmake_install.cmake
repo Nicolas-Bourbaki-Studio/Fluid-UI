@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/mike1/source/repos/FluidUI Liberary/examples
+# Install script for directory: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/examples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -38,7 +38,7 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/mike1/source/repos/FluidUI Liberary/build/examples/basic_glfw_gl.exe")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/examples/basic_glfw_gl.exe")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/basic_glfw_gl.exe" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/basic_glfw_gl.exe")
     if(CMAKE_INSTALL_DO_STRIP)
@@ -50,6 +50,6 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/mike1/source/repos/FluidUI Liberary/build/examples/install_local_manifest.txt"
+  file(WRITE "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/examples/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

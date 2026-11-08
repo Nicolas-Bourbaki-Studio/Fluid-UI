@@ -27,9 +27,9 @@ events:
     names:
       - "mingw32-make.exe"
     candidate_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/"
       - "C:/Windows/System32/"
       - "C:/Windows/"
       - "C:/Windows/System32/wbem/"
@@ -59,12 +59,12 @@ events:
       - "/MinGW/bin/"
       - "/REGISTRY-NOTFOUND/MinGW/bin/"
     searched_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/mingw32-make.exe.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/mingw32-make.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/mingw32-make.exe.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/mingw32-make.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/mingw32-make.exe.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/mingw32-make.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/mingw32-make.exe.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/mingw32-make.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/mingw32-make.exe.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/mingw32-make.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/mingw32-make.exe.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/mingw32-make.exe"
       - "C:/Windows/System32/mingw32-make.exe.com"
       - "C:/Windows/System32/mingw32-make.exe"
       - "C:/Windows/mingw32-make.exe.com"
@@ -87,7 +87,7 @@ events:
     found: "C:/msys64/ucrt64/bin/mingw32-make.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -134,9 +134,9 @@ events:
     names:
       - "g++"
     candidate_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/"
       - "C:/Windows/System32/"
       - "C:/Windows/"
       - "C:/Windows/System32/wbem/"
@@ -162,15 +162,15 @@ events:
       - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/g++.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/g++.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/g++"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/g++.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/g++.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/g++"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/g++.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/g++.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/g++"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++"
       - "C:/Windows/System32/g++.com"
       - "C:/Windows/System32/g++.exe"
       - "C:/Windows/System32/g++"
@@ -202,7 +202,7 @@ events:
     found: "C:/msys64/ucrt64/bin/g++.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -253,13 +253,13 @@ events:
       - "CMakeCXXCompilerId.cpp.in"
     candidate_directories:
       - "C:/Program Files/CMake/share/cmake-4.5/Modules/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/"
     found: "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeCXXCompilerId.cpp.in"
     search_context:
       CMAKE_INCLUDE_PATH:
         - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include"
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -306,7 +306,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.exe"
       
       The CXX compiler identification is GNU, found in:
-        C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/4.5.0-rc3/CompilerIdCXX/a.exe
+        C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/4.5.0-rc3/CompilerIdCXX/a.exe
       
   -
     kind: "find-v1"
@@ -357,7 +357,7 @@ events:
     found: "C:/msys64/ucrt64/bin/ar.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -433,7 +433,7 @@ events:
     found: "C:/msys64/ucrt64/bin/ranlib.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -509,7 +509,7 @@ events:
     found: "C:/msys64/ucrt64/bin/strip.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -585,7 +585,7 @@ events:
     found: "C:/msys64/ucrt64/bin/ld.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -661,7 +661,7 @@ events:
     found: "C:/msys64/ucrt64/bin/nm.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -737,7 +737,7 @@ events:
     found: "C:/msys64/ucrt64/bin/objdump.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -813,7 +813,7 @@ events:
     found: "C:/msys64/ucrt64/bin/objcopy.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -889,7 +889,7 @@ events:
     found: "C:/msys64/ucrt64/bin/readelf.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -965,7 +965,7 @@ events:
     found: "C:/msys64/ucrt64/bin/dlltool.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1041,7 +1041,7 @@ events:
     found: "C:/msys64/ucrt64/bin/addr2line.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1188,7 +1188,7 @@ events:
     found: false
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1276,7 +1276,7 @@ events:
     found: "C:/msys64/ucrt64/bin/gcc-ar.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1364,7 +1364,7 @@ events:
     found: "C:/msys64/ucrt64/bin/gcc-ranlib.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1414,9 +1414,9 @@ events:
       - "windres"
       - "windres"
     candidate_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/"
       - "C:/Windows/System32/"
       - "C:/Windows/"
       - "C:/Windows/System32/wbem/"
@@ -1454,15 +1454,15 @@ events:
       - "C:/Program Files (x86)/FluidUI/sbin/"
       - "C:/Program Files (x86)/FluidUI/"
     searched_directories:
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/windres.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/windres.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/bin/windres"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/windres.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/windres.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/sbin/windres"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/windres.com"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/windres.exe"
-      - "C:/Users/mike1/source/repos/FluidUI Liberary/build/windres"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/windres.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/windres.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/windres"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/windres.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/windres.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/windres"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/windres.com"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/windres.exe"
+      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/windres"
       - "C:/Windows/System32/windres.com"
       - "C:/Windows/System32/windres.exe"
       - "C:/Windows/System32/windres"
@@ -1494,7 +1494,7 @@ events:
     found: "C:/msys64/ucrt64/bin/windres.exe"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1536,26 +1536,26 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc"
-      binary: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc"
+      source: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l"
+      binary: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "-m64"
       CMAKE_CXX_FLAGS_DEBUG: "-g"
       CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
       CMAKE_CXX_STDLIB_MODULES_JSON: ""
       CMAKE_EXE_LINKER_FLAGS: "-m64"
-      CMAKE_MODULE_PATH: "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+      CMAKE_MODULE_PATH: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
     buildResult:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: false
       stdout: |
-        Change Dir: 'C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc'
+        Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
         
-        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_37e80/fast
-        C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_37e80.dir\\build.make CMakeFiles/cmTC_37e80.dir/build
-        mingw32-make[1]: Entering directory 'C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc'
-        Building CXX object CMakeFiles/cmTC_37e80.dir/CMakeCXXCompilerABI.cpp.obj
-        C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_47b5b/fast
+        C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_47b5b.dir\\build.make CMakeFiles/cmTC_47b5b.dir/build
+        mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
+        Building CXX object CMakeFiles/cmTC_47b5b.dir/CMakeCXXCompilerABI.cpp.obj
+        C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe
         Target: x86_64-w64-mingw32
@@ -1563,8 +1563,8 @@ events:
         Thread model: posix
         Supported LTO compression algorithms: zlib zstd
         gcc version 16.2.0 (Rev4, Built by MSYS2 project) 
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_37e80.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccbrohGS.s
+        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_47b5b.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s
         GNU C++20 (Rev4, Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)
         	compiled by GNU C version 16.2.0, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.4.1, isl version isl-0.28-GMP
         
@@ -1587,14 +1587,14 @@ events:
          C:/msys64/ucrt64/bin/../../ucrt64/include
         End of search list.
         Compiler executable checksum: 8e7d23a9ab3cd610d3de06f65ae43541
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccbrohGS.s
+        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s
         GNU assembler version 2.47 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.47.20260726
         COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/;C:/msys64/ucrt64/bin/../../ucrt64/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../;C:/msys64/ucrt64/bin/../../ucrt64/lib/
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.'
-        Linking CXX executable cmTC_37e80.exe
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_37e80.dir\\link.txt --verbose=1
+        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_47b5b.exe
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_47b5b.dir\\link.txt --verbose=1
         Using built-in specs.
         COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe
         COLLECT_LTO_WRAPPER=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe
@@ -1605,16 +1605,16 @@ events:
         gcc version 16.2.0 (Rev4, Built by MSYS2 project) 
         COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/;C:/msys64/ucrt64/bin/../../ucrt64/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../;C:/msys64/ucrt64/bin/../../ucrt64/lib/
-        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_37e80.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_37e80.'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
+        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
         collect2 version 16.2.0
-        C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
+        C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
         GNU ld (GNU Binutils) 2.47.20260726
-        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_37e80.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_37e80.'
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_37e80.dir/objects.a
-        C:\\msys64\\ucrt64\\bin\\ar.exe qc CMakeFiles\\cmTC_37e80.dir/objects.a @CMakeFiles\\cmTC_37e80.dir\\objects1.rsp
-        C:\\msys64\\ucrt64\\bin\\g++.exe -m64  -m64 -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a -Wl,--no-whole-archive -o cmTC_37e80.exe -Wl,--out-implib,libcmTC_37e80.dll.a -Wl,--major-image-version,0,--minor-image-version,0
-        mingw32-make[1]: Leaving directory 'C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc'
+        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.'
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_47b5b.dir/objects.a
+        C:\\msys64\\ucrt64\\bin\\ar.exe qc CMakeFiles\\cmTC_47b5b.dir/objects.a @CMakeFiles\\cmTC_47b5b.dir\\objects1.rsp
+        C:\\msys64\\ucrt64\\bin\\g++.exe -m64  -m64 -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a -Wl,--no-whole-archive -o cmTC_47b5b.exe -Wl,--out-implib,libcmTC_47b5b.dll.a -Wl,--major-image-version,0,--minor-image-version,0
+        mingw32-make[1]: Leaving directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
         
       exitCode: 0
   -
@@ -1653,13 +1653,13 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|wild|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)(\\.exe)?"?( |$)]
         linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|wild))("|,| |$)]
-        ignore line: [Change Dir: 'C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc']
+        ignore line: [Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l']
         ignore line: []
-        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_37e80/fast]
-        ignore line: [C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_37e80.dir\\build.make CMakeFiles/cmTC_37e80.dir/build]
-        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/CMakeScratch/TryCompile-p0rnoc']
-        ignore line: [Building CXX object CMakeFiles/cmTC_37e80.dir/CMakeCXXCompilerABI.cpp.obj]
-        ignore line: [C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"]
+        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_47b5b/fast]
+        ignore line: [C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_47b5b.dir\\build.make CMakeFiles/cmTC_47b5b.dir/build]
+        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l']
+        ignore line: [Building CXX object CMakeFiles/cmTC_47b5b.dir/CMakeCXXCompilerABI.cpp.obj]
+        ignore line: [C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe]
         ignore line: [Target: x86_64-w64-mingw32]
@@ -1667,8 +1667,8 @@ events:
         ignore line: [Thread model: posix]
         ignore line: [Supported LTO compression algorithms: zlib zstd]
         ignore line: [gcc version 16.2.0 (Rev4  Built by MSYS2 project) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\']
-        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_37e80.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccbrohGS.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\']
+        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_47b5b.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s]
         ignore line: [GNU C++20 (Rev4  Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)]
         ignore line: [	compiled by GNU C version 16.2.0  GMP version 6.3.0  MPFR version 4.2.2  MPC version 1.4.1  isl version isl-0.28-GMP]
         ignore line: []
@@ -1691,8 +1691,8 @@ events:
         ignore line: [ C:/msys64/ucrt64/bin/../../ucrt64/include]
         ignore line: [End of search list.]
         ignore line: [Compiler executable checksum: 8e7d23a9ab3cd610d3de06f65ae43541]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\']
-        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccbrohGS.s]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\']
+        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s]
         ignore line: [GNU assembler version 2.47 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.47.20260726]
         ignore line: [COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/]
@@ -1705,9 +1705,9 @@ events:
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../]
         ignore line: [C:/msys64/ucrt64/bin/../../ucrt64/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_37e80.dir\\CMakeCXXCompilerABI.cpp.']
-        ignore line: [Linking CXX executable cmTC_37e80.exe]
-        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_37e80.dir\\link.txt --verbose=1]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_47b5b.exe]
+        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_47b5b.dir\\link.txt --verbose=1]
         ignore line: [Using built-in specs.]
         ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe]
         ignore line: [COLLECT_LTO_WRAPPER=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe]
@@ -1727,13 +1727,13 @@ events:
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../]
         ignore line: [C:/msys64/ucrt64/bin/../../ucrt64/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_37e80.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_37e80.']
-        link line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.']
+        link line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe] ==> ignore
           arg [-plugin] ==> ignore, skip following value
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll] ==> skip value of -plugin
           arg [-plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe] ==> ignore
-          arg [-plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res] ==> ignore
+          arg [-plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
@@ -1756,7 +1756,7 @@ events:
           arg [i386pep] ==> ignore
           arg [-Bdynamic] ==> search dynamic
           arg [-o] ==> ignore, skip following value
-          arg [cmTC_37e80.exe] ==> skip value of -o
+          arg [cmTC_47b5b.exe] ==> skip value of -o
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o]
           arg [-LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0] ==> dir [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0]
@@ -1769,10 +1769,10 @@ events:
           arg [-LC:/msys64/ucrt64/bin/../../ucrt64/lib] ==> dir [C:/msys64/ucrt64/bin/../../ucrt64/lib]
           arg [-v] ==> ignore
           arg [--whole-archive] ==> ignore
-          arg [CMakeFiles\\cmTC_37e80.dir/objects.a] ==> ignore
+          arg [CMakeFiles\\cmTC_47b5b.dir/objects.a] ==> ignore
           arg [--no-whole-archive] ==> ignore
           arg [--out-implib] ==> ignore
-          arg [libcmTC_37e80.dll.a] ==> ignore
+          arg [libcmTC_47b5b.dll.a] ==> ignore
           arg [--major-image-version] ==> ignore
           arg [0] ==> ignore
           arg [--minor-image-version] ==> ignore
@@ -1798,9 +1798,9 @@ events:
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
         ignore line: [collect2 version 16.2.0]
-        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe]
-        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker architecture flags [-m;i386pep]
-        ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccTNvD31.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_37e80.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_37e80.dir/objects.a --no-whole-archive --out-implib libcmTC_37e80.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
+        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe]
+        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker architecture flags [-m;i386pep]
+        ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
         linker tool for 'CXX': C:/msys64/ucrt64/x86_64-w64-mingw32/bin/ld.exe -m;i386pep
         remove lib [msvcrt]
         remove lib [msvcrt]
@@ -1860,7 +1860,7 @@ events:
       CMAKE_LIBRARY_PATH:
         - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -1939,32 +1939,32 @@ events:
         CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
     candidates:
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/opengl_systemConfig.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/opengl_systemConfig.cmake"
         mode: "config"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/opengl_system-config.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/opengl_system-config.cmake"
         mode: "config"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/lib/cps/opengl_system.cps"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/lib/cps/opengl_system.cps"
         mode: "cps"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/share/cps/opengl_system.cps"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/share/cps/opengl_system.cps"
         mode: "cps"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/opengl_systemConfig.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/opengl_systemConfig.cmake"
         mode: "config"
         reason: "no_exist"
     found:
-      path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/opengl_system-config.cmake"
+      path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/opengl_system-config.cmake"
       mode: "config"
       version: "system"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -2036,32 +2036,32 @@ events:
         CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
     candidates:
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/glfw3Config.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3Config.cmake"
         mode: "config"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/glfw3-config.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3-config.cmake"
         mode: "config"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/lib/cps/glfw3.cps"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/lib/cps/glfw3.cps"
         mode: "cps"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/CMakeFiles/pkgRedirects/share/cps/glfw3.cps"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/share/cps/glfw3.cps"
         mode: "cps"
         reason: "no_exist"
       -
-        path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/glfw3Config.cmake"
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3Config.cmake"
         mode: "config"
         reason: "no_exist"
     found:
-      path: "C:/Users/mike1/source/repos/FluidUI Liberary/build/glfw3-config.cmake"
+      path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3-config.cmake"
       mode: "config"
       version: "3.4"
     search_context:
       CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
         - "C:\\WINDOWS"
@@ -2095,5 +2095,350 @@ events:
         - "C:/Program Files/CMake"
         - "C:/Program Files (x86)/FluidUI"
       CMAKE_MODULE_PATH:
-        - "C:/Users/mike1/source/repos/FluidUI Liberary/build"
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@vscode\\ripgrep-universal\\bin\\win32-x64"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@github\\copilot-sdk-win32-x64\\ripgrep\\bin\\win32-x64"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
 ...

@@ -59,10 +59,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary"
+CMAKE_SOURCE_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary\build"
+CMAKE_BINARY_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -134,14 +134,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" "C:\Users\mike1\source\repos\FluidUI Liberary\build\examples\\CMakeFiles\progress.marks"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 0
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples\\CMakeFiles\progress.marks
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/clean
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/clean
 .PHONY : clean
 
 # The main clean target
@@ -150,22 +150,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/preinstall
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/preinstall
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 examples/CMakeFiles/basic_glfw_gl.dir/rule:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/CMakeFiles/basic_glfw_gl.dir/rule
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 examples/CMakeFiles/basic_glfw_gl.dir/rule
 .PHONY : examples/CMakeFiles/basic_glfw_gl.dir/rule
 
 # Convenience name for target.
@@ -174,7 +174,7 @@ basic_glfw_gl: examples/CMakeFiles/basic_glfw_gl.dir/rule
 
 # fast build rule for target.
 basic_glfw_gl/fast:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/build
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/build
 .PHONY : basic_glfw_gl/fast
 
 main.obj: main.cpp.obj
@@ -182,7 +182,7 @@ main.obj: main.cpp.obj
 
 # target to build an object file
 main.cpp.obj:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj
 .PHONY : main.cpp.obj
 
 main.i: main.cpp.i
@@ -190,7 +190,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -198,7 +198,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f examples\CMakeFiles\basic_glfw_gl.dir\build.make examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -228,6 +228,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 0
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

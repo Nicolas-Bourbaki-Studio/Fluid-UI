@@ -1,9 +1,9 @@
 {
 	"InstallScripts" : 
 	[
-		"C:/Users/mike1/source/repos/FluidUI Liberary/build/cmake_install.cmake",
-		"C:/Users/mike1/source/repos/FluidUI Liberary/build/src/cmake_install.cmake",
-		"C:/Users/mike1/source/repos/FluidUI Liberary/build/examples/cmake_install.cmake"
+		"C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/cmake_install.cmake",
+		"C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/src/cmake_install.cmake",
+		"C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/examples/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

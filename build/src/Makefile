@@ -59,10 +59,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary"
+CMAKE_SOURCE_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary\build"
+CMAKE_BINARY_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -134,14 +134,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" "C:\Users\mike1\source\repos\FluidUI Liberary\build\src\\CMakeFiles\progress.marks"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" 0
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src\\CMakeFiles\progress.marks
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/clean
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/clean
 .PHONY : clean
 
 # The main clean target
@@ -150,22 +150,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/preinstall
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/preinstall
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 src/CMakeFiles/FluidUI.dir/rule:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/CMakeFiles/FluidUI.dir/rule
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 src/CMakeFiles/FluidUI.dir/rule
 .PHONY : src/CMakeFiles/FluidUI.dir/rule
 
 # Convenience name for target.
@@ -174,7 +174,7 @@ FluidUI: src/CMakeFiles/FluidUI.dir/rule
 
 # fast build rule for target.
 FluidUI/fast:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/build
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/build
 .PHONY : FluidUI/fast
 
 Context.obj: Context.cpp.obj
@@ -182,7 +182,7 @@ Context.obj: Context.cpp.obj
 
 # target to build an object file
 Context.cpp.obj:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.obj
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.obj
 .PHONY : Context.cpp.obj
 
 Context.i: Context.cpp.i
@@ -190,7 +190,7 @@ Context.i: Context.cpp.i
 
 # target to preprocess a source file
 Context.cpp.i:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.i
 .PHONY : Context.cpp.i
 
 Context.s: Context.cpp.s
@@ -198,7 +198,7 @@ Context.s: Context.cpp.s
 
 # target to generate assembly for a file
 Context.cpp.s:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Context.cpp.s
 .PHONY : Context.cpp.s
 
 DrawList.obj: DrawList.cpp.obj
@@ -206,7 +206,7 @@ DrawList.obj: DrawList.cpp.obj
 
 # target to build an object file
 DrawList.cpp.obj:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj
 .PHONY : DrawList.cpp.obj
 
 DrawList.i: DrawList.cpp.i
@@ -214,7 +214,7 @@ DrawList.i: DrawList.cpp.i
 
 # target to preprocess a source file
 DrawList.cpp.i:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.i
 .PHONY : DrawList.cpp.i
 
 DrawList.s: DrawList.cpp.s
@@ -222,7 +222,7 @@ DrawList.s: DrawList.cpp.s
 
 # target to generate assembly for a file
 DrawList.cpp.s:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/DrawList.cpp.s
 .PHONY : DrawList.cpp.s
 
 FluidUI.obj: FluidUI.cpp.obj
@@ -230,7 +230,7 @@ FluidUI.obj: FluidUI.cpp.obj
 
 # target to build an object file
 FluidUI.cpp.obj:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj
 .PHONY : FluidUI.cpp.obj
 
 FluidUI.i: FluidUI.cpp.i
@@ -238,7 +238,7 @@ FluidUI.i: FluidUI.cpp.i
 
 # target to preprocess a source file
 FluidUI.cpp.i:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.i
 .PHONY : FluidUI.cpp.i
 
 FluidUI.s: FluidUI.cpp.s
@@ -246,7 +246,7 @@ FluidUI.s: FluidUI.cpp.s
 
 # target to generate assembly for a file
 FluidUI.cpp.s:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/FluidUI.cpp.s
 .PHONY : FluidUI.cpp.s
 
 Style.obj: Style.cpp.obj
@@ -254,7 +254,7 @@ Style.obj: Style.cpp.obj
 
 # target to build an object file
 Style.cpp.obj:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.obj
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.obj
 .PHONY : Style.cpp.obj
 
 Style.i: Style.cpp.i
@@ -262,7 +262,7 @@ Style.i: Style.cpp.i
 
 # target to preprocess a source file
 Style.cpp.i:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.i
 .PHONY : Style.cpp.i
 
 Style.s: Style.cpp.s
@@ -270,7 +270,7 @@ Style.s: Style.cpp.s
 
 # target to generate assembly for a file
 Style.cpp.s:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(MAKE) $(MAKESILENT) -f src\CMakeFiles\FluidUI.dir\build.make src/CMakeFiles/FluidUI.dir/Style.cpp.s
 .PHONY : Style.cpp.s
 
 # Help Target
@@ -309,6 +309,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 0
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles\Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

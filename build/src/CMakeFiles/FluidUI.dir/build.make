@@ -55,10 +55,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary"
+CMAKE_SOURCE_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\mike1\source\repos\FluidUI Liberary\build"
+CMAKE_BINARY_DIR = C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build
 
 # Include any dependencies generated for this target.
 include src/CMakeFiles/FluidUI.dir/depend.make
@@ -76,63 +76,63 @@ src/CMakeFiles/FluidUI.dir/codegen:
 
 src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj: src/CMakeFiles/FluidUI.dir/flags.make
 src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj: src/CMakeFiles/FluidUI.dir/includes_CXX.rsp
-src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj: C:/Users/mike1/source/repos/FluidUI\ Liberary/src/FluidUI.cpp
+src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI.cpp
 src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj: src/CMakeFiles/FluidUI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj -MF CMakeFiles\FluidUI.dir\FluidUI.cpp.obj.d -o CMakeFiles\FluidUI.dir\FluidUI.cpp.obj -c "C:\Users\mike1\source\repos\FluidUI Liberary\src\FluidUI.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj"
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj -MF CMakeFiles\FluidUI.dir\FluidUI.cpp.obj.d -o CMakeFiles\FluidUI.dir\FluidUI.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI.cpp
 
 src/CMakeFiles/FluidUI.dir/FluidUI.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidUI.dir/FluidUI.cpp.i"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\mike1\source\repos\FluidUI Liberary\src\FluidUI.cpp" > CMakeFiles\FluidUI.dir\FluidUI.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI.cpp > CMakeFiles\FluidUI.dir\FluidUI.cpp.i
 
 src/CMakeFiles/FluidUI.dir/FluidUI.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidUI.dir/FluidUI.cpp.s"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\mike1\source\repos\FluidUI Liberary\src\FluidUI.cpp" -o CMakeFiles\FluidUI.dir\FluidUI.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\FluidUI.cpp -o CMakeFiles\FluidUI.dir\FluidUI.cpp.s
 
 src/CMakeFiles/FluidUI.dir/Style.cpp.obj: src/CMakeFiles/FluidUI.dir/flags.make
 src/CMakeFiles/FluidUI.dir/Style.cpp.obj: src/CMakeFiles/FluidUI.dir/includes_CXX.rsp
-src/CMakeFiles/FluidUI.dir/Style.cpp.obj: C:/Users/mike1/source/repos/FluidUI\ Liberary/src/Style.cpp
+src/CMakeFiles/FluidUI.dir/Style.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/Style.cpp
 src/CMakeFiles/FluidUI.dir/Style.cpp.obj: src/CMakeFiles/FluidUI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/FluidUI.dir/Style.cpp.obj"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/Style.cpp.obj -MF CMakeFiles\FluidUI.dir\Style.cpp.obj.d -o CMakeFiles\FluidUI.dir\Style.cpp.obj -c "C:\Users\mike1\source\repos\FluidUI Liberary\src\Style.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/FluidUI.dir/Style.cpp.obj"
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/Style.cpp.obj -MF CMakeFiles\FluidUI.dir\Style.cpp.obj.d -o CMakeFiles\FluidUI.dir\Style.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Style.cpp
 
 src/CMakeFiles/FluidUI.dir/Style.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidUI.dir/Style.cpp.i"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\mike1\source\repos\FluidUI Liberary\src\Style.cpp" > CMakeFiles\FluidUI.dir\Style.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Style.cpp > CMakeFiles\FluidUI.dir\Style.cpp.i
 
 src/CMakeFiles/FluidUI.dir/Style.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidUI.dir/Style.cpp.s"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\mike1\source\repos\FluidUI Liberary\src\Style.cpp" -o CMakeFiles\FluidUI.dir\Style.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Style.cpp -o CMakeFiles\FluidUI.dir\Style.cpp.s
 
 src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj: src/CMakeFiles/FluidUI.dir/flags.make
 src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj: src/CMakeFiles/FluidUI.dir/includes_CXX.rsp
-src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj: C:/Users/mike1/source/repos/FluidUI\ Liberary/src/DrawList.cpp
+src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/DrawList.cpp
 src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj: src/CMakeFiles/FluidUI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj -MF CMakeFiles\FluidUI.dir\DrawList.cpp.obj.d -o CMakeFiles\FluidUI.dir\DrawList.cpp.obj -c "C:\Users\mike1\source\repos\FluidUI Liberary\src\DrawList.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj"
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj -MF CMakeFiles\FluidUI.dir\DrawList.cpp.obj.d -o CMakeFiles\FluidUI.dir\DrawList.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\DrawList.cpp
 
 src/CMakeFiles/FluidUI.dir/DrawList.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidUI.dir/DrawList.cpp.i"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\mike1\source\repos\FluidUI Liberary\src\DrawList.cpp" > CMakeFiles\FluidUI.dir\DrawList.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\DrawList.cpp > CMakeFiles\FluidUI.dir\DrawList.cpp.i
 
 src/CMakeFiles/FluidUI.dir/DrawList.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidUI.dir/DrawList.cpp.s"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\mike1\source\repos\FluidUI Liberary\src\DrawList.cpp" -o CMakeFiles\FluidUI.dir\DrawList.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\DrawList.cpp -o CMakeFiles\FluidUI.dir\DrawList.cpp.s
 
 src/CMakeFiles/FluidUI.dir/Context.cpp.obj: src/CMakeFiles/FluidUI.dir/flags.make
 src/CMakeFiles/FluidUI.dir/Context.cpp.obj: src/CMakeFiles/FluidUI.dir/includes_CXX.rsp
-src/CMakeFiles/FluidUI.dir/Context.cpp.obj: C:/Users/mike1/source/repos/FluidUI\ Liberary/src/Context.cpp
+src/CMakeFiles/FluidUI.dir/Context.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/Context.cpp
 src/CMakeFiles/FluidUI.dir/Context.cpp.obj: src/CMakeFiles/FluidUI.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/FluidUI.dir/Context.cpp.obj"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/Context.cpp.obj -MF CMakeFiles\FluidUI.dir\Context.cpp.obj.d -o CMakeFiles\FluidUI.dir\Context.cpp.obj -c "C:\Users\mike1\source\repos\FluidUI Liberary\src\Context.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/FluidUI.dir/Context.cpp.obj"
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/FluidUI.dir/Context.cpp.obj -MF CMakeFiles\FluidUI.dir\Context.cpp.obj.d -o CMakeFiles\FluidUI.dir\Context.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Context.cpp
 
 src/CMakeFiles/FluidUI.dir/Context.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidUI.dir/Context.cpp.i"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "C:\Users\mike1\source\repos\FluidUI Liberary\src\Context.cpp" > CMakeFiles\FluidUI.dir\Context.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Context.cpp > CMakeFiles\FluidUI.dir\Context.cpp.i
 
 src/CMakeFiles/FluidUI.dir/Context.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidUI.dir/Context.cpp.s"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\mike1\source\repos\FluidUI Liberary\src\Context.cpp" -o CMakeFiles\FluidUI.dir\Context.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src\Context.cpp -o CMakeFiles\FluidUI.dir\Context.cpp.s
 
 # Object files for target FluidUI
 FluidUI_OBJECTS = \
@@ -152,18 +152,18 @@ src/libFluidUI.dll: src/CMakeFiles/FluidUI.dir/build.make
 src/libFluidUI.dll: src/CMakeFiles/FluidUI.dir/linkLibs.rsp
 src/libFluidUI.dll: src/CMakeFiles/FluidUI.dir/objects1.rsp
 src/libFluidUI.dll: src/CMakeFiles/FluidUI.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir="C:\Users\mike1\source\repos\FluidUI Liberary\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX shared library libFluidUI.dll"
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\FluidUI.dir\link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX shared library libFluidUI.dll"
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\FluidUI.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
 src/CMakeFiles/FluidUI.dir/build: src/libFluidUI.dll
 .PHONY : src/CMakeFiles/FluidUI.dir/build
 
 src/CMakeFiles/FluidUI.dir/clean:
-	cd /d C:\Users\mike1\source\repos\FLUIDU~1\build\src && $(CMAKE_COMMAND) -P CMakeFiles\FluidUI.dir\cmake_clean.cmake
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src && $(CMAKE_COMMAND) -P CMakeFiles\FluidUI.dir\cmake_clean.cmake
 .PHONY : src/CMakeFiles/FluidUI.dir/clean
 
 src/CMakeFiles/FluidUI.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "C:\Users\mike1\source\repos\FluidUI Liberary" "C:\Users\mike1\source\repos\FluidUI Liberary\src" "C:\Users\mike1\source\repos\FluidUI Liberary\build" "C:\Users\mike1\source\repos\FluidUI Liberary\build\src" "C:\Users\mike1\source\repos\FluidUI Liberary\build\src\CMakeFiles\FluidUI.dir\DependInfo.cmake" "--color=$(COLOR)" FluidUI
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\src C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\src\CMakeFiles\FluidUI.dir\DependInfo.cmake "--color=$(COLOR)" FluidUI
 .PHONY : src/CMakeFiles/FluidUI.dir/depend
 
