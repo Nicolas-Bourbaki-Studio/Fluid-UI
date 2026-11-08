@@ -97,7 +97,7 @@ Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-lik
 Selectors support widget names, multiple stacked classes, grouped selectors, and widget
 states (`hover`, `active`, `checked`, `disabled`). Global custom properties can be declared
 in `:root` and referenced with `var(--name)` (including a fallback). Colors support 3/4/6/8
-digit hex, common named colors, `rgb()` and `rgba()`, and the `transparent` keyword;
+digit hex, common named colors, `rgb()`/`rgba()`, `hsl()`/`hsla()`, and `transparent`;
 numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius`, `font-size`, `gap`, `shadow-blur`,
@@ -107,8 +107,10 @@ Supported properties are `background`, `color`/`foreground`, `accent`, `border-c
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
 `StyleSheet::RegisterImage`; Fluid UI does not load image files itself. Linear gradients
 support CSS `linear-gradient(...)` syntax, including angles or `to right`-style directions,
-multiple color stops, and percentage stops. Use `background`/`background-image` for widget
-backgrounds and `text-gradient` on text-bearing widgets for gradient-colored text. Unsupported
+multiple color stops, and percentage stops. Gradients are accepted anywhere a color is
+accepted (backgrounds, foreground/text, accent, borders, and shadows), with explicit
+`text-gradient`, `accent-gradient`, `border-color-gradient`, and `shadow-color-gradient`
+aliases available. Unsupported
 selectors and declarations report an error, and failed stylesheet loads do not partially
 modify the active theme.
 
@@ -125,7 +127,7 @@ button.primary:hover {
 
 empty-widget.brand {
     background: linear-gradient(120deg, #101319, #1D2B42);
-    background-image: url("../Github Assets/Images/FluidUI Brush.png");
+    background-image: url("../src/Images/Icon.jpg");
     background-size: contain;
     background-position: center;
 }
@@ -155,15 +157,16 @@ ui.PushClass("primary");
 ui.Button("Save");
 ui.PopClass();
 
-ui.Style().RegisterImage("../Github Assets/Images/FluidUI Brush.png",
-                         myGpuImageId, {1490.0f, 494.0f});
+ui.Style().RegisterImage("../src/Images/Icon.jpg", myGpuImageId, {1024.0f, 1024.0f});
 ```
 
 `EmptyWidget(id, size)` reserves and paints a class-styleable region without drawing
-content. The GLFW demo registers the repository Brush PNG with its GPU texture and displays
-it near the top of the component window so it is immediately visible. The registered source
-must exactly match the `url(...)` value in CSS. The demo also shows background and text
-gradient examples.
+content. `ImageWidget(id, imageId, size)` draws a class-styleable framed image with CSS
+padding, fit, position, background, border, and shadow styles. The GLFW demo loads
+`src/Images/Icon.jpg`, registers it for its CSS background-image URL, and displays it in
+both an empty widget and an image widget near the top of the component window. The registered
+source must match the `url(...)` value in CSS. The demo also shows gradients on backgrounds,
+text, borders, and accent colors.
 
 The `examples` target includes `theme.css` and a GLFW demo covering the controls, container
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible

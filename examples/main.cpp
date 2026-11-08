@@ -5,6 +5,7 @@
 #include "../src/FluidUI/FluidUI.h"
 #include "../third_party/font8x8_basic.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cmath>
 #include <cstdint>
@@ -48,8 +49,14 @@ static void RenderGL(const DrawList& dl, int fbW, int fbH) {
         if (c.idxCount == 0) continue;
         glScissor((GLint)c.clip.x, fbH - (GLint)(c.clip.y + c.clip.h),
                   (GLsizei)c.clip.w, (GLsizei)c.clip.h);
-        if (c.texture) { glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, (GLuint)c.texture); }
-        else           { glDisable(GL_TEXTURE_2D); }
+        if (c.texture) {
+            glEnable(GL_TEXTURE_2D);
+            glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+            glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(c.texture));
+        } else {
+            glDisable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
         glDrawElements(GL_TRIANGLES, (GLsizei)c.idxCount, GL_UNSIGNED_INT, idx.data() + c.idxOffset);
     }
     glDisableClientState(GL_COLOR_ARRAY);
@@ -73,10 +80,17 @@ static GLuint CreateDemoTexture() {
     return texture;
 }
 
-static GLuint CreateTextureFromPng(const std::filesystem::path& path, int& width, int& height) {
+static GLuint CreateTextureFromImage(const std::filesystem::path& path, int& width, int& height,
+                                     std::string& error) {
     HRESULT result = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     const bool uninitialize = SUCCEEDED(result);
-    if (FAILED(result) && result != RPC_E_CHANGED_MODE) return 0;
+    if (FAILED(result) && result != RPC_E_CHANGED_MODE) {
+        char message[96];
+        std::snprintf(message, sizeof(message), "COM initialization failed (HRESULT 0x%08lX)",
+                      static_cast<unsigned long>(result));
+        error = message;
+        return 0;
+    }
 
     IWICImagingFactory* factory = nullptr;
     IWICBitmapDecoder* decoder = nullptr;
@@ -106,23 +120,47 @@ static GLuint CreateTextureFromPng(const std::filesystem::path& path, int& width
         imageWidth > static_cast<UINT>(std::numeric_limits<GLsizei>::max() / 4) ||
         imageHeight > static_cast<UINT>(std::numeric_limits<GLsizei>::max())) {
         release();
+        if (FAILED(result)) {
+            char message[96];
+            std::snprintf(message, sizeof(message), "WIC could not decode the image (HRESULT 0x%08lX)",
+                          static_cast<unsigned long>(result));
+            error = message;
+        } else {
+            error = "Image dimensions are empty or exceed OpenGL limits";
+        }
         return 0;
     }
 
     const uint64_t pixelBytes = static_cast<uint64_t>(imageWidth) * imageHeight * 4u;
     if (pixelBytes > std::numeric_limits<UINT>::max()) {
         release();
+        error = "Decoded image is too large for the WIC pixel buffer";
         return 0;
     }
     std::vector<unsigned char> pixels(static_cast<size_t>(pixelBytes));
     result = converter->CopyPixels(nullptr, imageWidth * 4,
                                    static_cast<UINT>(pixels.size()), pixels.data());
     release();
-    if (FAILED(result)) return 0;
+    if (FAILED(result)) {
+        char message[96];
+        std::snprintf(message, sizeof(message), "WIC could not copy decoded pixels (HRESULT 0x%08lX)",
+                      static_cast<unsigned long>(result));
+        error = message;
+        return 0;
+    }
 
     GLuint texture = 0;
+    GLint previousTexture = 0;
+    GLint previousUnpackAlignment = 4;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
     glGenTextures(1, &texture);
+    if (texture == 0) {
+        error = "OpenGL did not allocate a texture for the decoded image";
+        return 0;
+    }
     glBindTexture(GL_TEXTURE_2D, texture);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     constexpr GLint clampToEdge = 0x812F;
@@ -130,9 +168,20 @@ static GLuint CreateTextureFromPng(const std::filesystem::path& path, int& width
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(imageWidth),
                  static_cast<GLsizei>(imageHeight), 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
+    const GLenum uploadError = glGetError();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(previousTexture));
+    if (uploadError != GL_NO_ERROR) {
+        char message[96];
+        std::snprintf(message, sizeof(message), "OpenGL texture upload failed (error 0x%04X)",
+                      static_cast<unsigned int>(uploadError));
+        error = message;
+        glDeleteTextures(1, &texture);
+        return 0;
+    }
     width = static_cast<int>(imageWidth);
     height = static_cast<int>(imageHeight);
+    error.clear();
     return texture;
 }
 
@@ -217,34 +266,37 @@ int main() {
     Context ui;
     ui.Style() = StyleSheet::Dark();
     std::string cssError;
-    const std::filesystem::path themePath = std::filesystem::path(__FILE__).parent_path() / "theme.css";
+    const std::filesystem::path themePath =
+        std::filesystem::path(FLUIDUI_EXAMPLE_SOURCE_DIR) / "theme.css";
     if (!ui.Style().LoadCSSFile(themePath.string(), &cssError)) {
         std::fprintf(stderr, "%s\n", cssError.c_str());
         glfwDestroyWindow(win);
         glfwTerminate();
         return 1;
     }
-    const std::string brandImageSource = "../Github Assets/Images/FluidUI Brush.png";
-    const std::filesystem::path brandImagePath =
-        themePath.parent_path().parent_path() / "Github Assets" / "Images" / "FluidUI Brush.png";
-    int brandImageWidth = 0, brandImageHeight = 0;
-    const GLuint brandTexture = CreateTextureFromPng(
-        brandImagePath, brandImageWidth, brandImageHeight);
-    if (brandTexture == 0) {
-        std::fprintf(stderr, "Could not load background image: %s\n", brandImagePath.string().c_str());
+    const std::string iconImageSource = "../src/Images/Icon.jpg";
+    const std::filesystem::path iconImagePath =
+        themePath.parent_path().parent_path() / "src" / "Images" / "Icon.jpg";
+    int iconImageWidth = 0, iconImageHeight = 0;
+    std::string imageError;
+    const GLuint iconTexture = CreateTextureFromImage(
+        iconImagePath, iconImageWidth, iconImageHeight, imageError);
+    if (iconTexture == 0) {
+        std::fprintf(stderr, "Could not load background image '%s': %s\n",
+                     iconImagePath.string().c_str(), imageError.c_str());
         glfwDestroyWindow(win);
         glfwTerminate();
         return 1;
     }
-    ui.Style().RegisterImage(brandImageSource, static_cast<GPUImageId>(brandTexture),
-                             {static_cast<float>(brandImageWidth),
-                              static_cast<float>(brandImageHeight)});
+    ui.Style().RegisterImage(iconImageSource, static_cast<GPUImageId>(iconTexture),
+                             {static_cast<float>(iconImageWidth),
+                              static_cast<float>(iconImageHeight)});
     const std::vector<std::string> brandClasses{"brand"};
     const ComputedStyle brandStyle =
         ui.Style().Resolve("empty-widget", brandClasses, State_None);
-    if (brandStyle.backgroundImage != static_cast<GPUImageId>(brandTexture)) {
+    if (brandStyle.backgroundImage != static_cast<GPUImageId>(iconTexture)) {
         std::fprintf(stderr, "CSS background-image did not resolve to the registered texture\n");
-        glDeleteTextures(1, &brandTexture);
+        glDeleteTextures(1, &iconTexture);
         glfwDestroyWindow(win);
         glfwTerminate();
         return 1;
@@ -258,7 +310,24 @@ int main() {
     if (gradientStyle.backgroundGradient.stops.size() != 3 ||
         gradientTextStyle.textGradient.stops.size() != 3) {
         std::fprintf(stderr, "CSS background or text gradient did not resolve\n");
-        glDeleteTextures(1, &brandTexture);
+        glDeleteTextures(1, &iconTexture);
+        glfwDestroyWindow(win);
+        glfwTerminate();
+        return 1;
+    }
+    const ComputedStyle windowStyle = ui.Style().Resolve("window", {}, State_None);
+    const ComputedStyle buttonGradientStyle =
+        ui.Style().Resolve("button", {"gradient-demo"}, State_None);
+    const ComputedStyle toggleGradientStyle = ui.Style().Resolve("toggle", {}, State_None);
+    if (windowStyle.backgroundGradient.stops.size() != 2 ||
+        windowStyle.borderColorGradient.stops.size() != 2 ||
+        windowStyle.shadowColorGradient.stops.size() != 2 ||
+        buttonGradientStyle.backgroundGradient.stops.size() != 2 ||
+        buttonGradientStyle.borderColorGradient.stops.size() != 2 ||
+        buttonGradientStyle.textGradient.stops.size() != 2 ||
+        toggleGradientStyle.accentGradient.stops.size() != 2) {
+        std::fprintf(stderr, "CSS background, text, accent, border, or shadow gradient did not resolve\n");
+        glDeleteTextures(1, &iconTexture);
         glfwDestroyWindow(win);
         glfwTerminate();
         return 1;
@@ -281,6 +350,7 @@ int main() {
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     double last = glfwGetTime();
+    bool imageDrawVerified = false;
 
     while (!glfwWindowShouldClose(win)) {
         glfwPollEvents();
@@ -323,7 +393,11 @@ int main() {
             ui.Text("Core controls");
             ui.Text("CSS background image and gradients");
             ui.PushClass("brand");
-            ui.EmptyWidget("CSS background image", {360, 120});
+            ui.EmptyWidget("CSS background image", {160, 120});
+            ui.PopClass();
+            ui.SameLine();
+            ui.PushClass("icon-card");
+            ui.ImageWidget("Icon image card", static_cast<GPUImageId>(iconTexture), {112, 112});
             ui.PopClass();
             ui.PushClass("gradient-demo");
             ui.EmptyWidget("CSS background gradient", {360, 56});
@@ -429,12 +503,26 @@ int main() {
         }
 
         const DrawList& dl = ui.EndFrame();
+        if (!imageDrawVerified) {
+            const auto iconDrawCount = std::count_if(dl.Commands().begin(), dl.Commands().end(),
+                [&](const DrawCmd& command) {
+                    return command.texture == static_cast<GPUImageId>(iconTexture) &&
+                           command.idxCount >= 6;
+                });
+            imageDrawVerified = iconDrawCount >= 2;
+            if (!imageDrawVerified)
+                std::fprintf(stderr, "CSS background image or image widget was not emitted by the UI renderer\n");
+            else {
+                std::fprintf(stdout, "CSS background image and image widget loaded and emitted for rendering\n");
+                std::fflush(stdout);
+            }
+        }
         glClearColor(0.08f, 0.08f, 0.1f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
         RenderGL(dl, w, h);
         glfwSwapBuffers(win);
     }
-    glDeleteTextures(1, &brandTexture);
+    glDeleteTextures(1, &iconTexture);
     glDeleteTextures(1, &demoTexture);
     glDeleteTextures(1, &fontTexture);
     glfwDestroyWindow(win);

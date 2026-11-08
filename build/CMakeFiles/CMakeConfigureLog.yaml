@@ -2373,3 +2373,72 @@ events:
         - "C:/Program Files/CMake/bin"
         - "/bin"
 ...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
+    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
+        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@vscode\\ripgrep-universal\\bin\\win32-x64"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@github\\copilot-sdk-win32-x64\\ripgrep\\bin\\win32-x64"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+...

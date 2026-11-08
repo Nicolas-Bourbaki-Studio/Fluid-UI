@@ -16,11 +16,12 @@
 /* ================= WINDOW ================= */
 
 window {
-    background: #0f1114;
-    border: 1px solid #353B47;
+    background: linear-gradient(120deg, #101319, hsl(217, 100%, 81%));
+    border-color: linear-gradient(90deg, #353B47, #638CC2);
+    border-width: 2px;
     border-radius: 3px;
     padding: 5px;
-    shadow-color: rgba(0, 0, 0, 0);
+    shadow-color: linear-gradient(135deg, rgba(20, 25, 40, 0), rgba(90, 110, 220, 0.2));
     shadow-blur: 15px;
 }
 
@@ -135,11 +136,29 @@ empty-widget {
 
 empty-widget.brand {
     background: linear-gradient(120deg, #101319, #1D2B42);
-    background-image: url("../Github Assets/Images/FluidUI Brush.png");
+    background-image: url("../src/Images/Icon.jpg");
     background-size: contain;
     background-position: center;
     border: 1px solid #303846;
     border-radius: 10px;
+}
+
+image-widget {
+    background: linear-gradient(135deg, #172235, #263B5B);
+    border-color: linear-gradient(120deg, #6A8AC0, #BD86F4);
+    border-width: 2px;
+    border-radius: 12px;
+    padding: 8px;
+    background-size: contain;
+    background-position: center;
+    shadow-color: linear-gradient(135deg, rgba(89, 107, 206, 0.25), rgba(189, 134, 244, 0.15));
+    shadow-blur: 10px;
+}
+
+image-widget.icon-card {
+    background: linear-gradient(135deg, #192537, #34264C);
+    border-color: linear-gradient(90deg, #C781F4, #6AD5EF);
+    padding: 8px;
 }
 
 empty-widget.gradient-demo {
@@ -160,7 +179,7 @@ text-label, image-label {
 }
 
 text.gradient-text {
-    text-gradient: linear-gradient(90deg, #62D5FF, #A991FF, #FF86C8);
+    color: linear-gradient(90deg, #62D5FF, #A991FF, #FF86C8);
 }
 
 /* ================= BUTTONS ================= */
@@ -203,9 +222,8 @@ button.primary.emphasis {
 
 button.gradient-demo {
     background: linear-gradient(100deg, #2467B2, #6D48C8);
-    border-color: #8AA9F5;
-    color: #FFFFFF;
-    text-gradient: linear-gradient(90deg, #FFFFFF, #D4F5FF);
+    border-color: linear-gradient(90deg, #8AA9F5, #D98CF7);
+    color: linear-gradient(90deg, #FFFFFF, #D4F5FF);
 }
 
 /* Destructive buttons */
@@ -236,7 +254,7 @@ checkbox:hover, radio:hover {
 
 toggle {
     background: #404146;
-    accent: var(--ui-accent);
+    accent: linear-gradient(90deg, #3978B8, #A45CE0);
     color: #E4E7EC;
     gap: 8px;
 }

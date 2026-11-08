@@ -71,6 +71,7 @@ public:
     void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
     void Image(GPUImageId imageId, Vec2 size);
+    void ImageWidget(std::string_view id, GPUImageId imageId, Vec2 size);
     void EmptyWidget(std::string_view id, Vec2 size);
 
     // Layout
@@ -124,6 +125,8 @@ private:
     Interaction Behavior(WidgetId id, Rect r);
     bool IsFloatingWindowAt(Vec2 position) const;
     Rect Place(Vec2 size, float spacing);
+    void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
+                         float opacity, float rounding = 0.f);
     void DrawBox(Rect r, const ComputedStyle& s);
     void DrawBackgroundImage(Rect r, const ComputedStyle& s);
     void EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style);

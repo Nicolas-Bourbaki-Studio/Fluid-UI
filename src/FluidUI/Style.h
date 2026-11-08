@@ -15,7 +15,8 @@ enum class Prop : uint8_t {
     Background, BackgroundReset, Foreground, Accent, BorderColor, ShadowColor,
     BorderWidth, Rounding, FontSize, Spacing, ShadowBlur, Opacity,
     Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
-    BackgroundGradient, TextGradient
+    BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
+    BorderColorGradient, ShadowColorGradient
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
@@ -49,6 +50,9 @@ struct ComputedStyle {
     Vec2 backgroundPosition{0.5f, 0.5f};
     LinearGradient backgroundGradient;
     LinearGradient textGradient;
+    LinearGradient accentGradient;
+    LinearGradient borderColorGradient;
+    LinearGradient shadowColorGradient;
 };
 
 FLUID_API ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t);
@@ -89,6 +93,15 @@ public:
         }
         RuleBuilder& TextGradient(std::string css) {
             return Set(Prop::TextGradient, {}, std::move(css));
+        }
+        RuleBuilder& AccentGradient(std::string css) {
+            return Set(Prop::AccentGradient, {}, std::move(css));
+        }
+        RuleBuilder& BorderColorGradient(std::string css) {
+            return Set(Prop::BorderColorGradient, {}, std::move(css));
+        }
+        RuleBuilder& ShadowColorGradient(std::string css) {
+            return Set(Prop::ShadowColorGradient, {}, std::move(css));
         }
         RuleBuilder& BackgroundSize(BackgroundFit fit) {
             return Num(Prop::BackgroundSize, static_cast<float>(fit));

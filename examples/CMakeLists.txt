@@ -1,5 +1,8 @@
 add_executable(basic_glfw_gl main.cpp)
 target_link_libraries(basic_glfw_gl PRIVATE FluidUI glfw opengl32 windowscodecs ole32)
+file(TO_CMAKE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" FLUIDUI_EXAMPLE_SOURCE_DIR)
+target_compile_definitions(basic_glfw_gl PRIVATE
+    FLUIDUI_EXAMPLE_SOURCE_DIR="${FLUIDUI_EXAMPLE_SOURCE_DIR}")
 
 add_custom_command(TARGET basic_glfw_gl POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

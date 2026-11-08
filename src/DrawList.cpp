@@ -168,6 +168,33 @@ void DrawList::AddRectFilledGradient(Rect r, const LinearGradient& gradient,
     AddConvexFillGradient(pts.data(), static_cast<int>(pts.size()), gradient, r, opacity);
 }
 
+void DrawList::AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
+                                 float blur, float rounding) {
+    if (blur <= 0.f || gradient.Empty()) return;
+    constexpr int steps = 6;
+    for (int i = 0; i < steps; ++i) {
+        const float t = static_cast<float>(i + 1) / steps;
+        const float fade = (1.f - t) * 0.35f;
+        AddRectFilledGradient(r.Expanded(blur * t), gradient, opacity * fade,
+                              rounding + blur * t);
+    }
+}
+
+void DrawList::AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
+                                 float borderWidth, float rounding) {
+    if (borderWidth <= 0.f || gradient.Empty()) return;
+    const float horizontalInset = std::min(borderWidth, r.w * 0.5f);
+    const float verticalInset = std::min(borderWidth, r.h * 0.5f);
+    AddRectFilledGradient({r.x, r.y, r.w, borderWidth}, gradient, opacity, rounding);
+    AddRectFilledGradient({r.x, r.y + r.h - borderWidth, r.w, borderWidth},
+                          gradient, opacity, rounding);
+    const float sideHeight = std::max(0.f, r.h - 2.f * borderWidth);
+    AddRectFilledGradient({r.x, r.y + borderWidth, horizontalInset, sideHeight},
+                          gradient, opacity);
+    AddRectFilledGradient({r.x + r.w - horizontalInset, r.y + borderWidth,
+                           horizontalInset, sideHeight}, gradient, opacity);
+}
+
 void DrawList::AddConvexFillGradient(const Vec2* points, int count,
                                     const LinearGradient& gradient, Rect bounds,
                                     float opacity) {
@@ -210,6 +237,17 @@ void DrawList::AddShadow(Rect r, Color c, float blur, float rounding) {
 void DrawList::AddTriangleFilled(Vec2 a, Vec2 b, Vec2 c, Color col) {
     const Vec2 p[3] = {a, b, c};
     AddConvexFill(p, 3, col);
+}
+
+void DrawList::AddTriangleFilledGradient(Vec2 a, Vec2 b, Vec2 c,
+                                         const LinearGradient& gradient, float opacity) {
+    const Vec2 points[] = {a, b, c};
+    const float left = std::min({a.x, b.x, c.x});
+    const float top = std::min({a.y, b.y, c.y});
+    const float right = std::max({a.x, b.x, c.x});
+    const float bottom = std::max({a.y, b.y, c.y});
+    AddConvexFillGradient(points, 3, gradient,
+                          {left, top, right - left, bottom - top}, opacity);
 }
 
 void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {

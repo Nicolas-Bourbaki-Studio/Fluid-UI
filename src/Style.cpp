@@ -39,6 +39,9 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     };
     o.backgroundGradient = t < 0.5f ? a.backgroundGradient : b.backgroundGradient;
     o.textGradient = t < 0.5f ? a.textGradient : b.textGradient;
+    o.accentGradient = t < 0.5f ? a.accentGradient : b.accentGradient;
+    o.borderColorGradient = t < 0.5f ? a.borderColorGradient : b.borderColorGradient;
+    o.shadowColorGradient = t < 0.5f ? a.shadowColorGradient : b.shadowColorGradient;
     return o;
 }
 
@@ -142,10 +145,22 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.backgroundImage = 0;
             s.backgroundImageSize = {};
             break;
-        case Prop::Foreground:      s.foreground = col; break;
-        case Prop::Accent:          s.accent = col; break;
-        case Prop::BorderColor:     s.borderColor = col; break;
-        case Prop::ShadowColor:     s.shadowColor = col; break;
+        case Prop::Foreground:
+            s.foreground = col;
+            s.textGradient = {};
+            break;
+        case Prop::Accent:
+            s.accent = col;
+            s.accentGradient = {};
+            break;
+        case Prop::BorderColor:
+            s.borderColor = col;
+            s.borderColorGradient = {};
+            break;
+        case Prop::ShadowColor:
+            s.shadowColor = col;
+            s.shadowColorGradient = {};
+            break;
         case Prop::BorderWidth:     s.borderWidth = v[0]; break;
         case Prop::Rounding:        s.rounding = v[0]; break;
         case Prop::FontSize:        s.fontSize = v[0]; break;
@@ -161,13 +176,24 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.backgroundPosition = {v[0], v[1]};
             break;
         case Prop::BackgroundGradient:
-            s.backgroundImage = 0;
-            s.backgroundImageSize = {};
             if (!d.text.empty()) ParseLinearGradient(d.text, s.backgroundGradient);
             break;
         case Prop::TextGradient:
+        case Prop::ForegroundGradient:
             if (d.text.empty()) s.textGradient = {};
             else ParseLinearGradient(d.text, s.textGradient);
+            break;
+        case Prop::AccentGradient:
+            if (d.text.empty()) s.accentGradient = {};
+            else ParseLinearGradient(d.text, s.accentGradient);
+            break;
+        case Prop::BorderColorGradient:
+            if (d.text.empty()) s.borderColorGradient = {};
+            else ParseLinearGradient(d.text, s.borderColorGradient);
+            break;
+        case Prop::ShadowColorGradient:
+            if (d.text.empty()) s.shadowColorGradient = {};
+            else ParseLinearGradient(d.text, s.shadowColorGradient);
             break;
         case Prop::BackgroundImage:
             break;
@@ -178,6 +204,12 @@ std::string_view Trim(std::string_view value) {
     while (!value.empty() && std::isspace(static_cast<unsigned char>(value.front()))) value.remove_prefix(1);
     while (!value.empty() && std::isspace(static_cast<unsigned char>(value.back()))) value.remove_suffix(1);
     return value;
+}
+
+std::string NormalizeImageSource(std::string_view source) {
+    std::string normalized(Trim(source));
+    std::replace(normalized.begin(), normalized.end(), '\\', '/');
+    return normalized;
 }
 
 bool ParseNumber(std::string_view text, float& value) {
@@ -229,6 +261,52 @@ bool ParseColor(std::string_view text, Color& color) {
         if (count != (hasAlpha ? 4u : 3u) || !Trim(parts).empty()) return false;
         color = {std::clamp(channels[0], 0.f, 1.f), std::clamp(channels[1], 0.f, 1.f),
                  std::clamp(channels[2], 0.f, 1.f), std::clamp(channels[3], 0.f, 1.f)};
+        return true;
+    }
+    if (text.starts_with("hsl(") || text.starts_with("hsla(")) {
+        const bool hasAlpha = text.starts_with("hsla(");
+        const size_t count = hasAlpha ? 4u : 3u;
+        const size_t open = text.find('(');
+        if (text.back() != ')' || open == std::string_view::npos) return false;
+        std::string_view parts = text.substr(open + 1, text.size() - open - 2);
+        float channels[4]{0.f, 0.f, 0.f, 1.f};
+        for (size_t i = 0; i < count; ++i) {
+            const size_t comma = parts.find(',');
+            std::string_view component = Trim(parts.substr(0, comma));
+            if (i == 0 && component.ends_with("deg")) component.remove_suffix(3);
+            const bool percent = !component.empty() && component.back() == '%';
+            if (i > 0 && i < 3 && !percent) return false;
+            if (percent) component.remove_suffix(1);
+            if (!ParseNumber(component, channels[i])) return false;
+            if (i == 0) channels[i] = std::fmod(channels[i], 360.f);
+            else if (i < 3) channels[i] = std::clamp(channels[i] / 100.f, 0.f, 1.f);
+            else if (percent) channels[i] /= 100.f;
+            if (i + 1 < count) {
+                if (comma == std::string_view::npos) return false;
+                parts.remove_prefix(comma + 1);
+            } else if (comma != std::string_view::npos) {
+                return false;
+            } else {
+                parts = {};
+            }
+        }
+        if (!Trim(parts).empty()) return false;
+        float hue = channels[0] / 360.f;
+        if (hue < 0.f) hue += 1.f;
+        const float saturation = channels[1], lightness = channels[2];
+        const float chroma = (1.f - std::abs(2.f * lightness - 1.f)) * saturation;
+        const float hueSector = hue * 6.f;
+        const float x = chroma * (1.f - std::abs(std::fmod(hueSector, 2.f) - 1.f));
+        Color rgb;
+        if (hueSector < 1.f) rgb = {chroma, x, 0.f, 1.f};
+        else if (hueSector < 2.f) rgb = {x, chroma, 0.f, 1.f};
+        else if (hueSector < 3.f) rgb = {0.f, chroma, x, 1.f};
+        else if (hueSector < 4.f) rgb = {0.f, x, chroma, 1.f};
+        else if (hueSector < 5.f) rgb = {x, 0.f, chroma, 1.f};
+        else rgb = {chroma, 0.f, x, 1.f};
+        const float match = lightness - chroma * 0.5f;
+        color = {rgb.r + match, rgb.g + match, rgb.b + match,
+                 std::clamp(channels[3], 0.f, 1.f)};
         return true;
     }
     if (text.empty() || text.front() != '#') return false;
@@ -349,6 +427,14 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         out.value = {{c.r, c.g, c.b, c.a}};
         return true;
     };
+    auto colorOrGradient = [&](Prop colorProp, Prop gradientProp) {
+        if (color(colorProp)) return true;
+        LinearGradient parsed;
+        if (!ParseLinearGradient(value, parsed)) return false;
+        out.prop = gradientProp;
+        out.text = std::string(value);
+        return true;
+    };
     auto number = [&](Prop p) {
         float v = 0.f;
         if (!ParseNumber(value, v)) return false;
@@ -357,19 +443,16 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         return true;
     };
     if (name == "background" || name == "background-color") {
-        if (color(name == "background" ? Prop::BackgroundReset : Prop::Background)) return true;
-        LinearGradient parsed;
-        if (name == "background" && ParseLinearGradient(value, parsed)) {
-            out.prop = Prop::BackgroundGradient;
-            out.text = std::string(value);
-            return true;
-        }
-        return false;
+        return colorOrGradient(name == "background" ? Prop::BackgroundReset : Prop::Background,
+                               Prop::BackgroundGradient);
     }
-    if (name == "color" || name == "foreground") return color(Prop::Foreground);
-    if (name == "accent") return color(Prop::Accent);
-    if (name == "border-color") return color(Prop::BorderColor);
-    if (name == "shadow-color") return color(Prop::ShadowColor);
+    if (name == "color" || name == "foreground")
+        return colorOrGradient(Prop::Foreground, Prop::ForegroundGradient);
+    if (name == "accent") return colorOrGradient(Prop::Accent, Prop::AccentGradient);
+    if (name == "border-color")
+        return colorOrGradient(Prop::BorderColor, Prop::BorderColorGradient);
+    if (name == "shadow-color")
+        return colorOrGradient(Prop::ShadowColor, Prop::ShadowColorGradient);
     if (name == "border-width") return number(Prop::BorderWidth);
     if (name == "border-radius" || name == "rounding") return number(Prop::Rounding);
     if (name == "font-size") return number(Prop::FontSize);
@@ -417,10 +500,10 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         }
         if (source.empty()) return false;
         out.prop = Prop::BackgroundImage;
-        out.text = std::string(source);
+        out.text = NormalizeImageSource(source);
         return true;
     }
-    if (name == "text-gradient") {
+    if (name == "text-gradient" || name == "foreground-gradient") {
         if (value == "none") {
             out.prop = Prop::TextGradient;
             out.text.clear();
@@ -428,7 +511,24 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         }
         LinearGradient parsed;
         if (!ParseLinearGradient(value, parsed)) return false;
-        out.prop = Prop::TextGradient;
+        out.prop = Prop::ForegroundGradient;
+        out.text = std::string(value);
+        return true;
+    }
+    if (name == "accent-gradient" || name == "border-color-gradient" ||
+        name == "shadow-color-gradient") {
+        if (value == "none") {
+            out.prop = name == "accent-gradient" ? Prop::AccentGradient
+                : name == "border-color-gradient" ? Prop::BorderColorGradient
+                : Prop::ShadowColorGradient;
+            out.text.clear();
+            return true;
+        }
+        LinearGradient parsed;
+        if (!ParseLinearGradient(value, parsed)) return false;
+        out.prop = name == "accent-gradient" ? Prop::AccentGradient
+            : name == "border-color-gradient" ? Prop::BorderColorGradient
+            : Prop::ShadowColorGradient;
         out.text = std::string(value);
         return true;
     }
@@ -581,10 +681,11 @@ void StyleSheet::SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string tex
 }
 
 void StyleSheet::RegisterImage(std::string_view source, GPUImageId image, Vec2 size) {
+    const std::string key = NormalizeImageSource(source);
     if (image == 0) {
-        images_.erase(std::string(source));
+        images_.erase(key);
     } else {
-        images_[std::string(source)] = {image, size};
+        images_[key] = {image, size};
     }
     cache_.clear();
     ++version_;
@@ -741,9 +842,8 @@ ComputedStyle StyleSheet::Resolve(std::string_view widget,
                 if (d.text.empty()) {
                     out.backgroundImage = 0;
                     out.backgroundImageSize = {};
-                    out.backgroundGradient = {};
                 } else {
-                    const auto image = images_.find(d.text);
+                    const auto image = images_.find(NormalizeImageSource(d.text));
                     if (image != images_.end()) {
                         out.backgroundImage = image->second.id;
                         out.backgroundImageSize = image->second.size;

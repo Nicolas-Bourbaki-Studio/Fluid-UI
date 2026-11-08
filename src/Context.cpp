@@ -98,7 +98,9 @@ const DrawList& Context::EndFrame() {
                        segmentStart, thickness, segmentEnd - segmentStart}
                 : Rect{segmentStart, splitter.y + (splitter.h - thickness) * 0.5f,
                        segmentEnd - segmentStart, thickness};
-            draw_.AddRectFilled(line, Fade(color, splitterStyle.opacity), thickness * 0.5f);
+            DrawStyledColor(line, color, hovered || active ? splitterStyle.accentGradient
+                                                          : LinearGradient{},
+                            splitterStyle.opacity, thickness * 0.5f);
         };
         float visibleStart = start;
         for (const auto& [coveredStart, coveredEnd] : occlusions) {
@@ -109,19 +111,29 @@ const DrawList& Context::EndFrame() {
     }
     if (hasDockPreview_) {
         const ComputedStyle previewStyle = Resolve("dock-preview", 0);
-        draw_.AddRectFilled(dockPreview_, Fade(previewStyle.accent, 0.24f), previewStyle.rounding);
-        draw_.AddBox(dockPreview_, Fade(previewStyle.background, 0.08f),
-                     Fade(previewStyle.accent, 0.95f), 2.f, previewStyle.rounding);
+        DrawStyledColor(dockPreview_, previewStyle.accent, previewStyle.accentGradient,
+                        previewStyle.opacity * 0.24f, previewStyle.rounding);
+        draw_.AddRectFilledGradient(dockPreview_, previewStyle.backgroundGradient,
+                                    previewStyle.opacity * 0.08f, previewStyle.rounding);
+        if (!previewStyle.accentGradient.Empty())
+            draw_.AddBorderGradient(dockPreview_, previewStyle.accentGradient,
+                                    previewStyle.opacity * 0.95f, 2.f, previewStyle.rounding);
+        else
+            draw_.AddBox(dockPreview_, {0.f, 0.f, 0.f, 0.f},
+                         Fade(previewStyle.accent, 0.95f),
+                         2.f, previewStyle.rounding);
         DrawTextCentered(dockPreview_, "Dock preview", previewStyle);
     }
     if (dockCompassVisible_) {
         const ComputedStyle menuStyle = Resolve("dock-menu", 0);
         const ComputedStyle targetStyle = Resolve("dock-target", 0);
-        draw_.AddShadow(dockCompassRect_, Fade(menuStyle.shadowColor, menuStyle.opacity),
-                        menuStyle.shadowBlur, menuStyle.rounding);
-        draw_.AddBox(dockCompassRect_, Fade(menuStyle.background, menuStyle.opacity),
-                     Fade(menuStyle.borderColor, menuStyle.opacity),
-                     menuStyle.borderWidth, menuStyle.rounding);
+        if (!menuStyle.shadowColorGradient.Empty())
+            draw_.AddShadowGradient(dockCompassRect_, menuStyle.shadowColorGradient,
+                                    menuStyle.opacity, menuStyle.shadowBlur, menuStyle.rounding);
+        else
+            draw_.AddShadow(dockCompassRect_, Fade(menuStyle.shadowColor, menuStyle.opacity),
+                            menuStyle.shadowBlur, menuStyle.rounding);
+        DrawBox(dockCompassRect_, menuStyle);
         constexpr DockSide sides[] = {
             DockSide::Left, DockSide::Right, DockSide::Top,
             DockSide::Bottom, DockSide::Center
@@ -132,10 +144,11 @@ const DrawList& Context::EndFrame() {
             const bool hovered = target.Contains(in_.mousePos);
             ComputedStyle style = Resolve("dock-target",
                 hovered ? State_Hovered : State_None);
-            if (sides[i] == dockCompassSelection_) style.background = targetStyle.accent;
-            draw_.AddBox(target, Fade(style.background, style.opacity),
-                         Fade(style.borderColor, style.opacity),
-                         style.borderWidth, style.rounding);
+            if (sides[i] == dockCompassSelection_) {
+                style.background = targetStyle.accent;
+                style.backgroundGradient = targetStyle.accentGradient;
+            }
+            DrawBox(target, style);
             DrawTextCentered(target, labels[i], style);
         }
     }
@@ -224,12 +237,25 @@ Rect Context::Place(Vec2 size, float spacing) {
     return {pos.x, pos.y, size.x, size.y};
 }
 
+void Context::DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
+                              float opacity, float rounding) {
+    if (gradient.Empty()) draw_.AddRectFilled(r, Fade(color, opacity), rounding);
+    else draw_.AddRectFilledGradient(r, gradient, opacity, rounding);
+}
+
 void Context::DrawBox(Rect r, const ComputedStyle& s) {
-    draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.rounding);
+    if (!s.shadowColorGradient.Empty())
+        draw_.AddShadowGradient(r, s.shadowColorGradient, s.opacity,
+                                s.shadowBlur, s.rounding);
+    else
+        draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.rounding);
     draw_.AddRectFilled(r, Fade(s.background, s.opacity), s.rounding);
     draw_.AddRectFilledGradient(r, s.backgroundGradient, s.opacity, s.rounding);
     DrawBackgroundImage(r, s);
-    if (s.borderWidth > 0.f && s.borderColor.a > 0.f)
+    if (!s.borderColorGradient.Empty())
+        draw_.AddBorderGradient(r, s.borderColorGradient, s.opacity,
+                                s.borderWidth, s.rounding);
+    else if (s.borderWidth > 0.f && s.borderColor.a > 0.f)
         draw_.AddBox(r, {0.f, 0.f, 0.f, 0.f}, Fade(s.borderColor, s.opacity),
                      s.borderWidth, s.rounding);
 }
@@ -402,9 +428,7 @@ Rect Context::BeginMenuPopup(WidgetId id, Rect anchor, size_t depth) {
     x = std::clamp(x, 0.f, std::max(0.f, in_.displaySize.x - width));
     Rect popup{x, y, width, height};
     if (y + popup.h > in_.displaySize.y) popup.y = std::max(0.f, in_.displaySize.y - popup.h);
-    draw_.AddShadow(popup, Fade(style.shadowColor, style.opacity), style.shadowBlur, style.rounding);
-    draw_.AddBox(popup, Fade(style.background, style.opacity),
-                 Fade(style.borderColor, style.opacity), style.borderWidth, style.rounding);
+    DrawBox(popup, style);
     draw_.PushClipRect(popup);
     interactionClips_.push_back(popup);
     menuPopupRects_.push_back(popup);
@@ -890,7 +914,8 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     w.drawLayer = draw_.BeginLayer();
     w.hasDrawLayer = true;
     DrawBox(frame, ws);
-    draw_.AddRectFilled(bar, Fade(ts.background, ts.opacity), ws.rounding);
+    DrawStyledColor(bar, ts.background, ts.backgroundGradient, ts.opacity, ws.rounding);
+    DrawBackgroundImage(bar, ts);
     const Rect titleRect{bar.x + ts.padding.left, bar.y,
                          std::max(0.f, bar.w - ts.padding.Horizontal()), bar.h};
     DrawTextCentered(titleRect, text, ts);
@@ -906,10 +931,11 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         const ComputedStyle gripStyle = Resolve("window-resize", 0);
         for (int i = 0; i < 3; ++i) {
             const float offset = static_cast<float>(i * 5 + 4);
-            draw_.AddRectFilled({frame.x + frame.w - offset - 2.f,
-                                 frame.y + frame.h - 4.f, 2.f,
-                                 std::min(offset - 1.f, 8.f)},
-                                Fade(gripStyle.accent, gripStyle.opacity), 1.f);
+            DrawStyledColor({frame.x + frame.w - offset - 2.f,
+                             frame.y + frame.h - 4.f, 2.f,
+                             std::min(offset - 1.f, 8.f)},
+                            gripStyle.accent, gripStyle.accentGradient,
+                            gripStyle.opacity, 1.f);
         }
     }
 
@@ -956,8 +982,8 @@ void Context::EndWindow() {
             const float trackWidth = 7.f;
             const Rect track{windowViewport_.x + windowViewport_.w + 2.f, windowViewport_.y,
                              trackWidth, windowViewport_.h};
-            draw_.AddRectFilled(track, Fade(trackStyle.background, trackStyle.opacity),
-                                trackWidth * 0.5f);
+            DrawStyledColor(track, trackStyle.background, trackStyle.backgroundGradient,
+                            trackStyle.opacity, trackWidth * 0.5f);
             const float thumbH = std::max(28.f, track.h * track.h / window.contentHeight);
             float thumbY = track.y + (track.h - thumbH) *
                 (maxScroll > 0.f ? window.scrollY / maxScroll : 0.f);
@@ -977,8 +1003,9 @@ void Context::EndWindow() {
             } else if (window.scrolling && !in_.mouseDown[0]) {
                 window.scrolling = false;
             }
-            draw_.AddRectFilled({thumb.x, thumbY, thumb.w, thumb.h},
-                                Fade(trackStyle.accent, trackStyle.opacity), trackWidth * 0.5f);
+            DrawStyledColor({thumb.x, thumbY, thumb.w, thumb.h},
+                            trackStyle.accent, trackStyle.accentGradient,
+                            trackStyle.opacity, trackWidth * 0.5f);
         }
         if (window.scrolling && !in_.mouseDown[0]) window.scrolling = false;
     }
@@ -1210,7 +1237,8 @@ bool Context::Checkbox(std::string_view label, bool* value) {
     const Rect boxR{r.x, r.y + (r.h - box) * 0.5f, box, box};
     DrawBox(boxR, s);
     if (*value)
-        draw_.AddRectFilled(boxR.Expanded(-box * 0.25f), Fade(s.accent, s.opacity), s.rounding * 0.5f);
+        DrawStyledColor(boxR.Expanded(-box * 0.25f), s.accent, s.accentGradient,
+                        s.opacity, s.rounding * 0.5f);
     EmitText({boxR.x + box + s.spacing, r.y + (r.h - ts.y) * 0.5f}, text, s);
 
     if (b.pressed) *value = !*value;
@@ -1230,11 +1258,13 @@ bool Context::Toggle(std::string_view label, bool* value) {
     const ComputedStyle style = Animate(id, "toggle", *value ? State_Checked : State_None,
                                         interaction.hovered, interaction.held);
     const Rect track{r.x, r.y + (r.h - trackH) * 0.5f, trackW, trackH};
-    draw_.AddRectFilled(track, Fade(*value ? style.accent : style.background, style.opacity), trackH * 0.5f);
+    DrawStyledColor(track, *value ? style.accent : style.background,
+                    *value ? style.accentGradient : style.backgroundGradient,
+                    style.opacity, trackH * 0.5f);
     const float knob = trackH * 0.78f;
     const float knobX = *value ? track.x + track.w - trackH * 0.89f : track.x + trackH * 0.11f;
-    draw_.AddRectFilled({knobX, track.y + (trackH - knob) * 0.5f, knob, knob},
-                        Fade(style.foreground, style.opacity), knob * 0.5f);
+    DrawStyledColor({knobX, track.y + (trackH - knob) * 0.5f, knob, knob},
+                    style.foreground, style.textGradient, style.opacity, knob * 0.5f);
     EmitText({track.x + track.w + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
              text, style);
     if (interaction.pressed) *value = !*value;
@@ -1254,12 +1284,14 @@ bool Context::Radio(std::string_view label, int* value, int option) {
     const ComputedStyle style = Animate(id, "radio", checked ? State_Checked : State_None,
                                         interaction.hovered, interaction.held);
     const Rect circle{r.x, r.y + (r.h - diameter) * 0.5f, diameter, diameter};
-    draw_.AddRectFilled(circle, Fade(style.borderColor.a > 0.f ? style.borderColor : style.background,
-                                     style.opacity), diameter * 0.5f);
+    DrawStyledColor(circle, style.borderColor.a > 0.f ? style.borderColor : style.background,
+                    style.borderColor.a > 0.f ? style.borderColorGradient
+                                              : style.backgroundGradient,
+                    style.opacity, diameter * 0.5f);
     if (checked) {
         const float inset = diameter * 0.28f;
-        draw_.AddRectFilled(circle.Expanded(-inset), Fade(style.accent, style.opacity),
-                            diameter * 0.5f);
+        DrawStyledColor(circle.Expanded(-inset), style.accent, style.accentGradient,
+                        style.opacity, diameter * 0.5f);
     }
     EmitText({circle.x + diameter + style.spacing, r.y + (r.h - textSize.y) * 0.5f},
              text, style);
@@ -1288,7 +1320,8 @@ bool Context::SliderFloat(std::string_view label, float* value, float lo, float 
 
     DrawBox(r, s);
     if (t > 0.f)
-        draw_.AddRectFilled({r.x, r.y, r.w * t, r.h}, Fade(s.accent, s.opacity), s.rounding);
+        DrawStyledColor({r.x, r.y, r.w * t, r.h}, s.accent, s.accentGradient,
+                        s.opacity, s.rounding);
 
     char buf[128];
     std::snprintf(buf, sizeof(buf), "%.*s: %.2f", static_cast<int>(text.size()), text.data(), *value);
@@ -1304,6 +1337,23 @@ bool Context::ValueSlider(std::string_view label, float* value, float lo, float 
 void Context::Image(GPUImageId imageId, Vec2 size) {
     const Rect r = Place(size, Resolve("image", 0).spacing);
     draw_.AddQuad(r, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
+}
+
+void Context::ImageWidget(std::string_view id, GPUImageId imageId, Vec2 size) {
+    if (imageId == 0 || size.x <= 0.f || size.y <= 0.f) return;
+    PushID(id);
+    const ComputedStyle style = Resolve("image-widget", 0);
+    const Rect rect = Place({size.x + style.padding.Horizontal(),
+                             size.y + style.padding.Vertical()}, style.spacing);
+    DrawBox(rect, style);
+    ComputedStyle imageStyle;
+    imageStyle.backgroundImage = imageId;
+    imageStyle.backgroundImageSize = size;
+    imageStyle.backgroundFit = style.backgroundFit;
+    imageStyle.backgroundPosition = style.backgroundPosition;
+    DrawBackgroundImage({rect.x + style.padding.left, rect.y + style.padding.top,
+                         size.x, size.y}, imageStyle);
+    PopID();
 }
 
 void Context::EmptyWidget(std::string_view id, Vec2 size) {
@@ -1345,9 +1395,17 @@ bool Context::Dropdown(std::string_view label, const std::vector<std::string_vie
     DrawBox(r, style);
     EmitText({r.x + style.padding.left, r.y + (r.h - fullSize.y) * 0.5f}, display, style);
     const float arrowX = r.x + r.w - style.padding.right - style.fontSize * 0.35f;
-    draw_.AddTriangleFilled({arrowX - 4.f, r.y + r.h * 0.42f},
-                            {arrowX + 4.f, r.y + r.h * 0.42f},
-                            {arrowX, r.y + r.h * 0.58f}, Fade(style.foreground, style.opacity));
+    if (style.textGradient.Empty()) {
+        draw_.AddTriangleFilled({arrowX - 4.f, r.y + r.h * 0.42f},
+                                {arrowX + 4.f, r.y + r.h * 0.42f},
+                                {arrowX, r.y + r.h * 0.58f},
+                                Fade(style.foreground, style.opacity));
+    } else {
+        draw_.AddTriangleFilledGradient({arrowX - 4.f, r.y + r.h * 0.42f},
+                                        {arrowX + 4.f, r.y + r.h * 0.42f},
+                                        {arrowX, r.y + r.h * 0.58f},
+                                        style.textGradient, style.opacity);
+    }
     if (interaction.pressed) dropdowns_[id] = !dropdowns_[id];
 
     bool changed = false;
