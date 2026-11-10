@@ -149,7 +149,9 @@ const DrawList& Context::EndFrame() {
         const auto target = windows_.find(tabDropTarget_);
         if (target != windows_.end()) {
             const Rect rect{target->second.pos.x, target->second.pos.y,
-                            target->second.size.x, target->second.size.y};
+                            target->second.size.x,
+                            std::min(target->second.size.y,
+                                     target->second.titleHeight)};
             const ComputedStyle style = Resolve("dock-tab", State_Checked);
             constexpr float border = 3.f;
             DrawStyledColor({rect.x, rect.y, rect.w, border},
@@ -263,9 +265,13 @@ bool Context::IsFloatingWindowAt(Vec2 position) const {
     return false;
 }
 
-WidgetId Context::WindowAt(Vec2 position, WidgetId exclude) const {
+WidgetId Context::WindowTitleAt(Vec2 position, WidgetId exclude) const {
     WidgetId hit = 0;
     uint64_t topZ = 0;
+    const WindowState* topWindow = nullptr;
+    const ComputedStyle fallbackTitleStyle = style_.Resolve("window-title", {}, 0);
+    const float fallbackTitleHeight =
+        fallbackTitleStyle.fontSize * 1.2f + fallbackTitleStyle.padding.Vertical();
     const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
     for (const auto& [id, window] : windows_) {
         if (id == exclude || !window.open || !window.init) continue;
@@ -280,7 +286,14 @@ WidgetId Context::WindowAt(Vec2 position, WidgetId exclude) const {
                 .Contains(position) && window.zOrder >= topZ) {
             hit = id;
             topZ = window.zOrder;
+            topWindow = &window;
         }
+    }
+    if (topWindow) {
+        const float titleHeight = topWindow->titleHeight > 0.f
+            ? topWindow->titleHeight : fallbackTitleHeight;
+        if (position.y >= topWindow->pos.y + std::min(topWindow->size.y, titleHeight))
+            return 0;
     }
     return hit;
 }
@@ -400,12 +413,27 @@ void Context::DrawStyledColor(Rect r, Color color, const LinearGradient& gradien
     else draw_.AddRectFilledGradient(r, gradient, opacity, rounding);
 }
 
+namespace {
+
+CornerRadii ExpandRadii(CornerRadii radii, float amount) {
+    return {
+        std::max(0.f, radii.topLeft + amount),
+        std::max(0.f, radii.topRight + amount),
+        std::max(0.f, radii.bottomRight + amount),
+        std::max(0.f, radii.bottomLeft + amount)
+    };
+}
+
+} // namespace
+
 void Context::DrawBox(Rect r, const ComputedStyle& s) {
-    if (!s.shadowColorGradient.Empty())
-        draw_.AddShadowGradient(r, s.shadowColorGradient, s.opacity,
-                                s.shadowBlur, s.cornerRadii);
-    else
-        draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.cornerRadii);
+    if (s.shadowEnabled) {
+        if (!s.shadowColorGradient.Empty())
+            draw_.AddShadowGradient(r, s.shadowColorGradient, s.opacity,
+                                    s.shadowBlur, s.cornerRadii);
+        else
+            draw_.AddShadow(r, Fade(s.shadowColor, s.opacity), s.shadowBlur, s.cornerRadii);
+    }
     draw_.AddRectFilled(r, Fade(s.background, s.opacity), s.cornerRadii);
     draw_.AddRectFilledGradient(r, s.backgroundGradient, s.opacity, s.cornerRadii);
     DrawBackgroundImage(r, s);
@@ -415,6 +443,22 @@ void Context::DrawBox(Rect r, const ComputedStyle& s) {
     else if (s.borderWidth > 0.f && s.borderColor.a > 0.f)
         draw_.AddBox(r, {0.f, 0.f, 0.f, 0.f}, Fade(s.borderColor, s.opacity),
                      s.borderWidth, s.cornerRadii);
+    DrawOutline(r, s);
+}
+
+void Context::DrawOutline(Rect r, const ComputedStyle& s) {
+    if (!s.outlineEnabled || s.outlineWidth <= 0.f) return;
+    const Rect outline = r.Expanded(s.outlineWidth);
+    const CornerRadii rounding = ExpandRadii(s.cornerRadii, s.outlineWidth);
+    if (!s.outlineColorGradient.Empty())
+        draw_.AddBorderGradient(outline, s.outlineColorGradient, s.opacity,
+                                s.outlineWidth, rounding);
+    else {
+        const Color color = s.outlineColorSet ? s.outlineColor : s.foreground;
+        if (color.a > 0.f)
+            draw_.AddBox(outline, {0.f, 0.f, 0.f, 0.f},
+                         Fade(color, s.opacity), s.outlineWidth, rounding);
+    }
 }
 
 void Context::EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style) {
@@ -1414,6 +1458,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     const ComputedStyle ts = Resolve("window-title", 0);
     const std::string_view text = DisplayLabel(title);
     const float titleH = ts.fontSize * 1.2f + ts.padding.Vertical();
+    w.titleHeight = titleH;
     constexpr float controlWidth = 25.f;
     Rect frame{w.pos.x, w.pos.y, w.size.x, w.size.y};
     const Rect closeRect{frame.x + frame.w - controlWidth - ts.padding.right, frame.y,
@@ -1433,13 +1478,13 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     const Interaction drag = Behavior(dragId, dragRect);
     if (w.dock != DockSide::None) {
         if (drag.pressed) {
-            w.dockDragPending = false;
             const float dx = in_.mousePos.x - w.lastTitleClickPos.x;
             const float dy = in_.mousePos.y - w.lastTitleClickPos.y;
             const bool doubleClick = w.lastTitleClickTime >= 0.0 &&
                 timeSeconds_ - static_cast<float>(w.lastTitleClickTime) <= 0.35f &&
                 dx * dx + dy * dy <= 100.f;
             if (doubleClick) {
+                w.dockDragPending = false;
                 DetachTab(id);
                 w.dock = DockSide::None;
                 if (w.dockRestoreSize.x > 0.f && w.dockRestoreSize.y > 0.f)
@@ -1468,18 +1513,18 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             const float dx = in_.mousePos.x - w.dockDragStartPos.x;
             const float dy = in_.mousePos.y - w.dockDragStartPos.y;
             if (dx * dx + dy * dy > 25.f) {
-                w.dockDragPending = false;
-                DetachTab(id);
-                w.dock = DockSide::None;
-                if (w.dockRestoreSize.x > 0.f && w.dockRestoreSize.y > 0.f)
-                    w.size = w.dockRestoreSize;
-                w.dragging = true;
-                w.dragOff = {w.size.x * 0.5f, titleH * 0.5f};
-                w.pos = in_.mousePos - w.dragOff;
-                dockLayoutDone_ = false;
-                frame = {w.pos.x, w.pos.y, w.size.x, w.size.y};
+                tabDropTarget_ = dockingEnabled_ ? WindowTitleAt(in_.mousePos, id) : 0;
             }
-        } else if (!in_.mouseDown[0]) {
+        } else if (w.dockDragPending && !in_.mouseDown[0]) {
+            const float dx = in_.mousePos.x - w.dockDragStartPos.x;
+            const float dy = in_.mousePos.y - w.dockDragStartPos.y;
+            const WidgetId targetWindow =
+                dx * dx + dy * dy > 25.f && dockingEnabled_
+                    ? WindowTitleAt(in_.mousePos, id) : 0;
+            if (targetWindow != 0) {
+                JoinTab(id, targetWindow);
+                tabDropTarget_ = targetWindow;
+            }
             w.dockDragPending = false;
         }
     } else if (drag.held) {
@@ -1512,18 +1557,19 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         }
         if (w.dragging) {
             w.pos = in_.mousePos - w.dragOff;
-            tabDropTarget_ = WindowAt(in_.mousePos, id);
+            tabDropTarget_ = WindowTitleAt(in_.mousePos, id);
             dockCompassRect_ = {in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
                                 in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
                                 kDockCompassSize, kDockCompassSize};
-            dockCompassVisible_ = dockingEnabled_;
-            dockCompassSelection_ = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
+            dockCompassVisible_ = dockingEnabled_ && tabDropTarget_ == 0;
+            dockCompassSelection_ = dockCompassVisible_
+                ? DockTargetAt(in_.mousePos) : DockSide::None;
             SetDockPreview(dockCompassSelection_);
         }
     } else if (w.dockDragPending && !in_.mouseDown[0]) {
         w.dockDragPending = false;
     } else if (wasDragging && !in_.mouseDown[0]) {
-        const WidgetId targetWindow = dockingEnabled_ ? WindowAt(in_.mousePos, id) : 0;
+        const WidgetId targetWindow = dockingEnabled_ ? WindowTitleAt(in_.mousePos, id) : 0;
         const DockSide target = targetWindow == 0 && dockingEnabled_
             ? DockTargetAt(in_.mousePos) : DockSide::None;
         dockCompassVisible_ = false;
@@ -1620,12 +1666,9 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     w.drawLayer = draw_.BeginLayer();
     w.hasDrawLayer = true;
     ComputedStyle windowStyle = ws;
-    windowStyle.shadowBlur = 0.f;
-    windowStyle.shadowColor = {};
-    windowStyle.shadowColorGradient = {};
+    if (w.dock != DockSide::None) windowStyle.shadowEnabled = false;
     DrawBox(frame, windowStyle);
-    DrawStyledColor(bar, ts.background, ts.backgroundGradient, ts.opacity, ts.cornerRadii);
-    DrawBackgroundImage(bar, ts);
+    DrawBox(bar, ts);
     float contentTop = titleH;
     const std::vector<WidgetId>* tabWindows = nullptr;
     WidgetId selectedTab = 0;
@@ -1925,6 +1968,7 @@ void Context::Text(std::string_view text) {
     const ComputedStyle s = Resolve("text", 0);
     const Vec2 ts = text_->Measure(text, s.fontSize);
     const Rect r = Place({ts.x + s.padding.Horizontal(), ts.y + s.padding.Vertical()}, s.spacing);
+    DrawOutline(r, s);
     EmitText({r.x + s.padding.left, r.y + s.padding.top}, text, s);
 }
 
@@ -1936,6 +1980,7 @@ void Context::TextLabelLeft(std::string_view text, std::string_view icon) {
     const Vec2 textSize = text_->Measure(text, style.fontSize);
     const Rect r = Place({iconSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
                           std::max(iconSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    DrawOutline(r, style);
     EmitText({r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f}, icon, style);
     EmitText({r.x + style.padding.left + iconSize.x + style.spacing,
               r.y + (r.h - textSize.y) * 0.5f}, text, style);
@@ -1947,6 +1992,7 @@ void Context::TextLabelRight(std::string_view text, std::string_view icon) {
     const Vec2 iconSize = text_->Measure(icon, style.fontSize);
     const Rect r = Place({textSize.x + style.spacing + iconSize.x + style.padding.Horizontal(),
                           std::max(textSize.y, iconSize.y) + style.padding.Vertical()}, style.spacing);
+    DrawOutline(r, style);
     EmitText({r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f}, text, style);
     EmitText({r.x + style.padding.left + textSize.x + style.spacing,
               r.y + (r.h - iconSize.y) * 0.5f}, icon, style);
@@ -1957,6 +2003,7 @@ void Context::TextLabelLeft(std::string_view text, GPUImageId icon, Vec2 iconSiz
     const Vec2 textSize = text_->Measure(text, style.fontSize);
     const Rect r = Place({iconSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
                           std::max(iconSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    DrawOutline(r, style);
     draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - iconSize.y) * 0.5f,
                    iconSize.x, iconSize.y}, {0.f, 0.f, 1.f, 1.f},
                   Fade(Color{}, style.opacity), icon);
@@ -1969,6 +2016,7 @@ void Context::TextLabelRight(std::string_view text, GPUImageId icon, Vec2 iconSi
     const Vec2 textSize = text_->Measure(text, style.fontSize);
     const Rect r = Place({textSize.x + style.spacing + iconSize.x + style.padding.Horizontal(),
                           std::max(textSize.y, iconSize.y) + style.padding.Vertical()}, style.spacing);
+    DrawOutline(r, style);
     EmitText({r.x + style.padding.left, r.y + (r.h - textSize.y) * 0.5f}, text, style);
     draw_.AddQuad({r.x + style.padding.left + textSize.x + style.spacing,
                    r.y + (r.h - iconSize.y) * 0.5f, iconSize.x, iconSize.y},
@@ -2044,6 +2092,7 @@ bool Context::Toggle(std::string_view label, bool* value) {
     const ComputedStyle style = Animate(id, "toggle", *value ? State_Checked : State_None,
                                         interaction.hovered, interaction.held);
     const Rect track{r.x, r.y + (r.h - trackH) * 0.5f, trackW, trackH};
+    DrawOutline(track, style);
     DrawStyledColor(track, *value ? style.accent : style.background,
                     *value ? style.accentGradient : style.backgroundGradient,
                     style.opacity, trackH * 0.5f);
@@ -2070,6 +2119,7 @@ bool Context::Radio(std::string_view label, int* value, int option) {
     const ComputedStyle style = Animate(id, "radio", checked ? State_Checked : State_None,
                                         interaction.hovered, interaction.held);
     const Rect circle{r.x, r.y + (r.h - diameter) * 0.5f, diameter, diameter};
+    DrawOutline(circle, style);
     DrawStyledColor(circle, style.borderColor.a > 0.f ? style.borderColor : style.background,
                     style.borderColor.a > 0.f ? style.borderColorGradient
                                               : style.backgroundGradient,
@@ -2157,6 +2207,7 @@ void Context::ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageS
     const Vec2 textSize = text_->Measure(label, style.fontSize);
     const Rect r = Place({imageSize.x + style.spacing + textSize.x + style.padding.Horizontal(),
                           std::max(imageSize.y, textSize.y) + style.padding.Vertical()}, style.spacing);
+    DrawOutline(r, style);
     draw_.AddQuad({r.x + style.padding.left, r.y + (r.h - imageSize.y) * 0.5f,
                    imageSize.x, imageSize.y}, {0.f, 0.f, 1.f, 1.f}, Color{}, imageId);
     EmitText({r.x + style.padding.left + imageSize.x + style.spacing,

@@ -100,7 +100,8 @@ private:
         std::string title;
         Vec2 pos, size, dragOff, dockDragStartPos, resizeStart, startSize, resizeStartPos;
         Vec2 dockRestoreSize, lastTitleClickPos;
-        float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
+        float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f;
+        float dockSpan = 1.f, titleHeight = 0.f;
         WidgetId tabGroup = 0;
         double lastTitleClickTime = -1.0;
         uint64_t zOrder = 0;
@@ -141,13 +142,14 @@ private:
                           bool hovered, bool held);
     Interaction Behavior(WidgetId id, Rect r);
     bool IsFloatingWindowAt(Vec2 position) const;
-    WidgetId WindowAt(Vec2 position, WidgetId exclude) const;
+    WidgetId WindowTitleAt(Vec2 position, WidgetId exclude) const;
     void DetachTab(WidgetId id);
     void JoinTab(WidgetId id, WidgetId target);
     Rect Place(Vec2 size, float spacing);
     void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
                          float opacity, CornerRadii rounding = {});
     void DrawBox(Rect r, const ComputedStyle& s);
+    void DrawOutline(Rect r, const ComputedStyle& s);
     void DrawBackgroundImage(Rect r, const ComputedStyle& s);
     void EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style);
     Interaction DrawMenuButton(Rect rect, std::string_view label, WidgetId id,

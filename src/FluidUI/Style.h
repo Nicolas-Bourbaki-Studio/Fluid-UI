@@ -13,8 +13,9 @@ namespace fluid {
 // Every stylable property. Add new ones here + in ComputedStyle + Apply() in Style.cpp.
 enum class Prop : uint8_t {
     Background, BackgroundReset, Foreground, Accent, BorderColor, ShadowColor,
-    BorderWidth, Rounding, FontSize, Spacing, ShadowBlur, Opacity,
-    Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
+    Outline, OutlineStyle, OutlineColor, OutlineColorGradient,
+    BorderWidth, Rounding, FontSize, Spacing, ShadowBlur, ShadowEnabled, Opacity,
+    OutlineWidth, Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
     BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
     RoundingBottomRight, RoundingBottomLeft
@@ -37,12 +38,17 @@ struct ComputedStyle {
     Color accent      {0.29f, 0.42f, 0.97f, 1.f};
     Color borderColor {0.f, 0.f, 0.f, 0.f};
     Color shadowColor {0.f, 0.f, 0.f, 0.f};
+    Color outlineColor {0.f, 0.f, 0.f, 0.f};
     float borderWidth = 0.f;
+    float outlineWidth = 0.f;
+    bool outlineEnabled = false;
+    bool outlineColorSet = false;
     float rounding    = 4.f;
     CornerRadii cornerRadii{4.f};
     float fontSize    = 16.f;
     float spacing     = 6.f;
     float shadowBlur  = 0.f;
+    bool shadowEnabled = true;
     float opacity     = 1.f;
     float transitionSpeed = 14.f; // higher = snappier
     Edges padding {4.f, 8.f, 4.f, 8.f};
@@ -55,6 +61,7 @@ struct ComputedStyle {
     LinearGradient accentGradient;
     LinearGradient borderColorGradient;
     LinearGradient shadowColorGradient;
+    LinearGradient outlineColorGradient;
 };
 
 FLUID_API ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t);
@@ -80,11 +87,15 @@ public:
         RuleBuilder& Accent(Color c)          { return Col(Prop::Accent, c); }
         RuleBuilder& BorderColor(Color c)     { return Col(Prop::BorderColor, c); }
         RuleBuilder& ShadowColor(Color c)     { return Col(Prop::ShadowColor, c); }
+        RuleBuilder& OutlineColor(Color c)    { return Col(Prop::OutlineColor, c); }
         RuleBuilder& BorderWidth(float v)     { return Num(Prop::BorderWidth, v); }
+        RuleBuilder& OutlineWidth(float v)    { return Num(Prop::OutlineWidth, v); }
+        RuleBuilder& Outline(bool v)          { return Num(Prop::OutlineStyle, v ? 1.f : 0.f); }
         RuleBuilder& Rounding(float v)        { return Num(Prop::Rounding, v); }
         RuleBuilder& FontSize(float v)        { return Num(Prop::FontSize, v); }
         RuleBuilder& Spacing(float v)         { return Num(Prop::Spacing, v); }
         RuleBuilder& ShadowBlur(float v)      { return Num(Prop::ShadowBlur, v); }
+        RuleBuilder& ShadowEnabled(bool v)    { return Num(Prop::ShadowEnabled, v ? 1.f : 0.f); }
         RuleBuilder& Opacity(float v)         { return Num(Prop::Opacity, v); }
         RuleBuilder& TransitionSpeed(float v) { return Num(Prop::TransitionSpeed, v); }
         RuleBuilder& BackgroundImage(std::string source) {
@@ -104,6 +115,9 @@ public:
         }
         RuleBuilder& ShadowColorGradient(std::string css) {
             return Set(Prop::ShadowColorGradient, {}, std::move(css));
+        }
+        RuleBuilder& OutlineColorGradient(std::string css) {
+            return Set(Prop::OutlineColorGradient, {}, std::move(css));
         }
         RuleBuilder& BackgroundSize(BackgroundFit fit) {
             return Num(Prop::BackgroundSize, static_cast<float>(fit));

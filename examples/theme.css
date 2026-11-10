@@ -2,61 +2,79 @@
 
 *:root {
     /* Accent */
-    --ui-accent: #0e6fff;
-    --ui-accent-hover: #217aff;
-    --ui-accent-active: #1967db;
+    --ui-accent: #f29d38;
+    --ui-accent-hover: #ffb454;
+    --ui-accent-active: #d97820;
+    --ui-accent-muted: #70451f;
 
-    /* Backgrounds */
-    --ui-window: #080808;
-    --ui-panel: #171717;
-    --ui-panel-hover: #202020;
-    --ui-panel-active: #2A2A2A;
+    /* Charcoal editor surfaces */
+    --ui-window: #101114;
+    --ui-window-end: #191b20;
+    --ui-sunken: #0c0d10;
+    --ui-panel: #191b20;
+    --ui-panel-hover: #22252b;
+    --ui-panel-active: #2c3038;
     --ui-overlay: transparent;
 
-    /* Borders */
-    --ui-border: #171717;
-    --ui-border-hover: #414141;
-    --ui-border-active: #59667A;
+    /* Borders / outlines */
+    --ui-border: #30343b;
+    --ui-border-hover: #454c57;
+    --ui-border-active: #f29d38;
+    --ui-window-border: #3c424c;
 
     /* Text */
-    --ui-text: #FFFFFF;
-    --ui-text-secondary: #BABABA;
-    --ui-text-muted: #C8CDD5;
+    --ui-text: #f3f4f6;
+    --ui-text-secondary: #b5bac3;
+    --ui-text-muted: #d6d9de;
 
     /* Danger */
     --ui-danger: #e62626;
     --ui-danger-hover: #f74848;
     --ui-danger-border: #be1c1c;
 
+    /* Gradient stops */
+    --ui-grad-1: #9c4d1f;
+    --ui-grad-2: #d97820;
+    --ui-grad-3: #f29d38;
+    --ui-grad-4: #f5b952;
+    --ui-grad-5: #ffd27a;
+
+    --ui-text-grad-1: #a9c6d9;
+    --ui-text-grad-2: #7eb1c7;
+    --ui-text-grad-3: #b4c6cf;
+    --ui-text-grad-4: #f2a843;
+    --ui-text-grad-5: #ffd27a;
+
     /* Gradients */
     --ui-window-gradient: linear-gradient(
         180deg,
-        #080808 0%,
-        #181717 100%
+        var(--ui-window) 0%,
+        var(--ui-window-end) 100%
     );
 
     --ui-demo-gradient: linear-gradient(
         90deg,
-        #0E6FFF 0%,
-        #3E66E8 25%,
-        #7D4FE0 50%,
-        #C44DC8 75%,
-        #F26A85 100%
+        var(--ui-grad-1) 0%,
+        var(--ui-grad-2) 25%,
+        var(--ui-grad-3) 50%,
+        var(--ui-grad-4) 75%,
+        var(--ui-grad-5) 100%
     );
 
     --ui-text-gradient: linear-gradient(
         90deg,
-        #62D5FF 0%,
-        #789EFF 25%,
-        #A991FF 50%,
-        #D78AE8 75%,
-        #FF86C8 100%
+        var(--ui-text-grad-1) 0%,
+        var(--ui-text-grad-2) 25%,
+        var(--ui-text-grad-3) 50%,
+        var(--ui-text-grad-4) 75%,
+        var(--ui-text-grad-5) 100%
     );
 
     /* Miscellaneous */
     --ui-radius: 6px;
-    --ui-dock-splitter: rgba(112, 124, 144, 0.46);
-    --ui-dock-shadow: rgba(0, 0, 0, 0.9);
+    --ui-outline-width: 1px;
+    --ui-dock-splitter: rgba(112, 122, 137, 0.5);
+    --ui-dock-shadow: rgba(0, 0, 0, 0.85);
 }
 
 /* ================= GLOBAL ================= */
@@ -72,11 +90,13 @@
 
 window {
     background: var(--ui-window-gradient);
-    border-color: transparent;
-    border-width: 2px;
+    border-color: var(--ui-window-border);
+    border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
-    shadow-color: transparent;
-    shadow-blur: 0px;
+    outline: 1px solid var(--ui-window-border);
+    shadow-enabled: true;
+    shadow-color: rgba(0, 0, 0, 0.699);
+    shadow-blur: 14px;
     padding: 5px;
 }
 
@@ -92,24 +112,30 @@ window-title {
 }
 
 dock-tab-bar {
-    background: #141B27;
+    background: var(--ui-sunken);
+    border-color: var(--ui-border);
+    border-width: var(--ui-outline-width);
     padding: 2px 4px;
     gap: 2px;
 }
 
 dock-tab {
-    background: #202A39;
-    color: #AEBBD0;
+    background: var(--ui-panel);
+    color: var(--ui-text-secondary);
+    border-color: var(--ui-border);
+    border-width: var(--ui-outline-width);
     padding: 4px 10px;
 }
 
 dock-tab:hover {
-    background: #2A3A50;
+    background: var(--ui-panel-active);
+    border-color: var(--ui-border-hover);
 }
 
 dock-tab:checked {
-    background: #315F98;
-    color: #FFFFFF;
+    background: var(--ui-accent-muted);
+    border-color: var(--ui-accent);
+    color: var(--ui-text);
 }
 
 window-close {
@@ -143,7 +169,7 @@ menu:hover, menu:checked {
 
 menu-popup {
     background: var(--ui-panel);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-window-border);
     border-radius: var(--ui-radius);
     padding: 4px;
 }
@@ -185,7 +211,7 @@ dock-splitter {
 
 dock-menu {
     background: var(--ui-window);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-window-border);
     border-radius: var(--ui-radius);
     shadow-color: var(--ui-dock-shadow);
     shadow-blur: 12px;
@@ -197,7 +223,7 @@ dock-menu.docking-options {
 
 dock-target {
     background: var(--ui-window);
-    border: 1px solid var(--ui-border-hover);
+    border: var(--ui-outline-width) solid var(--ui-border-hover);
     border-radius: var(--ui-radius);
     color: var(--ui-text);
     font-size: 13px;
@@ -214,7 +240,7 @@ dock-target.docking-options:hover {
 
 empty-widget {
     background: var(--ui-panel);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
 
@@ -223,7 +249,7 @@ empty-widget.brand {
     background-image: url("../src/Icons/FolderIcn.png");
     background-size: contain;
     background-position: center;
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
 
@@ -245,7 +271,7 @@ image-widget.icon-card {
 
 empty-widget.gradient-demo {
     background: var(--ui-demo-gradient);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
 
@@ -269,7 +295,7 @@ text.gradient-text {
 button, dropdown, image-button {
     background: var(--ui-panel-hover);
     color: var(--ui-text);
-    border-color: var(--ui-border);
+    border-color: var(--ui-border-hover);
     border-width: 1px;
     border-radius: var(--ui-radius);
     padding: 6px 12px;
@@ -277,16 +303,17 @@ button, dropdown, image-button {
 
 button:hover, dropdown:hover, image-button:hover {
     background: var(--ui-panel-active);
-    border-color: var(--ui-border-hover);
+    border-color: var(--ui-border-active);
 }
 
 button:active {
     background: var(--ui-accent-active);
+    border-color: var(--ui-accent);
 }
 
 button.primary {
     background: var(--ui-accent);
-    border-color: var(--ui-accent);
+    border-color: var(--ui-accent-hover);
     color: var(--ui-text);
 }
 
@@ -373,8 +400,13 @@ tab {
     padding: 6px 10px;
 }
 
+tab:hover {
+    background: var(--ui-panel-active);
+    border-color: var(--ui-border-hover);
+}
+
 tab:checked {
     background: var(--ui-accent);
-    border-color: var(--ui-accent);
+    border-color: var(--ui-accent-hover);
     color: var(--ui-text);
 }

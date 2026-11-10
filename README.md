@@ -92,8 +92,10 @@ Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu
 CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network menus,
 a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
 Floating windows can be resized from any edge or corner. Docking offers a 3x3 target
-grid with a live pane preview; docked windows hide their close control and require a
-double-click on the title bar to undock. The GLFW demo smooths rounded geometry with
+grid with a live pane preview; docked windows hide their close control, have no drop shadow,
+and require a title-bar double-click to undock. Dragging a docked title bar does not undock
+it; drop on another window's title bar to group the windows as tabs. Floating windows retain
+their shadows. The GLFW demo smooths rounded geometry with
 multisampling and higher-resolution corner tessellation, and uses linear filtering for
 images; multisampling is kept off for textured draws so it does not add antialiasing
 to the text.
@@ -109,9 +111,13 @@ numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius` and its `border-radius-top-left`,
 `border-radius-top-right`, `border-radius-bottom-left`, and `border-radius-bottom-right`
-corner overrides, `font-size`, `gap`, `shadow-blur`,
+corner overrides, `font-size`, `gap`, `shadow-blur`, `shadow-enabled` (`true` or `false`),
+`outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
+`outline-color`, `outline-width`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
-`padding`. Background images are supported with `background-image: url("...")`,
+`padding`. Outlines and shadows are available to box-drawn components and can be set
+using widget selectors or global rules. Background images are supported with
+`background-image: url("...")`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
 `StyleSheet::RegisterImage`; Fluid UI does not load image files itself. Linear gradients
@@ -218,10 +224,11 @@ or center target to preview that layout, then release to dock. Docked windows ti
 overlapping; adding panels on other edges adjusts the available regions. Drag the boundary
 splitters to resize edge regions horizontally or vertically, or drag dividers between
 same-edge panels to resize individual windows. Dropping on the compass center stacks windows
-as selectable tabs in the center dock area. Click a tab to switch windows, drag a docked
-title bar to undock it, then drop it directly inside another window to group them as tabs.
-This also works between floating and docked windows; the target window's dock region is kept.
-Drop on the center target to add a window to the center dock tab group instead. The layout
+as selectable tabs in the center dock area. Click a tab to switch windows. To tabify windows,
+drag a window's title bar and release on another window's title bar; dropping on its content
+does not group them. This works between floating and docked windows, and preserves the
+target's dock region. Double-click a docked window's title bar to undock it. Drop a floating
+window on the compass center to add it to the center dock tab group. The layout
 adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
 
 Save and restore window positions, sizes, open state, dock sides, dock order, split
