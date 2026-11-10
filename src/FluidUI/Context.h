@@ -33,6 +33,8 @@ public:
     bool BeginWindow(std::string_view title, Rect initial);
     void EndWindow();
     void SetWindowOpen(std::string_view title, bool open);
+    bool SaveLayout(const std::string& path, std::string* error = nullptr) const;
+    bool LoadLayout(const std::string& path, std::string* error = nullptr);
     bool BeginChild(std::string_view id, Vec2 size = {});
     void EndChild();
     bool BeginContainer(std::string_view label, Vec2 size);

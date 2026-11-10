@@ -1,7 +1,11 @@
 #include "FluidUI/Context.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
+#include <fstream>
+#include <limits>
+#include <unordered_set>
 #include <utility>
 
 namespace fluid {
@@ -364,6 +368,177 @@ void Context::SetWindowOpen(std::string_view title, bool open) {
         }
     }
     dockLayoutDone_ = false;
+}
+
+bool Context::SaveLayout(const std::string& path, std::string* error) const {
+    std::ofstream file(path, std::ios::out | std::ios::trunc);
+    if (!file) {
+        if (error) *error = "Could not open layout file for writing: " + path;
+        return false;
+    }
+
+    size_t windowCount = 0;
+    for (const auto& [id, window] : windows_) {
+        (void)id;
+        if (window.init) ++windowCount;
+    }
+
+    file.precision(std::numeric_limits<float>::max_digits10);
+    file << "FLUIDUI_LAYOUT 1\n"
+         << "ratios " << dockLeftRatio_ << ' ' << dockRightRatio_ << ' '
+         << dockTopRatio_ << ' ' << dockBottomRatio_ << '\n'
+         << "focus " << focusedWindow_ << '\n'
+         << "windows " << windowCount << '\n';
+
+    for (const auto& [id, window] : windows_) {
+        if (!window.init) continue;
+        file << "window " << id << ' ' << (window.open ? 1 : 0) << ' '
+             << window.pos.x << ' ' << window.pos.y << ' '
+             << window.size.x << ' ' << window.size.y << ' '
+             << static_cast<unsigned int>(window.dock) << ' ' << window.dockSpan << ' '
+             << window.dockRestoreSize.x << ' ' << window.dockRestoreSize.y << ' '
+             << window.scrollY << ' ' << window.zOrder << '\n';
+    }
+
+    for (size_t side = 1; side < dockedWindows_.size(); ++side) {
+        const auto& group = dockedWindows_[side];
+        std::vector<WidgetId> savedGroup;
+        for (WidgetId id : group) {
+            const auto window = windows_.find(id);
+            if (window != windows_.end() && window->second.init && window->second.open &&
+                static_cast<size_t>(window->second.dock) == side)
+                savedGroup.push_back(id);
+        }
+        file << "order " << side << ' ' << savedGroup.size();
+        for (WidgetId id : savedGroup) file << ' ' << id;
+        file << '\n';
+    }
+
+    file.flush();
+    if (!file) {
+        if (error) *error = "Could not write layout file: " + path;
+        return false;
+    }
+    if (error) error->clear();
+    return true;
+}
+
+bool Context::LoadLayout(const std::string& path, std::string* error) {
+    auto fail = [&](const std::string& message) {
+        if (error) *error = message;
+        return false;
+    };
+    std::ifstream file(path);
+    if (!file) return fail("Could not open layout file for reading: " + path);
+
+    std::string token;
+    unsigned int version = 0;
+    if (!(file >> token >> version) || token != "FLUIDUI_LAYOUT" || version != 1)
+        return fail("Invalid or unsupported FluidUI layout file: " + path);
+
+    float leftRatio = 0.f, rightRatio = 0.f, topRatio = 0.f, bottomRatio = 0.f;
+    if (!(file >> token >> leftRatio >> rightRatio >> topRatio >> bottomRatio) ||
+        token != "ratios" ||
+        !std::isfinite(leftRatio) || !std::isfinite(rightRatio) ||
+        !std::isfinite(topRatio) || !std::isfinite(bottomRatio) ||
+        leftRatio < 0.12f || leftRatio > 0.75f ||
+        rightRatio < 0.12f || rightRatio > 0.75f ||
+        topRatio < 0.12f || topRatio > 0.75f ||
+        bottomRatio < 0.12f || bottomRatio > 0.75f)
+        return fail("Invalid dock ratios in layout file: " + path);
+
+    WidgetId focusedWindow = 0;
+    if (!(file >> token >> focusedWindow) || token != "focus")
+        return fail("Invalid focus entry in layout file: " + path);
+
+    size_t windowCount = 0;
+    constexpr size_t maxWindows = 10000;
+    if (!(file >> token >> windowCount) || token != "windows" ||
+        windowCount > maxWindows)
+        return fail("Invalid window count in layout file: " + path);
+
+    std::unordered_map<WidgetId, WindowState> loadedWindows;
+    loadedWindows.reserve(windowCount);
+    for (size_t i = 0; i < windowCount; ++i) {
+        uint64_t rawId = 0;
+        int open = 0;
+        unsigned int dock = 0;
+        WindowState window;
+        if (!(file >> token >> rawId >> open
+                    >> window.pos.x >> window.pos.y >> window.size.x >> window.size.y
+                    >> dock >> window.dockSpan
+                    >> window.dockRestoreSize.x >> window.dockRestoreSize.y
+                    >> window.scrollY >> window.zOrder) ||
+            token != "window" || rawId > std::numeric_limits<WidgetId>::max() ||
+            (open != 0 && open != 1) || dock > 9 ||
+            !std::isfinite(window.pos.x) || !std::isfinite(window.pos.y) ||
+            !std::isfinite(window.size.x) || !std::isfinite(window.size.y) ||
+            window.size.x < 0.f || window.size.y < 0.f ||
+            !std::isfinite(window.dockSpan) || window.dockSpan <= 0.f ||
+            !std::isfinite(window.dockRestoreSize.x) ||
+            !std::isfinite(window.dockRestoreSize.y) ||
+            window.dockRestoreSize.x < 0.f || window.dockRestoreSize.y < 0.f ||
+            !std::isfinite(window.scrollY) || window.scrollY < 0.f)
+            return fail("Invalid window entry in layout file: " + path);
+        const WidgetId id = static_cast<WidgetId>(rawId);
+        window.init = true;
+        window.open = open != 0;
+        window.dock = static_cast<DockSide>(dock);
+        window.contentHeight = window.scrollY + window.size.y;
+        if (!loadedWindows.emplace(id, window).second)
+            return fail("Duplicate window ID in layout file: " + path);
+    }
+
+    std::array<std::vector<WidgetId>, 10> loadedDockGroups;
+    std::unordered_set<WidgetId> orderedWindows;
+    for (size_t i = 1; i < loadedDockGroups.size(); ++i) {
+        size_t side = 0, count = 0;
+        if (!(file >> token >> side >> count) || token != "order" ||
+            side != i || count > windowCount)
+            return fail("Invalid dock order in layout file: " + path);
+        auto& group = loadedDockGroups[i];
+        group.reserve(count);
+        for (size_t j = 0; j < count; ++j) {
+            uint64_t rawId = 0;
+            if (!(file >> rawId) || rawId > std::numeric_limits<WidgetId>::max())
+                return fail("Invalid docked window ID in layout file: " + path);
+            const WidgetId id = static_cast<WidgetId>(rawId);
+            const auto window = loadedWindows.find(id);
+            if (window == loadedWindows.end() || !window->second.open ||
+                static_cast<size_t>(window->second.dock) != i ||
+                !orderedWindows.insert(id).second)
+                return fail("Inconsistent dock order in layout file: " + path);
+            group.push_back(id);
+        }
+    }
+
+    for (const auto& [id, window] : loadedWindows) {
+        if (window.open && window.dock != DockSide::None &&
+            !orderedWindows.contains(id))
+            return fail("Docked window is missing from dock order in layout file: " + path);
+    }
+    file >> std::ws;
+    if (!file.eof()) return fail("Unexpected trailing data in layout file: " + path);
+
+    windows_ = std::move(loadedWindows);
+    dockedWindows_ = std::move(loadedDockGroups);
+    dockLeftRatio_ = leftRatio;
+    dockRightRatio_ = rightRatio;
+    dockTopRatio_ = topRatio;
+    dockBottomRatio_ = bottomRatio;
+    nextWindowZ_ = 0;
+    for (const auto& [id, window] : windows_) {
+        (void)id;
+        nextWindowZ_ = std::max(nextWindowZ_, window.zOrder);
+    }
+    const auto focused = windows_.find(focusedWindow);
+    focusedWindow_ = focused != windows_.end() && focused->second.open
+        ? focusedWindow : 0;
+    active_ = 0;
+    activeDockSplitter_ = 0;
+    dockLayoutDone_ = false;
+    if (error) error->clear();
+    return true;
 }
 
 bool Context::Begin(std::string_view title, bool* open) {

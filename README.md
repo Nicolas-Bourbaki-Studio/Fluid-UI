@@ -219,3 +219,23 @@ overlapping; adding panels on other edges adjusts the available regions. Drag th
 splitters to resize edge regions horizontally or vertically, or drag dividers between
 same-edge panels to resize individual windows. The layout adapts when the display changes
 size. Use `Context::DockWindows(false)` to disable docking.
+
+Save and restore window positions, sizes, open state, dock sides, dock order, split
+proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files
+are versioned and validated before being applied. Keep window titles and any surrounding
+`PushID` scopes stable between runs so saved window IDs continue to identify the same windows.
+
+```cpp
+std::string error;
+if (!ui.LoadLayout("workspace.layout", &error)) {
+    // Handle a missing or invalid layout file.
+}
+
+// Call when the user requests a save or when the application is shutting down.
+if (!ui.SaveLayout("workspace.layout", &error)) {
+    // Handle a write error.
+}
+```
+
+The demo's **Layout** menu saves and loads `fluidui-layout.ini` in its current working
+directory.

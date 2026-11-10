@@ -410,6 +410,8 @@ int main() {
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     constexpr std::string_view settingsWindow = "Settings##settings";
+    const std::filesystem::path layoutPath =
+        std::filesystem::current_path() / "fluidui-layout.ini";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -436,6 +438,24 @@ int main() {
                 if (ui.MenuItem("Settings..."))
                     ui.SetWindowOpen(settingsWindow, true);
                 if (ui.MenuItem("Exit")) glfwSetWindowShouldClose(win, GLFW_TRUE);
+                ui.EndMenu();
+            }
+            if (ui.BeginMenu("Layout")) {
+                std::string layoutError;
+                if (ui.MenuItem("Save layout")) {
+                    if (!ui.SaveLayout(layoutPath.string(), &layoutError))
+                        std::fprintf(stderr, "%s\n", layoutError.c_str());
+                    else
+                        std::fprintf(stdout, "Saved window layout to '%s'\n",
+                                     layoutPath.string().c_str());
+                }
+                if (ui.MenuItem("Load layout")) {
+                    if (!ui.LoadLayout(layoutPath.string(), &layoutError))
+                        std::fprintf(stderr, "%s\n", layoutError.c_str());
+                    else
+                        std::fprintf(stdout, "Loaded window layout from '%s'\n",
+                                     layoutPath.string().c_str());
+                }
                 ui.EndMenu();
             }
             if (ui.BeginMenu("Edit")) {
