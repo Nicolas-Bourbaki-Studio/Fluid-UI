@@ -97,16 +97,18 @@ private:
         TopLeft, TopRight, BottomLeft, BottomRight
     };
     struct WindowState {
-        Vec2 pos, size, dragOff, resizeStart, startSize, resizeStartPos;
+        std::string title;
+        Vec2 pos, size, dragOff, dockDragStartPos, resizeStart, startSize, resizeStartPos;
         Vec2 dockRestoreSize, lastTitleClickPos;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f, dockSpan = 1.f;
+        WidgetId tabGroup = 0;
         double lastTitleClickTime = -1.0;
         uint64_t zOrder = 0;
         DrawList::Layer drawLayer;
         DockSide dock = DockSide::None;
         uint8_t resizeEdges = 0;
         bool init = false, open = true, hasDrawLayer = false;
-        bool dragging = false, resizing = false, scrolling = false;
+        bool dragging = false, dockDragPending = false, resizing = false, scrolling = false;
     };
     struct Anim { float hover = 0.f, active = 0.f; };
     struct LayoutState {
@@ -119,6 +121,10 @@ private:
     struct DockSplitter {
         Rect rect;
         WidgetId id = 0;
+    };
+    struct TabGroup {
+        std::vector<WidgetId> windows;
+        WidgetId active = 0;
     };
     struct MenuState {
         WidgetId id = 0;
@@ -135,6 +141,9 @@ private:
                           bool hovered, bool held);
     Interaction Behavior(WidgetId id, Rect r);
     bool IsFloatingWindowAt(Vec2 position) const;
+    WidgetId WindowAt(Vec2 position, WidgetId exclude) const;
+    void DetachTab(WidgetId id);
+    void JoinTab(WidgetId id, WidgetId target);
     Rect Place(Vec2 size, float spacing);
     void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
                          float opacity, CornerRadii rounding = {});
@@ -177,6 +186,8 @@ private:
     std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
     std::array<std::vector<WidgetId>, 10> dockedWindows_;
+    std::unordered_map<WidgetId, TabGroup> tabGroups_;
+    WidgetId activeCenterTab_ = 0;
     WidgetId focusedWindow_ = 0;
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
@@ -200,6 +211,8 @@ private:
     Rect content_;
     Rect windowViewport_;
     Rect dockPreview_;
+    Rect tabDropPreview_;
+    WidgetId tabDropTarget_ = 0;
     bool hasDockPreview_ = false;
     Rect dockCompassRect_;
     DockSide dockCompassSelection_ = DockSide::None;

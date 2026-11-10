@@ -311,7 +311,21 @@ private:
     std::array<stbtt_bakedchar, DemoFontAtlas::CharacterCount> glyphs_;
 };
 
-int main() {
+int main(int argc, char** argv) {
+    std::filesystem::path layoutPath =
+        std::filesystem::current_path() / "fluidui-layout.ini";
+    for (int i = 1; i < argc; ++i) {
+        if (std::string_view(argv[i]) != "--layout" || i + 1 >= argc) {
+            std::fprintf(stderr, "Usage: %s [--layout <path>]\n", argv[0]);
+            return 1;
+        }
+        layoutPath = std::filesystem::path(argv[++i]);
+        if (layoutPath.empty()) {
+            std::fprintf(stderr, "Layout file path must not be empty\n");
+            return 1;
+        }
+    }
+
     if (!glfwInit()) return 1;
     glfwWindowHint(GLFW_SAMPLES, 4);
     GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI component and docking demo", nullptr, nullptr);
@@ -388,6 +402,23 @@ int main() {
     }
     DemoTextBackend demoText(fontAtlas);
     ui.SetTextBackend(&demoText);
+    std::error_code layoutPathError;
+    const bool layoutExists = std::filesystem::exists(layoutPath, layoutPathError);
+    bool layoutLoadFailed = false;
+    if (layoutPathError) {
+        std::fprintf(stderr, "Could not check layout path '%s': %s\n",
+                     layoutPath.string().c_str(), layoutPathError.message().c_str());
+        layoutLoadFailed = true;
+    } else if (layoutExists) {
+        std::string layoutError;
+        if (!ui.LoadLayout(layoutPath.string(), &layoutError)) {
+            std::fprintf(stderr, "%s\n", layoutError.c_str());
+            layoutLoadFailed = true;
+        } else {
+            std::fprintf(stdout, "Loaded window layout from '%s'\n",
+                         layoutPath.string().c_str());
+        }
+    }
     std::array<GLFWcursor*, 5> cursors{
         glfwCreateStandardCursor(GLFW_ARROW_CURSOR),
         glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR),
@@ -410,8 +441,6 @@ int main() {
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     constexpr std::string_view settingsWindow = "Settings##settings";
-    const std::filesystem::path layoutPath =
-        std::filesystem::current_path() / "fluidui-layout.ini";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -482,15 +511,10 @@ int main() {
                     ui.SetWindowOpen(managerWindow, true);
                 ui.EndMenu();
             }
-            if (ui.BeginMenu("Network")) {
-                if (!networkConnected && ui.MenuItem("Connect")) networkConnected = true;
-                if (networkConnected && ui.MenuItem("Disconnect")) networkConnected = false;
-                ui.EndMenu();
-            }
 
-            if (ui.BeginMenu("Clouds")) {
-                if (ui.MenuItem("Create Clouds")) std::puts("Clouds created");
-                if (ui.MenuItem("Configure Clouds and Sky"))
+            if (ui.BeginMenu("Connect engine to Roblox Studio")) {
+                if (ui.MenuItem("Connect to Roblox Studio")) networkConnected = true;
+                if (ui.MenuItem("EDIT API KEY"))
                 ui.EndMenu();
             }
             ui.EndMainMenuBar();
@@ -601,6 +625,7 @@ int main() {
             ui.Text("Drag a title bar and choose a 3x3 dock target.");
             ui.Text("Double-click a docked title bar to undock.");
             ui.Text("A live preview shows the snap area.");
+            ui.Text("Drop on the compass center to create a tabbed window group.");
             ui.Text("Docked windows resize with the display.");
             ui.Text("Resize floating windows from any edge or corner.");
             ui.Text("Click a window to bring it to the front.");
@@ -645,6 +670,14 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         RenderGL(dl, w, h);
         glfwSwapBuffers(win);
+    }
+    if (!layoutLoadFailed) {
+        std::string layoutError;
+        if (!ui.SaveLayout(layoutPath.string(), &layoutError))
+            std::fprintf(stderr, "%s\n", layoutError.c_str());
+        else
+            std::fprintf(stdout, "Saved window layout to '%s'\n",
+                         layoutPath.string().c_str());
     }
     glDeleteTextures(1, &iconTexture);
     glDeleteTextures(1, &folderIconTexture);

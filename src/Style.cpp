@@ -993,6 +993,13 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x344D6AFF))
         .BorderWidth(1).Rounding(7).Padding(Edges(7, 11));
     s.Rule("tab:checked").Background(C::FromHex(0x386FE0FF)).BorderColor(C::FromHex(0x6190E8FF));
+    s.Rule("dock-tab-bar").Background(C::FromHex(0x121A26FF))
+        .Padding(Edges(2, 4)).Spacing(2);
+    s.Rule("dock-tab").Background(C::FromHex(0x1B2737FF))
+        .Foreground(C::FromHex(0xAEBBD0FF)).Padding(Edges(4, 10));
+    s.Rule("dock-tab:hover").Background(C::FromHex(0x2A3A50FF));
+    s.Rule("dock-tab:checked").Background(C::FromHex(0x2F5E9AFF))
+        .Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("dropdown")
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));

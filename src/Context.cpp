@@ -87,6 +87,8 @@ void Context::NewFrame(const InputState& input) {
     dockCompassSelection_ = DockSide::None;
     dockLayoutDone_ = false;
     dockSplitters_.clear();
+    tabDropTarget_ = 0;
+    tabDropPreview_ = {};
     windowInputEnabled_ = true;
     for (auto& [id, window] : windows_) {
         (void)id;
@@ -142,6 +144,24 @@ const DrawList& Context::EndFrame() {
                             paneStyle.opacity * 0.3f, lineHeight * 0.5f);
         }
         draw_.PopClipRect();
+    }
+    if (tabDropTarget_ != 0) {
+        const auto target = windows_.find(tabDropTarget_);
+        if (target != windows_.end()) {
+            const Rect rect{target->second.pos.x, target->second.pos.y,
+                            target->second.size.x, target->second.size.y};
+            const ComputedStyle style = Resolve("dock-tab", State_Checked);
+            constexpr float border = 3.f;
+            DrawStyledColor({rect.x, rect.y, rect.w, border},
+                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+            DrawStyledColor({rect.x, rect.y + rect.h - border, rect.w, border},
+                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+            DrawStyledColor({rect.x, rect.y + border, border, rect.h - border * 2.f},
+                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+            DrawStyledColor({rect.x + rect.w - border, rect.y + border, border,
+                             rect.h - border * 2.f},
+                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+        }
     }
     if (dockCompassVisible_) {
         std::vector<std::string> dockClasses = classStack_;
@@ -241,6 +261,118 @@ bool Context::IsFloatingWindowAt(Vec2 position) const {
             return true;
     }
     return false;
+}
+
+WidgetId Context::WindowAt(Vec2 position, WidgetId exclude) const {
+    WidgetId hit = 0;
+    uint64_t topZ = 0;
+    const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
+    for (const auto& [id, window] : windows_) {
+        if (id == exclude || !window.open || !window.init) continue;
+        if (window.dock == DockSide::Center && centerGroup.size() > 1 &&
+            activeCenterTab_ != id)
+            continue;
+        if (window.tabGroup != 0) {
+            const auto group = tabGroups_.find(window.tabGroup);
+            if (group != tabGroups_.end() && group->second.active != id) continue;
+        }
+        if (Rect{window.pos.x, window.pos.y, window.size.x, window.size.y}
+                .Contains(position) && window.zOrder >= topZ) {
+            hit = id;
+            topZ = window.zOrder;
+        }
+    }
+    return hit;
+}
+
+void Context::DetachTab(WidgetId id) {
+    auto window = windows_.find(id);
+    if (window == windows_.end()) return;
+    for (auto& sideWindows : dockedWindows_)
+        sideWindows.erase(std::remove(sideWindows.begin(), sideWindows.end(), id),
+                          sideWindows.end());
+    if (window->second.dock == DockSide::Center) activeCenterTab_ = 0;
+    if (window->second.tabGroup != 0) {
+        const WidgetId groupId = window->second.tabGroup;
+        auto group = tabGroups_.find(groupId);
+        if (group != tabGroups_.end()) {
+            auto& members = group->second.windows;
+            members.erase(std::remove(members.begin(), members.end(), id), members.end());
+            if (group->second.active == id)
+                group->second.active = members.empty() ? 0 : members.front();
+            if (members.size() < 2) {
+                for (WidgetId member : members) {
+                    if (auto remaining = windows_.find(member); remaining != windows_.end())
+                        remaining->second.tabGroup = 0;
+                }
+                tabGroups_.erase(group);
+            }
+        }
+        window->second.tabGroup = 0;
+    }
+    dockLayoutDone_ = false;
+}
+
+void Context::JoinTab(WidgetId id, WidgetId target) {
+    if (id == target) return;
+    auto dragged = windows_.find(id);
+    auto targetWindow = windows_.find(target);
+    if (dragged == windows_.end() || targetWindow == windows_.end() ||
+        !dragged->second.open || !targetWindow->second.open)
+        return;
+
+    const DockSide targetDock = targetWindow->second.dock;
+    if (targetDock == DockSide::Center) {
+        auto& center = dockedWindows_[static_cast<size_t>(DockSide::Center)];
+        if (std::find(center.begin(), center.end(), id) != center.end()) return;
+        if (dragged->second.dock == DockSide::None)
+            dragged->second.dockRestoreSize = dragged->second.size;
+        DetachTab(id);
+        dragged->second.dock = DockSide::Center;
+        dragged->second.tabGroup = 0;
+        center.push_back(id);
+        activeCenterTab_ = id;
+        dockLayoutDone_ = false;
+        return;
+    }
+
+    if (dragged->second.tabGroup != 0 &&
+        dragged->second.tabGroup == targetWindow->second.tabGroup)
+        return;
+
+    const DockSide draggedDock = dragged->second.dock;
+    const Vec2 restoreSize = dragged->second.size;
+    if (draggedDock == DockSide::None) dragged->second.dockRestoreSize = restoreSize;
+    DetachTab(id);
+
+    targetWindow = windows_.find(target);
+    if (targetWindow == windows_.end()) return;
+    WidgetId groupId = targetWindow->second.tabGroup;
+    if (groupId == 0) {
+        groupId = target;
+        TabGroup group;
+        group.windows.push_back(target);
+        group.active = target;
+        tabGroups_.emplace(groupId, std::move(group));
+        targetWindow->second.tabGroup = groupId;
+    }
+
+    TabGroup& group = tabGroups_[groupId];
+    if (std::find(group.windows.begin(), group.windows.end(), id) == group.windows.end())
+        group.windows.push_back(id);
+    group.active = id;
+    dragged->second.tabGroup = groupId;
+    dragged->second.dock = targetWindow->second.dock;
+    if (dragged->second.dock != DockSide::None) {
+        auto& dockGroup = dockedWindows_[static_cast<size_t>(dragged->second.dock)];
+        if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end())
+            dockGroup.push_back(id);
+    }
+    dragged->second.pos = targetWindow->second.pos;
+    dragged->second.size = targetWindow->second.size;
+    dragged->second.zOrder = ++nextWindowZ_;
+    focusedWindow_ = id;
+    dockLayoutDone_ = false;
 }
 
 Rect Context::Place(Vec2 size, float spacing) {
@@ -378,16 +510,34 @@ bool Context::SaveLayout(const std::string& path, std::string* error) const {
     }
 
     size_t windowCount = 0;
+    std::vector<std::pair<WidgetId, TabGroup>> savedTabGroups;
+    std::unordered_set<WidgetId> savedTabMembers;
     for (const auto& [id, window] : windows_) {
-        (void)id;
         if (window.init) ++windowCount;
+        (void)id;
+    }
+    for (const auto& [groupId, group] : tabGroups_) {
+        TabGroup savedGroup;
+        for (WidgetId member : group.windows) {
+            const auto window = windows_.find(member);
+            if (window != windows_.end() && window->second.init && window->second.open &&
+                window->second.tabGroup == groupId)
+                savedGroup.windows.push_back(member);
+        }
+        if (savedGroup.windows.size() < 2) continue;
+        savedGroup.active = std::find(savedGroup.windows.begin(), savedGroup.windows.end(),
+                                      group.active) != savedGroup.windows.end()
+            ? group.active : savedGroup.windows.front();
+        for (WidgetId member : savedGroup.windows) savedTabMembers.insert(member);
+        savedTabGroups.emplace_back(groupId, std::move(savedGroup));
     }
 
     file.precision(std::numeric_limits<float>::max_digits10);
-    file << "FLUIDUI_LAYOUT 1\n"
+    file << "FLUIDUI_LAYOUT 3\n"
          << "ratios " << dockLeftRatio_ << ' ' << dockRightRatio_ << ' '
          << dockTopRatio_ << ' ' << dockBottomRatio_ << '\n'
          << "focus " << focusedWindow_ << '\n'
+         << "center-tab " << activeCenterTab_ << '\n'
          << "windows " << windowCount << '\n';
 
     for (const auto& [id, window] : windows_) {
@@ -397,7 +547,8 @@ bool Context::SaveLayout(const std::string& path, std::string* error) const {
              << window.size.x << ' ' << window.size.y << ' '
              << static_cast<unsigned int>(window.dock) << ' ' << window.dockSpan << ' '
              << window.dockRestoreSize.x << ' ' << window.dockRestoreSize.y << ' '
-             << window.scrollY << ' ' << window.zOrder << '\n';
+             << window.scrollY << ' ' << window.zOrder << ' '
+             << (savedTabMembers.contains(id) ? window.tabGroup : 0) << '\n';
     }
 
     for (size_t side = 1; side < dockedWindows_.size(); ++side) {
@@ -411,6 +562,12 @@ bool Context::SaveLayout(const std::string& path, std::string* error) const {
         }
         file << "order " << side << ' ' << savedGroup.size();
         for (WidgetId id : savedGroup) file << ' ' << id;
+        file << '\n';
+    }
+    file << "tab-groups " << savedTabGroups.size() << '\n';
+    for (const auto& [id, group] : savedTabGroups) {
+        file << "tab-group " << id << ' ' << group.active << ' ' << group.windows.size();
+        for (WidgetId member : group.windows) file << ' ' << member;
         file << '\n';
     }
 
@@ -433,7 +590,8 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
 
     std::string token;
     unsigned int version = 0;
-    if (!(file >> token >> version) || token != "FLUIDUI_LAYOUT" || version != 1)
+    if (!(file >> token >> version) || token != "FLUIDUI_LAYOUT" ||
+        (version < 1 || version > 3))
         return fail("Invalid or unsupported FluidUI layout file: " + path);
 
     float leftRatio = 0.f, rightRatio = 0.f, topRatio = 0.f, bottomRatio = 0.f;
@@ -450,6 +608,11 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
     WidgetId focusedWindow = 0;
     if (!(file >> token >> focusedWindow) || token != "focus")
         return fail("Invalid focus entry in layout file: " + path);
+    uint64_t centerTab = 0;
+    if (version >= 2 &&
+        (!(file >> token >> centerTab) || token != "center-tab" ||
+         centerTab > std::numeric_limits<WidgetId>::max()))
+        return fail("Invalid center tab in layout file: " + path);
 
     size_t windowCount = 0;
     constexpr size_t maxWindows = 10000;
@@ -469,6 +632,7 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
                     >> dock >> window.dockSpan
                     >> window.dockRestoreSize.x >> window.dockRestoreSize.y
                     >> window.scrollY >> window.zOrder) ||
+            (version >= 3 && !(file >> window.tabGroup)) ||
             token != "window" || rawId > std::numeric_limits<WidgetId>::max() ||
             (open != 0 && open != 1) || dock > 9 ||
             !std::isfinite(window.pos.x) || !std::isfinite(window.pos.y) ||
@@ -512,16 +676,72 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
         }
     }
 
+    std::unordered_map<WidgetId, TabGroup> loadedTabGroups;
+    if (version >= 3) {
+        std::unordered_set<WidgetId> tabGroupMembers;
+        size_t groupCount = 0;
+        if (!(file >> token >> groupCount) || token != "tab-groups" ||
+            groupCount > windowCount)
+            return fail("Invalid tab group count in layout file: " + path);
+        for (size_t i = 0; i < groupCount; ++i) {
+            uint64_t rawGroup = 0, rawActive = 0;
+            size_t memberCount = 0;
+            if (!(file >> token >> rawGroup >> rawActive >> memberCount) ||
+                token != "tab-group" || rawGroup > std::numeric_limits<WidgetId>::max() ||
+                rawGroup == 0 ||
+                rawActive > std::numeric_limits<WidgetId>::max() ||
+                memberCount < 2 || memberCount > windowCount)
+                return fail("Invalid tab group in layout file: " + path);
+            TabGroup group;
+            group.active = static_cast<WidgetId>(rawActive);
+            group.windows.reserve(memberCount);
+            DockSide sharedDock = DockSide::None;
+            for (size_t j = 0; j < memberCount; ++j) {
+                uint64_t rawMember = 0;
+                if (!(file >> rawMember) || rawMember > std::numeric_limits<WidgetId>::max())
+                    return fail("Invalid tab group member in layout file: " + path);
+                const WidgetId member = static_cast<WidgetId>(rawMember);
+                const auto window = loadedWindows.find(member);
+                if (window == loadedWindows.end() || !window->second.open ||
+                    window->second.tabGroup != static_cast<WidgetId>(rawGroup) ||
+                    !tabGroupMembers.insert(member).second)
+                    return fail("Inconsistent tab group member in layout file: " + path);
+                if (j == 0) sharedDock = window->second.dock;
+                else if (window->second.dock != sharedDock)
+                    return fail("Tab group windows must share a dock region: " + path);
+                group.windows.push_back(member);
+            }
+            if (std::find(group.windows.begin(), group.windows.end(), group.active) ==
+                    group.windows.end() ||
+                std::find(group.windows.begin(), group.windows.end(),
+                          static_cast<WidgetId>(rawGroup)) == group.windows.end() ||
+                !loadedTabGroups.emplace(static_cast<WidgetId>(rawGroup),
+                                         std::move(group)).second)
+                return fail("Duplicate or invalid tab group in layout file: " + path);
+        }
+        for (const auto& [id, window] : loadedWindows) {
+            if (window.tabGroup != 0 && !tabGroupMembers.contains(id))
+                return fail("Window references a missing tab group: " + path);
+        }
+    }
+
     for (const auto& [id, window] : loadedWindows) {
         if (window.open && window.dock != DockSide::None &&
             !orderedWindows.contains(id))
             return fail("Docked window is missing from dock order in layout file: " + path);
     }
+    const auto& loadedCenterGroup =
+        loadedDockGroups[static_cast<size_t>(DockSide::Center)];
+    if (version >= 2 && centerTab != 0 &&
+        std::find(loadedCenterGroup.begin(), loadedCenterGroup.end(),
+                  static_cast<WidgetId>(centerTab)) == loadedCenterGroup.end())
+        return fail("Center tab does not belong to the center dock group: " + path);
     file >> std::ws;
     if (!file.eof()) return fail("Unexpected trailing data in layout file: " + path);
 
     windows_ = std::move(loadedWindows);
     dockedWindows_ = std::move(loadedDockGroups);
+    tabGroups_ = std::move(loadedTabGroups);
     dockLeftRatio_ = leftRatio;
     dockRightRatio_ = rightRatio;
     dockTopRatio_ = topRatio;
@@ -534,6 +754,13 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
     const auto focused = windows_.find(focusedWindow);
     focusedWindow_ = focused != windows_.end() && focused->second.open
         ? focusedWindow : 0;
+    const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
+    const WidgetId savedCenterTab = static_cast<WidgetId>(centerTab);
+    activeCenterTab_ = version >= 2 &&
+            std::find(centerGroup.begin(), centerGroup.end(), savedCenterTab) != centerGroup.end()
+        ? savedCenterTab
+        : std::find(centerGroup.begin(), centerGroup.end(), focusedWindow_) != centerGroup.end()
+            ? focusedWindow_ : (centerGroup.empty() ? 0 : centerGroup.back());
     active_ = 0;
     activeDockSplitter_ = 0;
     dockLayoutDone_ = false;
@@ -782,7 +1009,9 @@ void Context::SetDockPreview(DockSide side, WidgetId newWindow) {
     const size_t index = static_cast<size_t>(side);
     const Rect region = DockRegions(side)[index];
     const auto& group = dockedWindows_[index];
-    if (newWindow != 0 && windows_.contains(newWindow)) {
+    if (side == DockSide::Center) {
+        dockPreview_ = region;
+    } else if (newWindow != 0 && windows_.contains(newWindow)) {
         const WindowState& window = windows_.at(newWindow);
         dockPreview_ = {window.pos.x, window.pos.y, window.size.x, window.size.y};
     } else if (group.empty()) {
@@ -873,6 +1102,39 @@ void Context::LayoutDockedWindows() {
     if (dockLayoutDone_) return;
     dockLayoutDone_ = true;
 
+    for (auto group = tabGroups_.begin(); group != tabGroups_.end();) {
+        auto& members = group->second.windows;
+        members.erase(std::remove_if(members.begin(), members.end(), [&](WidgetId id) {
+            const auto window = windows_.find(id);
+            return window == windows_.end() || !window->second.open ||
+                   window->second.tabGroup != group->first;
+        }), members.end());
+        if (group->second.active == 0 ||
+            std::find(members.begin(), members.end(), group->second.active) == members.end())
+            group->second.active = members.empty() ? 0 : members.front();
+        if (members.size() < 2) {
+            for (WidgetId id : members) {
+                if (auto window = windows_.find(id); window != windows_.end())
+                    window->second.tabGroup = 0;
+            }
+            group = tabGroups_.erase(group);
+        } else {
+            const DockSide sharedDock = windows_.at(members.front()).dock;
+            for (WidgetId id : members) {
+                WindowState& window = windows_.at(id);
+                if (window.dock != sharedDock) {
+                    if (window.dock != DockSide::None) {
+                        auto& oldGroup = dockedWindows_[static_cast<size_t>(window.dock)];
+                        oldGroup.erase(std::remove(oldGroup.begin(), oldGroup.end(), id),
+                                       oldGroup.end());
+                    }
+                    window.dock = sharedDock;
+                }
+            }
+            ++group;
+        }
+    }
+
     for (size_t side = 1; side < dockedWindows_.size(); ++side) {
         auto& ids = dockedWindows_[side];
         ids.erase(std::remove_if(ids.begin(), ids.end(), [&](WidgetId id) {
@@ -881,6 +1143,9 @@ void Context::LayoutDockedWindows() {
                    static_cast<size_t>(it->second.dock) != side;
         }), ids.end());
     }
+    auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
+    if (std::find(centerGroup.begin(), centerGroup.end(), activeCenterTab_) == centerGroup.end())
+        activeCenterTab_ = centerGroup.empty() ? 0 : centerGroup.back();
 
     auto addBoundarySplitter = [&](DockSide side, Rect rect, bool horizontalAxis,
                                   float& ratio) {
@@ -977,9 +1242,27 @@ void Context::LayoutDockedWindows() {
             false, dockBottomRatio_);
     regions = DockRegions();
     for (size_t side = 1; side < dockedWindows_.size(); ++side) {
-        auto& ids = dockedWindows_[side];
+        const auto& dockGroup = dockedWindows_[side];
+        std::vector<WidgetId> ids;
+        ids.reserve(dockGroup.size());
+        for (WidgetId id : dockGroup) {
+            const WindowState& window = windows_[id];
+            const auto group = window.tabGroup == 0
+                ? tabGroups_.end() : tabGroups_.find(window.tabGroup);
+            if (group == tabGroups_.end() || group->second.windows.empty() ||
+                group->second.windows.front() == id)
+                ids.push_back(id);
+        }
         if (ids.empty()) continue;
         const Rect region = regions[side];
+        if (side == static_cast<size_t>(DockSide::Center)) {
+            for (WidgetId id : ids) {
+                WindowState& window = windows_[id];
+                window.pos = {region.x, region.y};
+                window.size = {region.w, region.h};
+            }
+            continue;
+        }
 
         float totalSpan = 0.f;
         for (WidgetId id : ids) totalSpan += std::max(0.01f, windows_[id].dockSpan);
@@ -1057,12 +1340,26 @@ void Context::LayoutDockedWindows() {
             offset += verticalSplit ? window.size.y : window.size.x;
         }
     }
+    for (const auto& [groupId, group] : tabGroups_) {
+        (void)groupId;
+        if (group.windows.empty()) continue;
+        const auto host = windows_.find(group.windows.front());
+        if (host == windows_.end()) continue;
+        for (size_t i = 1; i < group.windows.size(); ++i) {
+            auto member = windows_.find(group.windows[i]);
+            if (member == windows_.end()) continue;
+            member->second.pos = host->second.pos;
+            member->second.size = host->second.size;
+            member->second.dockSpan = host->second.dockSpan;
+        }
+    }
 }
 
 bool Context::BeginWindow(std::string_view title, Rect initial) {
     LayoutDockedWindows();
     const WidgetId id = GetID(title);
     WindowState& w = windows_[id];
+    w.title = std::string(DisplayLabel(title));
     if (!w.init) {
         w.init = true;
         w.pos = {initial.x, initial.y};
@@ -1070,6 +1367,19 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         w.zOrder = ++nextWindowZ_;
     }
     if (!w.open) return false;
+    const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
+    if (w.dock == DockSide::Center && centerGroup.size() > 1 &&
+        activeCenterTab_ != id)
+        return false;
+    auto genericTabs = w.tabGroup == 0 ? tabGroups_.end() : tabGroups_.find(w.tabGroup);
+    if (genericTabs != tabGroups_.end() && genericTabs->second.windows.size() > 1) {
+        if (genericTabs->second.active != id) return false;
+        const auto host = windows_.find(genericTabs->second.windows.front());
+        if (host != windows_.end() && host->first != id) {
+            w.pos = host->second.pos;
+            w.size = host->second.size;
+        }
+    }
 
     WidgetId topWindowAtMouse = 0;
     uint64_t topWindowZ = 0;
@@ -1077,6 +1387,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         in_.mousePos.x < in_.displaySize.x && in_.mousePos.y < in_.displaySize.y) {
         for (const auto& [windowId, candidate] : windows_) {
             if (!candidate.open || !candidate.init) continue;
+            if (candidate.dock == DockSide::Center && centerGroup.size() > 1 &&
+                windowId != activeCenterTab_)
+                continue;
+            if (candidate.tabGroup != 0) {
+                const auto group = tabGroups_.find(candidate.tabGroup);
+                if (group != tabGroups_.end() && group->second.active != windowId)
+                    continue;
+            }
             const Rect candidateFrame{candidate.pos.x, candidate.pos.y,
                                       candidate.size.x, candidate.size.y};
             if (candidateFrame.Contains(in_.mousePos) && candidate.zOrder >= topWindowZ) {
@@ -1115,15 +1433,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     const Interaction drag = Behavior(dragId, dragRect);
     if (w.dock != DockSide::None) {
         if (drag.pressed) {
+            w.dockDragPending = false;
             const float dx = in_.mousePos.x - w.lastTitleClickPos.x;
             const float dy = in_.mousePos.y - w.lastTitleClickPos.y;
             const bool doubleClick = w.lastTitleClickTime >= 0.0 &&
                 timeSeconds_ - static_cast<float>(w.lastTitleClickTime) <= 0.35f &&
                 dx * dx + dy * dy <= 100.f;
             if (doubleClick) {
-                for (auto& sideWindows : dockedWindows_)
-                    sideWindows.erase(std::remove(sideWindows.begin(), sideWindows.end(), id),
-                                      sideWindows.end());
+                DetachTab(id);
                 w.dock = DockSide::None;
                 if (w.dockRestoreSize.x > 0.f && w.dockRestoreSize.y > 0.f)
                     w.size = w.dockRestoreSize;
@@ -1143,24 +1460,80 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
                 w.lastTitleClickPos = in_.mousePos;
             }
         }
+        if (drag.held && !w.dragging) {
+            if (!w.dockDragPending) {
+                w.dockDragPending = true;
+                w.dockDragStartPos = in_.mousePos;
+            }
+            const float dx = in_.mousePos.x - w.dockDragStartPos.x;
+            const float dy = in_.mousePos.y - w.dockDragStartPos.y;
+            if (dx * dx + dy * dy > 25.f) {
+                w.dockDragPending = false;
+                DetachTab(id);
+                w.dock = DockSide::None;
+                if (w.dockRestoreSize.x > 0.f && w.dockRestoreSize.y > 0.f)
+                    w.size = w.dockRestoreSize;
+                w.dragging = true;
+                w.dragOff = {w.size.x * 0.5f, titleH * 0.5f};
+                w.pos = in_.mousePos - w.dragOff;
+                dockLayoutDone_ = false;
+                frame = {w.pos.x, w.pos.y, w.size.x, w.size.y};
+            }
+        } else if (!in_.mouseDown[0]) {
+            w.dockDragPending = false;
+        }
     } else if (drag.held) {
         if (!wasDragging) {
-            w.dragging = true;
             w.dragOff = in_.mousePos - w.pos;
+            if (w.tabGroup != 0) {
+                if (!w.dockDragPending) {
+                    w.dockDragPending = true;
+                    w.dockDragStartPos = in_.mousePos;
+                }
+                const float dx = in_.mousePos.x - w.dockDragStartPos.x;
+                const float dy = in_.mousePos.y - w.dockDragStartPos.y;
+                if (dx * dx + dy * dy > 25.f) {
+                    DetachTab(id);
+                    w.dock = DockSide::None;
+                    w.dockDragPending = false;
+                    w.dragging = true;
+                }
+            } else {
+                w.dragging = true;
+            }
+        } else if (w.dockDragPending) {
+            const float dx = in_.mousePos.x - w.dockDragStartPos.x;
+            const float dy = in_.mousePos.y - w.dockDragStartPos.y;
+            if (dx * dx + dy * dy > 25.f) {
+                DetachTab(id);
+                w.dockDragPending = false;
+                w.dragging = true;
+            }
         }
-        w.pos = in_.mousePos - w.dragOff;
-        dockCompassRect_ = {in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
-                            in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
-                            kDockCompassSize, kDockCompassSize};
-        dockCompassVisible_ = dockingEnabled_;
-        dockCompassSelection_ = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
-        SetDockPreview(dockCompassSelection_);
+        if (w.dragging) {
+            w.pos = in_.mousePos - w.dragOff;
+            tabDropTarget_ = WindowAt(in_.mousePos, id);
+            dockCompassRect_ = {in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
+                                in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
+                                kDockCompassSize, kDockCompassSize};
+            dockCompassVisible_ = dockingEnabled_;
+            dockCompassSelection_ = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
+            SetDockPreview(dockCompassSelection_);
+        }
+    } else if (w.dockDragPending && !in_.mouseDown[0]) {
+        w.dockDragPending = false;
     } else if (wasDragging && !in_.mouseDown[0]) {
-        const DockSide target = dockingEnabled_ ? DockTargetAt(in_.mousePos) : DockSide::None;
+        const WidgetId targetWindow = dockingEnabled_ ? WindowAt(in_.mousePos, id) : 0;
+        const DockSide target = targetWindow == 0 && dockingEnabled_
+            ? DockTargetAt(in_.mousePos) : DockSide::None;
         dockCompassVisible_ = false;
         dockCompassSelection_ = target;
-        if (target != DockSide::None) {
+        if (targetWindow != 0) {
+            JoinTab(id, targetWindow);
+            tabDropTarget_ = targetWindow;
+        } else if (target != DockSide::None) {
             w.dockRestoreSize = w.size;
+            DetachTab(id);
             w.dock = target;
             auto& dockGroup = dockedWindows_[static_cast<size_t>(target)];
             if (std::find(dockGroup.begin(), dockGroup.end(), id) == dockGroup.end()) {
@@ -1171,6 +1544,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
                     ? 1.f : existingSpan / static_cast<float>(dockGroup.size());
                 dockGroup.push_back(id);
             }
+            if (target == DockSide::Center) activeCenterTab_ = id;
             dockLayoutDone_ = false;
             LayoutDockedWindows();
         }
@@ -1216,6 +1590,17 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     }
     if (w.dock == DockSide::None && menuBarHeight_ > 0.f)
         w.pos.y = std::max(w.pos.y, menuBarHeight_);
+    if (w.tabGroup != 0) {
+        const auto group = tabGroups_.find(w.tabGroup);
+        if (group != tabGroups_.end()) {
+            for (WidgetId memberId : group->second.windows) {
+                auto member = windows_.find(memberId);
+                if (member == windows_.end() || memberId == id) continue;
+                member->second.pos = w.pos;
+                member->second.size = w.size;
+            }
+        }
+    }
     frame = {w.pos.x, w.pos.y, w.size.x, w.size.y};
     const Rect bar{frame.x, frame.y, frame.w, titleH};
     const Rect finalClose{frame.x + frame.w - controlWidth - ts.padding.right, frame.y,
@@ -1241,6 +1626,65 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     DrawBox(frame, windowStyle);
     DrawStyledColor(bar, ts.background, ts.backgroundGradient, ts.opacity, ts.cornerRadii);
     DrawBackgroundImage(bar, ts);
+    float contentTop = titleH;
+    const std::vector<WidgetId>* tabWindows = nullptr;
+    WidgetId selectedTab = 0;
+    bool centerTabs = false;
+    if (w.dock == DockSide::Center && centerGroup.size() > 1) {
+        tabWindows = &centerGroup;
+        selectedTab = activeCenterTab_;
+        centerTabs = true;
+    } else if (genericTabs != tabGroups_.end() &&
+               genericTabs->second.windows.size() > 1) {
+        tabWindows = &genericTabs->second.windows;
+        selectedTab = genericTabs->second.active;
+    }
+    if (tabWindows) {
+        const ComputedStyle tabBarStyle = Resolve("dock-tab-bar", 0);
+        const ComputedStyle tabBaseStyle = Resolve("dock-tab", 0);
+        const float tabHeight = tabBaseStyle.fontSize * 1.2f +
+                                tabBaseStyle.padding.Vertical();
+        const Rect tabBar{frame.x, frame.y + titleH, frame.w, tabHeight};
+        DrawBox(tabBar, tabBarStyle);
+        const float tabWidth = frame.w / static_cast<float>(tabWindows->size());
+        for (size_t index = 0; index < tabWindows->size(); ++index) {
+            const WidgetId tabId = (*tabWindows)[index];
+            const auto tabWindow = windows_.find(tabId);
+            if (tabWindow == windows_.end()) continue;
+            const Rect tabRect{frame.x + tabWidth * static_cast<float>(index),
+                               tabBar.y, index + 1 == tabWindows->size()
+                                   ? frame.x + frame.w -
+                                         (frame.x + tabWidth * static_cast<float>(index))
+                                   : tabWidth,
+                               tabHeight};
+            const bool selected = tabId == selectedTab;
+            const WidgetId tabButtonId = HashStr("##dock-tab", tabId);
+            const Interaction interaction = Behavior(tabButtonId, tabRect);
+            const ComputedStyle tabStyle = Animate(tabButtonId, "dock-tab",
+                selected ? State_Checked : State_None, interaction.hovered, interaction.held);
+            DrawBox(tabRect, tabStyle);
+            const std::string_view tabLabel = tabWindow->second.title;
+            const Vec2 labelSize = text_->Measure(tabLabel, tabStyle.fontSize);
+            EmitText({tabRect.x + std::max(0.f, (tabRect.w - labelSize.x) * 0.5f),
+                      tabRect.y + std::max(0.f, (tabRect.h - labelSize.y) * 0.5f)},
+                     tabLabel, tabStyle);
+            if (interaction.pressed) {
+                if (centerTabs) activeCenterTab_ = tabId;
+                else if (auto group = tabGroups_.find(w.tabGroup);
+                         group != tabGroups_.end())
+                    group->second.active = tabId;
+                focusedWindow_ = tabId;
+                tabWindow->second.zOrder = ++nextWindowZ_;
+            }
+        }
+        contentTop += tabHeight;
+        const WidgetId activeTab = centerTabs ? activeCenterTab_ :
+            (genericTabs == tabGroups_.end() ? 0 : genericTabs->second.active);
+        if (activeTab != id) {
+            draw_.EndLayer(w.drawLayer);
+            return false;
+        }
+    }
     const float titleRightPadding = w.dock == DockSide::None
         ? ts.padding.right + controlWidth : ts.padding.right;
     const Rect titleRect{bar.x + ts.padding.left, bar.y,
@@ -1263,9 +1707,9 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
 
     const float scrollBarWidth = 12.f;
     content_ = {frame.x + ws.padding.left,
-                frame.y + titleH + ws.padding.top,
+                frame.y + contentTop + ws.padding.top,
                 frame.w - ws.padding.Horizontal() - scrollBarWidth,
-                frame.h - titleH - ws.padding.Vertical()};
+                frame.h - contentTop - ws.padding.Vertical()};
     windowViewport_ = content_;
     if (in_.mouseWheel != 0.f && content_.Contains(in_.mousePos))
         w.scrollY = std::max(0.f, w.scrollY - in_.mouseWheel * ts.fontSize * 3.f);

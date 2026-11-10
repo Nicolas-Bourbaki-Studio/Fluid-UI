@@ -217,25 +217,26 @@ Hold a window's title bar to show the docking compass. Hover its left, right, to
 or center target to preview that layout, then release to dock. Docked windows tile without
 overlapping; adding panels on other edges adjusts the available regions. Drag the boundary
 splitters to resize edge regions horizontally or vertically, or drag dividers between
-same-edge panels to resize individual windows. The layout adapts when the display changes
-size. Use `Context::DockWindows(false)` to disable docking.
+same-edge panels to resize individual windows. Dropping on the compass center stacks windows
+as selectable tabs in the center dock area. Click a tab to switch windows, drag a docked
+title bar to undock it, then drop it directly inside another window to group them as tabs.
+This also works between floating and docked windows; the target window's dock region is kept.
+Drop on the center target to add a window to the center dock tab group instead. The layout
+adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
 
 Save and restore window positions, sizes, open state, dock sides, dock order, split
 proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files
-are versioned and validated before being applied. Keep window titles and any surrounding
+are versioned and validated before being applied; tab groups and the selected center dock tab
+are saved too. Version 1 layouts are still accepted. Keep window titles and any surrounding
 `PushID` scopes stable between runs so saved window IDs continue to identify the same windows.
 
-```cpp
-std::string error;
-if (!ui.LoadLayout("workspace.layout", &error)) {
-    // Handle a missing or invalid layout file.
-}
+The demo loads its layout at startup and saves it when the application exits. By default,
+the file is `fluidui-layout.ini` in the current working directory. Change the path with
+the `--layout` command-line option, for example:
 
-// Call when the user requests a save or when the application is shutting down.
-if (!ui.SaveLayout("workspace.layout", &error)) {
-    // Handle a write error.
-}
+```text
+basic_glfw_gl.exe --layout "C:\Users\me\AppData\Roaming\MyApp\layout.ini"
 ```
 
-The demo's **Layout** menu saves and loads `fluidui-layout.ini` in its current working
-directory.
+Applications can choose any path by passing it to `SaveLayout(path)` and
+`LoadLayout(path)`; both methods report errors through their optional error string.

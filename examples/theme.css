@@ -91,6 +91,27 @@ window-title {
     border-radius-bottom-right: 0px;
 }
 
+dock-tab-bar {
+    background: #141B27;
+    padding: 2px 4px;
+    gap: 2px;
+}
+
+dock-tab {
+    background: #202A39;
+    color: #AEBBD0;
+    padding: 4px 10px;
+}
+
+dock-tab:hover {
+    background: #2A3A50;
+}
+
+dock-tab:checked {
+    background: #315F98;
+    color: #FFFFFF;
+}
+
 window-close {
     background: var(--ui-overlay);
     color: var(--ui-text-secondary);
