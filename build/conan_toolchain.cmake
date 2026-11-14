@@ -23,8 +23,6 @@ endif()
 
 ########## 'compilers' block #############
 
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
 
 
 ########## 'arch_flags' block #############
@@ -86,9 +84,6 @@ foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
     if(DEFINED CONAN_C_FLAGS_${config})
       string(APPEND CMAKE_C_FLAGS_${config}_INIT " ${CONAN_C_FLAGS_${config}}")
     endif()
-    if(DEFINED CONAN_ASM_FLAGS_${config})
-      string(APPEND CMAKE_ASM_FLAGS_${config}_INIT " ${CONAN_ASM_FLAGS_${config}}")
-    endif()
     if(DEFINED CONAN_SHARED_LINKER_FLAGS_${config})
       string(APPEND CMAKE_SHARED_LINKER_FLAGS_${config}_INIT " ${CONAN_SHARED_LINKER_FLAGS_${config}}")
     endif()
@@ -105,9 +100,6 @@ if(DEFINED CONAN_CXX_FLAGS)
 endif()
 if(DEFINED CONAN_C_FLAGS)
   string(APPEND CMAKE_C_FLAGS_INIT " ${CONAN_C_FLAGS}")
-endif()
-if(DEFINED CONAN_ASM_FLAGS)
-  string(APPEND CMAKE_ASM_FLAGS_INIT " ${CONAN_ASM_FLAGS}")
 endif()
 if(DEFINED CONAN_SHARED_LINKER_FLAGS)
   string(APPEND CMAKE_SHARED_LINKER_FLAGS_INIT " ${CONAN_SHARED_LINKER_FLAGS}")
@@ -156,9 +148,9 @@ list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 # Definition of CMAKE_PREFIX_PATH, CMAKE_XXXXX_PATH
 # The Conan local "generators" folder, where this toolchain is saved.
 list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR} )
-list(PREPEND CMAKE_LIBRARY_PATH "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib")
-list(PREPEND CMAKE_INCLUDE_PATH "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include")
-set(CONAN_RUNTIME_LIB_DIRS "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/bin" )
+list(PREPEND CMAKE_LIBRARY_PATH "C:/Users/Nuggew/.conan2/p/b/glfwce8138eb9c485/p/lib")
+list(PREPEND CMAKE_INCLUDE_PATH "C:/Users/Nuggew/.conan2/p/b/glfwce8138eb9c485/p/include")
+set(CONAN_RUNTIME_LIB_DIRS "C:/Users/Nuggew/.conan2/p/b/glfwce8138eb9c485/p/bin" )
 
 endif()
 

@@ -1,3 +1,3 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\FluidUI.dir/objects.a
-C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\FluidUI.dir/objects.a @CMakeFiles\FluidUI.dir\objects1.rsp
-C:\msys64\ucrt64\bin\g++.exe -m64 -g -shared -m64 -o libFluidUI.dll -Wl,--out-implib,libFluidUI.dll.a -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\FluidUI.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\FluidUI.dir\linkLibs.rsp
+"D:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\FluidUI.dir/objects.a
+D:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\FluidUI.dir/objects.a @CMakeFiles\FluidUI.dir\objects1.rsp
+D:\msys64\ucrt64\bin\g++.exe -m64 -g -shared -m64 -o libFluidUI.dll -Wl,--out-implib,libFluidUI.dll.a -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive CMakeFiles\FluidUI.dir/objects.a -Wl,--no-whole-archive @CMakeFiles\FluidUI.dir\linkLibs.rsp

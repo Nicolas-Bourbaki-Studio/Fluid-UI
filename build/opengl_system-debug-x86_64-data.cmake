@@ -11,7 +11,7 @@ endif()
 
 ########### VARIABLES #######################################################################
 #############################################################################################
-set(opengl_PACKAGE_FOLDER_DEBUG "C:/Users/mike1/.conan2/p/opengb4dfd9d76a483/p")
+set(opengl_PACKAGE_FOLDER_DEBUG "C:/Users/Nuggew/.conan2/p/opengb4dfd9d76a483/p")
 set(opengl_BUILD_MODULES_PATHS_DEBUG )
 
 
@@ -37,24 +37,13 @@ set(opengl_NO_SONAME_MODE_DEBUG FALSE)
 
 
 # COMPOUND VARIABLES
-set(opengl_COMPILE_OPTIONS_DEBUG)
-if (NOT "${opengl_COMPILE_OPTIONS_CXX_DEBUG}" STREQUAL "")
-    list(APPEND opengl_COMPILE_OPTIONS_DEBUG
-        "$<$<COMPILE_LANGUAGE:CXX>:${opengl_COMPILE_OPTIONS_CXX_DEBUG}>")
-endif ()
-if (NOT "${opengl_COMPILE_OPTIONS_C_DEBUG}" STREQUAL "")
-    list(APPEND opengl_COMPILE_OPTIONS_DEBUG
-        "$<$<COMPILE_LANGUAGE:C>:${opengl_COMPILE_OPTIONS_C_DEBUG}>")
-endif ()
-set(opengl_LINKER_FLAGS_DEBUG)
-if (NOT "${opengl_SHARED_LINK_FLAGS_DEBUG}" STREQUAL "")
-    list(APPEND opengl_LINKER_FLAGS_DEBUG
-        "$<$<OR:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,SHARED_LIBRARY>,$<STREQUAL:$<TARGET_PROPERTY:TYPE>,MODULE_LIBRARY>>:${opengl_SHARED_LINK_FLAGS_DEBUG}>")
-endif ()
-if (NOT "${opengl_EXE_LINK_FLAGS_DEBUG}" STREQUAL "")
-    list(APPEND opengl_LINKER_FLAGS_DEBUG
-        "$<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>:${opengl_EXE_LINK_FLAGS_DEBUG}>")
-endif ()
+set(opengl_COMPILE_OPTIONS_DEBUG
+    "$<$<COMPILE_LANGUAGE:CXX>:${opengl_COMPILE_OPTIONS_CXX_DEBUG}>"
+    "$<$<COMPILE_LANGUAGE:C>:${opengl_COMPILE_OPTIONS_C_DEBUG}>")
+set(opengl_LINKER_FLAGS_DEBUG
+    "$<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,SHARED_LIBRARY>:${opengl_SHARED_LINK_FLAGS_DEBUG}>"
+    "$<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,MODULE_LIBRARY>:${opengl_SHARED_LINK_FLAGS_DEBUG}>"
+    "$<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,EXECUTABLE>:${opengl_EXE_LINK_FLAGS_DEBUG}>")
 
 
 set(opengl_COMPONENTS_DEBUG )

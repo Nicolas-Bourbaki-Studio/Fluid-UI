@@ -1,3 +1,3 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\basic_glfw_gl.dir/objects.a
-C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\basic_glfw_gl.dir/objects.a @CMakeFiles\basic_glfw_gl.dir\objects1.rsp
-C:\msys64\ucrt64\bin\g++.exe -m64 -g -m64 -Wl,--whole-archive CMakeFiles\basic_glfw_gl.dir/objects.a -Wl,--no-whole-archive -o basic_glfw_gl.exe -Wl,--out-implib,libbasic_glfw_gl.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\basic_glfw_gl.dir\linkLibs.rsp
+"D:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\basic_glfw_gl.dir/objects.a
+D:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\basic_glfw_gl.dir/objects.a @CMakeFiles\basic_glfw_gl.dir\objects1.rsp
+D:\msys64\ucrt64\bin\g++.exe -m64 -g -m64 -Wl,--whole-archive CMakeFiles\basic_glfw_gl.dir/objects.a -Wl,--no-whole-archive -o basic_glfw_gl.exe -Wl,--out-implib,libbasic_glfw_gl.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\basic_glfw_gl.dir\linkLibs.rsp

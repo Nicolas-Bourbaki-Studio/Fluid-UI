@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/Context.cpp" "src/CMakeFiles/FluidUI.dir/Context.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/Context.cpp.obj.d"
-  "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/DrawList.cpp" "src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj.d"
-  "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI.cpp" "src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj.d"
-  "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/Style.cpp" "src/CMakeFiles/FluidUI.dir/Style.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/Style.cpp.obj.d"
+  "D:/Projects/NightEngine/external/Fluid-UI/src/Context.cpp" "src/CMakeFiles/FluidUI.dir/Context.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/Context.cpp.obj.d"
+  "D:/Projects/NightEngine/external/Fluid-UI/src/DrawList.cpp" "src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/DrawList.cpp.obj.d"
+  "D:/Projects/NightEngine/external/Fluid-UI/src/FluidUI.cpp" "src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/FluidUI.cpp.obj.d"
+  "D:/Projects/NightEngine/external/Fluid-UI/src/Style.cpp" "src/CMakeFiles/FluidUI.dir/Style.cpp.obj" "gcc" "src/CMakeFiles/FluidUI.dir/Style.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

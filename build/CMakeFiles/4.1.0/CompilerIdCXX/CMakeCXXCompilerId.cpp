@@ -99,20 +99,6 @@
 # define SIMULATE_VERSION_PATCH DEC(__GNUC_PATCHLEVEL__)
 #endif
 
-#elif defined(__clang__) && defined(__DPCPP__) && defined(__dpcpp_major__) && __dpcpp_major__ >= 7 && defined(__dpcpp_minor__) && defined(__dpcpp_patchlevel__) && !defined(__INTEL_CLANG_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
-# define COMPILER_ID "DPClang"
-#if defined(_MSC_VER)
-# define SIMULATE_ID "MSVC"
-#endif
-# define COMPILER_VERSION_MAJOR DEC(__dpcpp_major__)
-# define COMPILER_VERSION_MINOR DEC(__dpcpp_minor__)
-# define COMPILER_VERSION_PATCH DEC(__dpcpp_patchlevel__)
-# define COMPILER_VERSION_INTERNAL_STR __clang_version__
-#if defined(_MSC_VER)
-# define SIMULATE_VERSION_MAJOR DEC(_MSC_VER / 100)
-# define SIMULATE_VERSION_MINOR DEC(_MSC_VER % 100)
-#endif
-
 #elif defined(__PATHCC__)
 # define COMPILER_ID "PathScale"
 # define COMPILER_VERSION_MAJOR DEC(__PATHCC__)
@@ -430,15 +416,12 @@
 #  define COMPILER_VERSION_MAJOR DEC((__VER__) / 1000000)
 #  define COMPILER_VERSION_MINOR DEC(((__VER__) / 1000) % 1000)
 #  define COMPILER_VERSION_PATCH DEC((__VER__) % 1000)
+#  define COMPILER_VERSION_INTERNAL DEC(__IAR_SYSTEMS_ICC__)
 # elif defined(__VER__) && (defined(__ICCAVR__) || defined(__ICCRX__) || defined(__ICCRH850__) || defined(__ICCRL78__) || defined(__ICC430__) || defined(__ICCRISCV__) || defined(__ICCV850__) || defined(__ICC8051__) || defined(__ICCSTM8__))
 #  define COMPILER_VERSION_MAJOR DEC((__VER__) / 100)
 #  define COMPILER_VERSION_MINOR DEC((__VER__) - (((__VER__) / 100)*100))
 #  define COMPILER_VERSION_PATCH DEC(__SUBVERSION__)
-# endif
-# if defined(__IAR_COMPILERBASE__)
-#  define COMPILER_VERSION_INTERNAL DEC(__IAR_COMPILERBASE__)
-# else
-#  define COMPILER_VERSION_INTERNAL DEC((__IAR_SYSTEMS_ICC__ << 16))
+#  define COMPILER_VERSION_INTERNAL DEC(__IAR_SYSTEMS_ICC__)
 # endif
 
 #elif defined(__DCC__) && defined(_DIAB_TOOL)
@@ -883,9 +866,7 @@ char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";
 #    define CXX_STD __cplusplus
 #  endif
 #elif defined(__NVCOMPILER)
-#  if __cplusplus > CXX_STD_20 && defined(__cpp_pp_embed)
-#    define CXX_STD /*CXX_STD_26*/ (CXX_STD_23 + 1)
-#  elif __cplusplus == CXX_STD_17 && defined(__cpp_aggregate_paren_init)
+#  if __cplusplus == CXX_STD_17 && defined(__cpp_aggregate_paren_init)
 #    define CXX_STD CXX_STD_20
 #  else
 #    define CXX_STD __cplusplus

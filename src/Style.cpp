@@ -946,12 +946,17 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("menu-item:checked")
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("menu-item.selected")
+        .Background(C::FromHex(0x2C3D54FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("menu-item.disabled").Opacity(0.5f);
     s.Rule("window-scrollbar")
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
 
     s.Rule("text").Padding(Edges(2, 0)).Foreground(C::FromHex(0xCFD9E8FF));
+    s.Rule("text:disabled").Foreground(C::FromHex(0x8290A4FF)).Opacity(0.7f);
+    s.Rule("separator").Foreground(C::FromHex(0x526783FF)).Spacing(8).BorderWidth(1);
 
     s.Rule("button")
         .Background(C::FromHex(0x253449FF)).BorderColor(C::FromHex(0x3D526FFF)).BorderWidth(1)
@@ -1001,6 +1006,39 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
     s.Rule("image-button:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("image-button:checked")
+        .BorderColor(C::FromHex(0x5A91F7FF)).BorderWidth(2);
+    s.Rule("input-text")
+        .Background(C::FromHex(0x111A27FF)).Foreground(C::FromHex(0xE7EDF7FF))
+        .BorderColor(C::FromHex(0x526783FF)).BorderWidth(1).Rounding(6).Padding(Edges(6, 8));
+    s.Rule("input-text:active")
+        .BorderColor(C::FromHex(0x5A91F7FF)).Accent(C::FromHex(0x5A91F7FF));
+    s.Rule("selectable").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(4, 8)).Rounding(4);
+    s.Rule("selectable:hover").Background(C::FromHex(0x315A91FF));
+    s.Rule("selectable:checked").Background(C::FromHex(0x315A91FF));
+    s.Rule("tree-node").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(3, 5)).Rounding(4);
+    s.Rule("tree-node:hover").Background(C::FromHex(0x26374DFF));
+    s.Rule("tree-node:checked").Foreground(C::FromHex(0x82B2FFFF));
+    s.Rule("collapsing-header").Background(C::FromHex(0x223147FF))
+        .Foreground(C::FromHex(0xE7EDF7FF)).Padding(Edges(7, 10)).Rounding(6);
+    s.Rule("collapsing-header:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("popup").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(8)).ShadowColor(C::FromHex(0x00000088)).ShadowBlur(14);
+    s.Rule("tooltip").Background(C::FromHex(0x0B111BFF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).BorderColor(C::FromHex(0x526783FF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(5, 8)).FontSize(13);
+    s.Rule("button:disabled").Opacity(0.5f);
+    s.Rule("checkbox:disabled").Opacity(0.5f);
+    s.Rule("slider:disabled").Opacity(0.5f);
+    s.Rule("toggle:disabled").Opacity(0.5f);
+    s.Rule("radio:disabled").Opacity(0.5f);
+    s.Rule("dropdown:disabled").Opacity(0.5f);
+    s.Rule("image-button:disabled").Opacity(0.5f);
+    s.Rule("input-text:disabled").Opacity(0.5f);
+    s.Rule("selectable:disabled").Opacity(0.5f);
     s.Rule("text-label").Spacing(7);
     s.Rule("image-label").Spacing(7);
 

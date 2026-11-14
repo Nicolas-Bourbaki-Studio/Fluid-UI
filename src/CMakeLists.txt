@@ -3,6 +3,7 @@ add_library(FluidUI SHARED
     Style.cpp
     DrawList.cpp
     Context.cpp
+    ContextExtras.cpp
 )
 add_library(FluidUI::FluidUI ALIAS FluidUI)
 
