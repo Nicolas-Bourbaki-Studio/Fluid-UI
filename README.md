@@ -11,11 +11,15 @@
 ## Components
 
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
-dropdown menus, text and image labels, image buttons, collapsible containers, containers,
-horizontal/vertical lists, tabbed containers, and class-styleable empty widgets.
+popup dropdown menus, progress bars, selectable console output and input, file-browser-style
+tile containers, text and image labels, image buttons, collapsible containers, containers,
+horizontal/vertical lists, tabbed containers, hover hints, timed notifications, and
+class-styleable empty widgets.
 Text/icon labels can be combined as needed.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
+The Windows GLFW example loads PNG and JPEG with WIC and SVG with Direct2D (Windows 10 or
+later), then registers the resulting OpenGL textures with the stylesheet.
 
 ```cpp
 fluid::Context ui;
@@ -29,6 +33,7 @@ const std::vector<std::string_view> options{"One", "Two", "Three"};
 ui.Toggle("Enabled", &enabled);
 ui.ValueSlider("Value", &value, 0.0f, 1.0f);
 ui.Dropdown("Choice", options, &selected);
+ui.ProgressBar("Download", 0.65f);
 ui.Image(myGpuImageId, {128.0f, 128.0f});
 
 if (ui.BeginContainer("Panel", {300.0f, 120.0f})) {
@@ -46,6 +51,51 @@ Call `EndContainer()` for each successful `BeginContainer`, `BeginList`,
 horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
 `TabPosition::Top`, `Bottom`, or `Left` setting. A `TabItem` with no icon displays text;
 one with an icon displays both by default, or just the icon when `showText` is false.
+`TileContainer` displays selectable file-style tiles from supplied labels; its optional
+GPU-image argument sets a shared tile icon. `ConsoleOutput`
+and `ConsoleInput` support mouse text selection; `ConsoleOutput` scrolls when its content
+overflows and has a black background by default. It also accepts
+`std::vector<Context::ConsoleLine>` entries with `ConsoleTextType::Normal`, `Warning`, or
+`Error`; style their colors with the `console-output-normal`, `console-output-warning`, and
+`console-output-error` selectors. Retrieve selected bytes with `SelectedConsoleText()` for host
+clipboard integration.
+The controls also include `TextWrapped`, `TextDisabled`, `InputText`, `DragFloat`/`DragInt`,
+`ColorEdit3`/`ColorEdit4`, `Selectable`, `TreeNode`/`TreePop`, and `CollapsingHeader`.
+Use `BeginDisabled`/`EndDisabled` to disable a scope, `BeginGroup`/`EndGroup` to keep items
+together in layout, and `BeginPropertyGrid`/`EndPropertyGrid` with `PropertyRow` for label/value
+rows. `SetNextItemWidth` sets the next widget width, `GetContentRegionAvail` queries remaining
+space, `PushWindowPadding`/`PopWindowPadding` overrides window padding, `ClippedList` draws only
+visible fixed-height rows, and `ScrollToBottom` moves the current window to its end.
+`TreeNode` flags are `TreeNode_Selected`, `TreeNode_Leaf`, and `TreeNode_DefaultOpen`.
+Containers automatically show draggable scrollbars when their content exceeds the visible area.
+Vertical overflow also responds to the mouse wheel; style container bars with
+`container-scrollbar`.
+`InputText` receives UTF-8 through `InputState::textInput`; keyboard navigation uses the
+`keysDown`/`keysPressed` arrays (GLFW key codes), with legacy backspace/enter/select-all/copy
+flags retained. Clipboard integration is provided by `clipboardText` and `setClipboardText`.
+The GLFW example wires text input and clipboard events.
+Open dropdown popups render above window content; context menus and hints retain their higher
+priority layers.
+`OpenPopup`/`BeginPopup` and `BeginPopupModal` provide layered popup scopes; pair each
+successful begin with `EndPopup`. `BeginPopupContextItem` and `BeginPopupContextWindow` open
+right-click popups. Use `BeginDragSource`/`SetDragPayload`/`EndDragSource` and
+`BeginDropTarget`/`AcceptDrop`/`EndDropTarget` for typed drag-and-drop data.
+`IsItemHovered`, `IsItemClicked`, `IsItemDoubleClicked`, `IsAnyItemActive`,
+`IsWindowHovered`, `IsWindowFocused`, `WantsMouse`, `WantsMouseAt`, and `WantsKeyboard`
+expose interaction state. `ItemTooltip` shows a tooltip for the last hovered item.
+Custom draw helpers include `DrawLine`, `DrawPolyline`, `DrawTriangleFilled`,
+`DrawRectFilled`, and `DrawLabel`; `Separator` adds a themed divider.
+After an interactive widget, `RMB_Start()` opens its context menu on right-click; add options
+with `RMB_Item()` and close the scope with `RMB_End()`. The popup renders above windows,
+dock previews, and other UI layers.
+The GLFW example includes a dedicated RMB test button with Refresh and Clear console actions.
+Call `LMB_Start()` immediately after an interactive widget to detect its left-click
+activation, and pair a successful call with `LMB_End()`.
+Call `Hint(message)` immediately after an interactive widget to show a tooltip while it is
+hovered; hints render above all other UI. `Notification(message)` displays a shadowed toast
+at the bottom center of the app for three seconds; a new notification replaces the current
+one. The GLFW demo includes
+controls for both, and docking a window automatically shows the undocking hint.
 
 ## Wrapper-friendly windows and menus
 
@@ -91,11 +141,16 @@ if (ui.BeginMainMenuBar()) {
 Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu-item`
 CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network menus,
 a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
-Floating windows can be resized from any edge or corner. Docking offers a 3x3 target
-grid with a live pane preview; docked windows hide their close control and require a
-double-click on the title bar to undock. The GLFW demo smooths rounded geometry with
-multisampling and higher-resolution corner tessellation, and uses linear filtering for
-images; multisampling is kept off for textured draws so it does not add antialiasing
+Floating windows can be resized from any edge or corner. The dock compass arranges top,
+bottom, left, right, and center targets in a 3x3 layout with a live pane preview; docked
+windows hide their close control, have no drop shadow,
+and require a title-bar double-click to undock. Dragging a docked title bar does not undock
+it; drop on another window's title bar to group the windows as tabs. Floating windows retain
+their shadows. Visible separators mark the canvas boundary of edge-docked panels for resizing;
+window-to-window splitters remain independently draggable. Canvas-boundary separators are drawn
+in the adjacent docked panel's layer, so floating windows can cover them. The GLFW demo smooths
+rounded geometry with multisampling and higher-resolution corner tessellation, and uses linear
+filtering for images; multisampling is kept off for textured draws so it does not add antialiasing
 to the text.
 
 ## CSS-like themes and classes
@@ -109,9 +164,13 @@ numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius` and its `border-radius-top-left`,
 `border-radius-top-right`, `border-radius-bottom-left`, and `border-radius-bottom-right`
-corner overrides, `font-size`, `gap`, `shadow-blur`,
+corner overrides, `font-size`, `gap`, `shadow-blur`, `shadow-enabled` (`true` or `false`),
+`outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
+`outline-color`, `outline-width`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
-`padding`. Background images are supported with `background-image: url("...")`,
+`padding`. Outlines and shadows are available to box-drawn components and can be set
+using widget selectors or global rules. Background images are supported with
+`background-image: url("...")`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
 `StyleSheet::RegisterImage`; Fluid UI does not load image files itself. Linear gradients
@@ -124,6 +183,8 @@ aliases available. Unsupported
 declarations are ignored so themes can include properties not implemented by Fluid UI.
 Unsupported selectors and invalid values for supported properties report an error, and
 failed stylesheet loads do not partially modify the active theme.
+Window styles also support `window-can-dock` and `window-child-dock`, each accepting
+`true` or `false`.
 
 ```css
 button.primary {
@@ -155,6 +216,14 @@ window-title {
     background: #1A2637;
     color: #F1F5FC;
     padding: 7px 12px;
+}
+
+window.no-docking {
+    window-can-dock: false;
+}
+
+window.no-children {
+    window-child-dock: false;
 }
 ```
 
@@ -217,5 +286,34 @@ Hold a window's title bar to show the docking compass. Hover its left, right, to
 or center target to preview that layout, then release to dock. Docked windows tile without
 overlapping; adding panels on other edges adjusts the available regions. Drag the boundary
 splitters to resize edge regions horizontally or vertically, or drag dividers between
-same-edge panels to resize individual windows. The layout adapts when the display changes
-size. Use `Context::DockWindows(false)` to disable docking.
+same-edge panels to resize individual windows. Dropping on the compass center stacks windows
+as selectable tabs in the center dock area. Click a tab to switch windows. Dropping on any
+part of an eligible window groups the dragged window as a tab. This works between floating
+and docked windows, and preserves the target's dock region. Dragging a grouped title bar keeps
+the group intact; double-click a docked title bar to undock it. Docked window corners are
+square, and the dock compass takes precedence over windows behind it. Drop a floating
+window on the compass center to add it to the center dock tab group. The layout
+adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
+CSS `window-can-dock: false` prevents a window from being docked, and
+`window-child-dock: false` prevents other windows from being grouped into it; both properties
+apply to `window` styles and default to `true`.
+The `dock-highlight` selector's `color` sets the outline color shown across the full target
+window while dragging another window onto it.
+
+Save and restore window positions, sizes, open state, dock sides, dock order, split
+proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files
+are versioned and validated before being applied; tab groups and the selected center dock tab
+are saved too. Version 1 layouts are still accepted, and older tab groups whose original anchor
+was removed are normalized when loaded. Keep window titles and any surrounding
+`PushID` scopes stable between runs so saved window IDs continue to identify the same windows.
+
+The demo loads its layout at startup and saves it when the application exits. By default,
+the file is `fluidui-layout.ini` in the current working directory. Change the path with
+the `--layout` command-line option, for example:
+
+```text
+basic_glfw_gl.exe --layout "C:\Users\me\AppData\Roaming\MyApp\layout.ini"
+```
+
+Applications can choose any path by passing it to `SaveLayout(path)` and
+`LoadLayout(path)`; both methods report errors through their optional error string.

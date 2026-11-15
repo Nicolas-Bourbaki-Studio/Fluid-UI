@@ -4,8 +4,7 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/_mingw_mac.h \
  C:/msys64/ucrt64/include/_mingw_secapi.h \
  C:/msys64/ucrt64/include/vadefs.h C:/msys64/ucrt64/include/sdkddkver.h \
- C:/msys64/ucrt64/include/excpt.h C:/msys64/ucrt64/include/crtdefs.h \
- C:/msys64/ucrt64/include/corecrt.h \
+ C:/msys64/ucrt64/include/excpt.h C:/msys64/ucrt64/include/corecrt.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdarg.h \
  C:/msys64/ucrt64/include/stdarg.h \
  C:/msys64/ucrt64/include/_mingw_stdarg.h \
@@ -242,7 +241,33 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/mcx.h C:/msys64/ucrt64/include/imm.h \
  C:/msys64/ucrt64/include/wincodec.h C:/msys64/ucrt64/include/ocidl.h \
  C:/msys64/ucrt64/include/dxgiformat.h C:/msys64/ucrt64/include/dcommon.h \
- C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include/GLFW/glfw3.h \
+ C:/msys64/ucrt64/include/d2d1_1.h C:/msys64/ucrt64/include/d2d1.h \
+ C:/msys64/ucrt64/include/dcommon.h C:/msys64/ucrt64/include/d3d10_1.h \
+ C:/msys64/ucrt64/include/d3d10.h C:/msys64/ucrt64/include/dxgi.h \
+ C:/msys64/ucrt64/include/dxgitype.h \
+ C:/msys64/ucrt64/include/dxgicommon.h \
+ C:/msys64/ucrt64/include/d3dcommon.h \
+ C:/msys64/ucrt64/include/d3d10sdklayers.h \
+ C:/msys64/ucrt64/include/d3d10misc.h C:/msys64/ucrt64/include/d3d10.h \
+ C:/msys64/ucrt64/include/d3d10shader.h \
+ C:/msys64/ucrt64/include/d3d10effect.h \
+ C:/msys64/ucrt64/include/d3d10shader.h \
+ C:/msys64/ucrt64/include/d3d10_1shader.h \
+ C:/msys64/ucrt64/include/d2dbasetypes.h \
+ C:/msys64/ucrt64/include/d2derr.h C:/msys64/ucrt64/include/d2d1helper.h \
+ C:/msys64/ucrt64/include/d2d1effects.h \
+ C:/msys64/ucrt64/include/d2d1_1helper.h \
+ C:/msys64/ucrt64/include/d2d1_3.h C:/msys64/ucrt64/include/d2d1_2.h \
+ C:/msys64/ucrt64/include/d2d1effects_1.h \
+ C:/msys64/ucrt64/include/d2d1_2helper.h \
+ C:/msys64/ucrt64/include/d2d1effects_2.h \
+ C:/msys64/ucrt64/include/d2d1svg.h \
+ C:/msys64/ucrt64/include/d2d1_3helper.h C:/msys64/ucrt64/include/d3d11.h \
+ C:/msys64/ucrt64/include/d3d11sdklayers.h \
+ C:/msys64/ucrt64/include/d3d10misc.h \
+ C:/msys64/ucrt64/include/d3d10effect.h \
+ C:/msys64/ucrt64/include/dxgi1_2.h \
+ C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/GL/gl.h \
  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h \
@@ -343,8 +368,20 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/16.2.0/tuple \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/array \
+ C:/msys64/ucrt64/include/c++/16.2.0/functional \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/refwrap.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/std_function.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/typeinfo \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/functexcept.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/unordered_map \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/unordered_map.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/hashtable.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/hashtable_policy.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/ext/aligned_buffer.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/enable_special_members.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/node_handle.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/binders.h \
  C:/msys64/ucrt64/include/c++/16.2.0/string \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/localefwd.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++locale.h \
@@ -357,17 +394,16 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/cerrno \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/charconv.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/unordered_map \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/unordered_map.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/hashtable.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/hashtable_policy.h \
- C:/msys64/ucrt64/include/c++/16.2.0/ext/aligned_buffer.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/enable_special_members.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/node_handle.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h \
  C:/msys64/ucrt64/include/c++/16.2.0/utility \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/intcmp.h \
- C:/msys64/ucrt64/include/c++/16.2.0/array \
+ C:/msys64/ucrt64/include/c++/16.2.0/optional \
+ C:/msys64/ucrt64/include/c++/16.2.0/exception \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/nested_exception.h \
  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h \
  C:/msys64/ucrt64/include/c++/16.2.0/math.h \
  C:/msys64/ucrt64/include/c++/16.2.0/cmath \
@@ -386,16 +422,12 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_laguerre.tcc \
  C:/msys64/ucrt64/include/c++/16.2.0/tr1/riemann_zeta.tcc \
  C:/msys64/ucrt64/include/assert.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/cstring \
  C:/msys64/ucrt64/include/c++/16.2.0/filesystem \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_fwd.h \
  C:/msys64/ucrt64/include/c++/16.2.0/system_error \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/error_constants.h \
  C:/msys64/ucrt64/include/c++/16.2.0/stdexcept \
- C:/msys64/ucrt64/include/c++/16.2.0/exception \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/16.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stdexcept_except.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/chrono.h \
  C:/msys64/ucrt64/include/c++/16.2.0/ratio \
@@ -407,7 +439,6 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h \
  C:/msys64/ucrt64/include/c++/16.2.0/locale \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/locale_classes.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/16.2.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
@@ -453,7 +484,6 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/shared_ptr.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/shared_ptr_base.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/allocated_ptr.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/refwrap.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/align.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_dir.h \

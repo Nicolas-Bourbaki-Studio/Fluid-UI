@@ -19,12 +19,19 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.accent      = Lerp(a.accent,      b.accent,      t);
     o.borderColor = Lerp(a.borderColor, b.borderColor, t);
     o.shadowColor = Lerp(a.shadowColor, b.shadowColor, t);
+    o.outlineColor = Lerp(a.outlineColor, b.outlineColor, t);
     o.borderWidth = Lerp(a.borderWidth, b.borderWidth, t);
+    o.outlineWidth = Lerp(a.outlineWidth, b.outlineWidth, t);
+    o.outlineEnabled = t < 0.5f ? a.outlineEnabled : b.outlineEnabled;
+    o.outlineColorSet = t < 0.5f ? a.outlineColorSet : b.outlineColorSet;
     o.rounding    = Lerp(a.rounding,    b.rounding,    t);
     o.cornerRadii = Lerp(a.cornerRadii, b.cornerRadii, t);
     o.fontSize    = Lerp(a.fontSize,    b.fontSize,    t);
     o.spacing     = Lerp(a.spacing,     b.spacing,     t);
     o.shadowBlur  = Lerp(a.shadowBlur,  b.shadowBlur,  t);
+    o.shadowEnabled = t < 0.5f ? a.shadowEnabled : b.shadowEnabled;
+    o.windowCanDock = t < 0.5f ? a.windowCanDock : b.windowCanDock;
+    o.windowChildDock = t < 0.5f ? a.windowChildDock : b.windowChildDock;
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
     o.padding     = Lerp(a.padding,     b.padding,     t);
@@ -43,6 +50,7 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.accentGradient = t < 0.5f ? a.accentGradient : b.accentGradient;
     o.borderColorGradient = t < 0.5f ? a.borderColorGradient : b.borderColorGradient;
     o.shadowColorGradient = t < 0.5f ? a.shadowColorGradient : b.shadowColorGradient;
+    o.outlineColorGradient = t < 0.5f ? a.outlineColorGradient : b.outlineColorGradient;
     return o;
 }
 
@@ -132,17 +140,21 @@ bool ValidSelector(std::string_view selector) {
 }
 
 bool ParseLinearGradient(std::string_view text, LinearGradient& gradient);
+bool ParseColor(std::string_view text, Color& color);
 
 bool IsSupportedDeclaration(std::string_view name) {
     return name == "background" || name == "background-color" ||
         name == "background-gradient" || name == "color" || name == "text-color" ||
         name == "foreground" || name == "foreground-color" || name == "accent" ||
-        name == "border-color" || name == "shadow-color" ||
+        name == "border-color" || name == "shadow-color" || name == "outline-color" ||
+        name == "outline-width" || name == "outline-style" || name == "outline" ||
         name == "border-width" || name == "border-radius" || name == "rounding" ||
         name == "border-radius-top-left" || name == "border-radius-top-right" ||
         name == "border-radius-bottom-left" || name == "border-radius-bottom-right" ||
         name == "font-size" || name == "gap" || name == "spacing" ||
-        name == "shadow-blur" || name == "opacity" || name == "transition-speed" ||
+        name == "shadow-blur" || name == "shadow-enabled" ||
+        name == "opacity" || name == "transition-speed" ||
+        name == "window-can-dock" || name == "window-child-dock" ||
         name == "padding" || name == "border" || name == "background-image" ||
         name == "text-gradient" || name == "color-gradient" ||
         name == "foreground-gradient" ||
@@ -181,7 +193,34 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.shadowColor = col;
             s.shadowColorGradient = {};
             break;
+        case Prop::OutlineColor:
+            s.outlineColor = col;
+            s.outlineColorGradient = {};
+            s.outlineColorSet = true;
+            break;
         case Prop::BorderWidth: s.borderWidth = v[0]; break;
+        case Prop::OutlineWidth: s.outlineWidth = v[0]; break;
+        case Prop::OutlineStyle: s.outlineEnabled = v[0] != 0.f; break;
+        case Prop::Outline:
+            s.outlineWidth = v[0];
+            s.outlineEnabled = v[1] != 0.f;
+            if (d.text == "none") {
+                s.outlineColor = {};
+                s.outlineColorGradient = {};
+                s.outlineColorSet = false;
+            } else if (!d.text.empty()) {
+                Color outlineColor;
+                if (ParseColor(d.text, outlineColor)) {
+                    s.outlineColor = outlineColor;
+                    s.outlineColorGradient = {};
+                    s.outlineColorSet = true;
+                } else {
+                    s.outlineColor = {};
+                    ParseLinearGradient(d.text, s.outlineColorGradient);
+                    s.outlineColorSet = true;
+                }
+            }
+            break;
         case Prop::Rounding:
             s.rounding = v[0];
             s.cornerRadii = CornerRadii(v[0]);
@@ -193,6 +232,9 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::FontSize:        s.fontSize = v[0]; break;
         case Prop::Spacing:         s.spacing = v[0]; break;
         case Prop::ShadowBlur:      s.shadowBlur = v[0]; break;
+        case Prop::ShadowEnabled:   s.shadowEnabled = v[0] != 0.f; break;
+        case Prop::WindowCanDock:   s.windowCanDock = v[0] != 0.f; break;
+        case Prop::WindowChildDock: s.windowChildDock = v[0] != 0.f; break;
         case Prop::Opacity:         s.opacity = v[0]; break;
         case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
@@ -222,6 +264,12 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::ShadowColorGradient:
             if (d.text.empty()) s.shadowColorGradient = {};
             else ParseLinearGradient(d.text, s.shadowColorGradient);
+            break;
+        case Prop::OutlineColorGradient:
+            s.outlineColor = {};
+            s.outlineColorSet = true;
+            if (d.text.empty()) s.outlineColorGradient = {};
+            else ParseLinearGradient(d.text, s.outlineColorGradient);
             break;
         case Prop::BackgroundImage:
             break;
@@ -497,7 +545,16 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         return colorOrGradient(Prop::BorderColor, Prop::BorderColorGradient);
     if (name == "shadow-color")
         return colorOrGradient(Prop::ShadowColor, Prop::ShadowColorGradient);
+    if (name == "outline-color")
+        return colorOrGradient(Prop::OutlineColor, Prop::OutlineColorGradient);
     if (name == "border-width") return number(Prop::BorderWidth);
+    if (name == "outline-width") return number(Prop::OutlineWidth);
+    if (name == "outline-style") {
+        if (value != "none" && value != "solid") return false;
+        out.prop = Prop::OutlineStyle;
+        out.value = {{value == "solid" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
+        return true;
+    }
     if (name == "border-radius" || name == "rounding") return number(Prop::Rounding);
     if (name == "border-radius-top-left") return number(Prop::RoundingTopLeft);
     if (name == "border-radius-top-right") return number(Prop::RoundingTopRight);
@@ -506,6 +563,65 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     if (name == "font-size") return number(Prop::FontSize);
     if (name == "gap" || name == "spacing") return number(Prop::Spacing);
     if (name == "shadow-blur") return number(Prop::ShadowBlur);
+    if (name == "shadow-enabled") {
+        if (value != "true" && value != "false") return false;
+        out.prop = Prop::ShadowEnabled;
+        out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "window-can-dock" || name == "window-child-dock") {
+        if (value != "true" && value != "false") return false;
+        out.prop = name == "window-can-dock" ? Prop::WindowCanDock : Prop::WindowChildDock;
+        out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "outline") {
+        if (value == "none") {
+            out.prop = Prop::Outline;
+            out.value = {{0.f, 0.f, 0.f, 0.f}};
+            out.text = "none";
+            return true;
+        }
+        std::string_view remaining = value;
+        bool hasWidth = false, hasStyle = false, hasColor = false;
+        float width = 0.f;
+        std::string colorText;
+        while (!(remaining = Trim(remaining)).empty()) {
+            size_t split = 0;
+            int depth = 0;
+            for (; split < remaining.size(); ++split) {
+                if (remaining[split] == '(') ++depth;
+                else if (remaining[split] == ')') --depth;
+                else if (depth == 0 &&
+                         std::isspace(static_cast<unsigned char>(remaining[split])))
+                    break;
+            }
+            const std::string_view token = remaining.substr(0, split);
+            remaining = split == remaining.size() ? std::string_view{}
+                                                   : remaining.substr(split);
+            float parsedWidth = 0.f;
+            if (token == "solid" && !hasStyle) {
+                hasStyle = true;
+            } else if (ParseNumber(token, parsedWidth) && !hasWidth &&
+                       parsedWidth >= 0.f) {
+                width = parsedWidth;
+                hasWidth = true;
+            } else {
+                Color parsedColor;
+                LinearGradient parsedGradient;
+                if (hasColor || (!ParseColor(token, parsedColor) &&
+                                 !ParseLinearGradient(token, parsedGradient)))
+                    return false;
+                colorText = std::string(token);
+                hasColor = true;
+            }
+        }
+        if (!hasWidth || !hasStyle || !hasColor) return false;
+        out.prop = Prop::Outline;
+        out.value = {{width, 1.f, 0.f, 0.f}};
+        out.text = std::move(colorText);
+        return true;
+    }
     if (name == "opacity") return number(Prop::Opacity);
     if (name == "transition-speed") return number(Prop::TransitionSpeed);
     if (name == "padding") {
@@ -646,28 +762,65 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
 
 bool ResolveVariables(std::string_view source,
                       const std::unordered_map<std::string, std::string>& variables,
-                      std::string& resolved) {
-    resolved.assign(source);
-    for (size_t position = 0; (position = resolved.find("var(", position)) != std::string::npos;) {
-        const size_t close = resolved.find(')', position + 4);
-        if (close == std::string::npos) return false;
-        const std::string_view expression(resolved.data() + position + 4,
-                                          close - position - 4);
-        const size_t comma = expression.find(',');
-        const std::string key(Trim(expression.substr(0, comma)));
-        auto value = variables.find(key);
-        std::string replacement;
-        if (value != variables.end()) {
-            replacement = value->second;
-        } else if (comma != std::string_view::npos) {
-            replacement = std::string(Trim(expression.substr(comma + 1)));
-        } else {
-            return false;
+                      std::vector<std::string>& resolving, std::string& resolved) {
+    resolved.clear();
+    size_t position = 0;
+    while (position < source.size()) {
+        const size_t variableStart = source.find("var(", position);
+        if (variableStart == std::string_view::npos) {
+            resolved.append(source.substr(position));
+            return true;
         }
-        resolved.replace(position, close - position + 1, replacement);
-        position += replacement.size();
+        resolved.append(source.substr(position, variableStart - position));
+
+        size_t close = variableStart + 4;
+        size_t depth = 1;
+        for (; close < source.size() && depth > 0; ++close) {
+            if (source[close] == '(') ++depth;
+            else if (source[close] == ')') --depth;
+        }
+        if (depth != 0) return false;
+        --close;
+
+        const std::string_view expression =
+            source.substr(variableStart + 4, close - variableStart - 4);
+        size_t comma = std::string_view::npos;
+        depth = 0;
+        for (size_t i = 0; i < expression.size(); ++i) {
+            if (expression[i] == '(') ++depth;
+            else if (expression[i] == ')') --depth;
+            else if (expression[i] == ',' && depth == 0) {
+                comma = i;
+                break;
+            }
+        }
+        const std::string key(Trim(expression.substr(0, comma)));
+        const auto value = variables.find(key);
+        const bool cyclic = std::find(resolving.begin(), resolving.end(), key) !=
+                            resolving.end();
+        std::string replacement;
+        bool valid = false;
+        if (value != variables.end() && !cyclic) {
+            resolving.push_back(key);
+            valid = ResolveVariables(value->second, variables, resolving, replacement);
+            resolving.pop_back();
+        }
+        if (!valid && comma != std::string_view::npos)
+            valid = ResolveVariables(Trim(expression.substr(comma + 1)),
+                                     variables, resolving, replacement);
+        if (!valid) return false;
+
+        resolved.append(replacement);
+        position = close + 1;
     }
     return true;
+}
+
+bool ResolveVariables(std::string_view source,
+                      const std::unordered_map<std::string, std::string>& variables,
+                      std::string& resolved) {
+    std::vector<std::string> resolving;
+    return ResolveVariables(source, variables, resolving, resolved);
 }
 
 void CollectVariables(std::string_view source,
@@ -917,6 +1070,7 @@ StyleSheet StyleSheet::Dark() {
     using C = Color;
     StyleSheet s;
 
+    s.Rule("*:disabled").Opacity(0.55f);
     s.Rule("*").Foreground(C::FromHex(0xE7EDF7FF)).FontSize(15).Spacing(8).TransitionSpeed(16);
 
     s.Rule("window")
@@ -946,10 +1100,48 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("menu-item:checked")
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("context-menu").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(5)).ShadowColor(C::FromHex(0x00000088)).ShadowBlur(14);
+    s.Rule("context-menu-item").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(5, 10)).Rounding(4);
+    s.Rule("context-menu-item:hover")
+        .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("hint").Background(C::FromHex(0x182231FF))
+        .Foreground(C::FromHex(0xDCE6F5FF)).BorderColor(C::FromHex(0x3A4B64FF))
+        .BorderWidth(1).Rounding(7).Padding(Edges(6, 10))
+        .ShadowColor(C::FromHex(0x000000AA)).ShadowBlur(12);
+    s.Rule("notification").Background(C::FromHex(0x182231FF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).BorderColor(C::FromHex(0x5A91F7FF))
+        .BorderWidth(1).Rounding(8).Padding(Edges(8, 14))
+        .ShadowColor(C::FromHex(0x000000CC)).ShadowBlur(18);
     s.Rule("window-scrollbar")
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
+    s.Rule("container-scrollbar")
+        .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
+    s.Rule("popup").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(8)).ShadowColor(C::FromHex(0x000000AA)).ShadowBlur(14);
+    s.Rule("input-text").Background(C::FromHex(0x0C121BFF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).BorderColor(C::FromHex(0x526783FF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
+    s.Rule("input-text:active").BorderColor(C::FromHex(0x5A91F7FF));
+    s.Rule("selectable").Foreground(C::FromHex(0xDCE6F5FF))
+        .Padding(Edges(5, 8));
+    s.Rule("selectable:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("selectable:checked").Background(C::FromHex(0x2F5E9AFF));
+    s.Rule("tree-node").Foreground(C::FromHex(0xDCE6F5FF))
+        .Padding(Edges(4, 8));
+    s.Rule("tree-node:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("collapsing-header").Background(C::FromHex(0x1B2839FF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).Padding(Edges(6, 8));
+    s.Rule("collapsing-header:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("separator").Foreground(C::FromHex(0x526783FF)).BorderWidth(1);
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
+    s.Rule("dock-splitter").Background(C::FromHex(0x8999B0AA)).Rounding(2);
+    s.Rule("dock-splitter:hover").Background(C::FromHex(0x5A91F7FF));
+    s.Rule("dock-splitter:active").Background(C::FromHex(0x82B2FFFF));
 
     s.Rule("text").Padding(Edges(2, 0)).Foreground(C::FromHex(0xCFD9E8FF));
 
@@ -993,10 +1185,38 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x344D6AFF))
         .BorderWidth(1).Rounding(7).Padding(Edges(7, 11));
     s.Rule("tab:checked").Background(C::FromHex(0x386FE0FF)).BorderColor(C::FromHex(0x6190E8FF));
+    s.Rule("dock-tab-bar").Background(C::FromHex(0x121A26FF))
+        .Padding(Edges(2, 4)).Spacing(2);
+    s.Rule("dock-tab").Background(C::FromHex(0x1B2737FF))
+        .Foreground(C::FromHex(0xAEBBD0FF)).Padding(Edges(4, 10));
+    s.Rule("dock-tab:hover").Background(C::FromHex(0x2A3A50FF));
+    s.Rule("dock-tab:checked").Background(C::FromHex(0x2F5E9AFF))
+        .Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("dropdown")
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
     s.Rule("dropdown:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("progress-bar").Background(C::FromHex(0x111A27FF))
+        .BorderColor(C::FromHex(0x34445AFF)).BorderWidth(1).Rounding(6)
+        .Accent(C::FromHex(0x5A91F7FF)).Padding(Edges(2, 6));
+    s.Rule("tile-container").Background(C::FromHex(0x111A27FF))
+        .BorderColor(C::FromHex(0x34445AFF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(6)).Spacing(6);
+    s.Rule("tile").Background(C::FromHex(0x1B2839FF))
+        .BorderColor(C::FromHex(0x344D6AFF)).BorderWidth(1).Rounding(7)
+        .Accent(C::FromHex(0x5A91F7FF)).Padding(Edges(6));
+    s.Rule("tile:hover").BorderColor(C::FromHex(0x7EA8E9FF));
+    s.Rule("tile:checked").Background(C::FromHex(0x2F5E9AFF))
+        .BorderColor(C::FromHex(0x6190E8FF));
+    s.Rule("console-output")
+        .Background(C::FromHex(0x000000FF)).BorderColor(C::FromHex(0x34445AFF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
+    s.Rule("console-output-normal").Foreground(C::FromHex(0xE2E8F0FF));
+    s.Rule("console-output-warning").Foreground(C::FromHex(0xFFC857FF));
+    s.Rule("console-output-error").Foreground(C::FromHex(0xFF6B6BFF));
+    s.Rule("console-input")
+        .Background(C::FromHex(0x0C121BFF)).BorderColor(C::FromHex(0x526783FF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
     s.Rule("image-button")
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));

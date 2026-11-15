@@ -1,65 +1,30 @@
-/* ================= COLORS & VARIABLES ================= */
+:root {
+    --ui-accent: #2B6ED9;
+    --ui-accent-muted: rgba(10, 26, 53, 0.09);
 
-*:root {
-    /* Accent */
-    --ui-accent: #0e6fff;
-    --ui-accent-hover: #217aff;
-    --ui-accent-active: #1967db;
-
-    /* Backgrounds */
-    --ui-window: #080808;
-    --ui-panel: #171717;
-    --ui-panel-hover: #202020;
-    --ui-panel-active: #2A2A2A;
+    --ui-window: #050506;
+    --ui-sunken: #000000;
+    --ui-panel: #030303;
+    --ui-panel-hover: #101216;
+    --ui-panel-active: #161A20;
     --ui-overlay: transparent;
 
-    /* Borders */
-    --ui-border: #171717;
-    --ui-border-hover: #414141;
-    --ui-border-active: #59667A;
+    --ui-border: #141619;
+    --ui-border-hover: #242932;
+    --ui-window-border: #030303;
 
-    /* Text */
-    --ui-text: #FFFFFF;
-    --ui-text-secondary: #BABABA;
-    --ui-text-muted: #C8CDD5;
+    --ui-text: #E8E8E8;
+    --ui-text-secondary: #777E89;
+    --ui-text-muted: #A5ABB5;
 
-    /* Danger */
-    --ui-danger: #e62626;
-    --ui-danger-hover: #f74848;
-    --ui-danger-border: #be1c1c;
+    --ui-danger: #D9363E;
+    --ui-danger-hover: #E54850;
+    --ui-danger-border: #B92D35;
 
-    /* Gradients */
-    --ui-window-gradient: linear-gradient(
-        180deg,
-        #080808 0%,
-        #181717 100%
-    );
-
-    --ui-demo-gradient: linear-gradient(
-        90deg,
-        #0E6FFF 0%,
-        #3E66E8 25%,
-        #7D4FE0 50%,
-        #C44DC8 75%,
-        #F26A85 100%
-    );
-
-    --ui-text-gradient: linear-gradient(
-        90deg,
-        #62D5FF 0%,
-        #789EFF 25%,
-        #A991FF 50%,
-        #D78AE8 75%,
-        #FF86C8 100%
-    );
-
-    /* Miscellaneous */
-    --ui-radius: 6px;
-    --ui-dock-splitter: rgba(112, 124, 144, 0.46);
-    --ui-dock-shadow: rgba(0, 0, 0, 0.9);
+    --ui-radius: 10px;
+    --ui-outline-width: 1px;
+    --ui-dock-splitter: rgba(255, 255, 255, 0.045);
 }
-
-/* ================= GLOBAL ================= */
 
 * {
     color: var(--ui-text);
@@ -68,23 +33,27 @@
     transition-speed: 5;
 }
 
-/* ================= WINDOW ================= */
+*:disabled {
+    opacity: 0.55;
+}
 
 window {
-    background: var(--ui-window-gradient);
-    border-color: transparent;
-    border-width: 2px;
+    background: var(--ui-window);
+    border-color: var(--ui-window-border);
+    border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
-    shadow-color: transparent;
-    shadow-blur: 0px;
+    outline: 1px solid var(--ui-window-border);
+    shadow-enabled: true;
     padding: 5px;
+    window-can-dock: true;
+    window-child-dock: true;
 }
 
 window-title {
-    background: var(--ui-panel);
+    background: #141414;
     color: var(--ui-text-secondary);
     font-size: 16px;
-    padding: 7px 7px;
+    padding: 7px;
     border-radius-top-left: var(--ui-radius);
     border-radius-top-right: var(--ui-radius);
     border-radius-bottom-left: 0px;
@@ -102,6 +71,34 @@ window-close:hover {
     color: var(--ui-text);
 }
 
+dock-tab-bar {
+    background: var(--ui-sunken);
+    border-color: var(--ui-border);
+    border-width: var(--ui-outline-width);
+    padding: 2px 4px;
+    gap: 2px;
+}
+
+dock-tab {
+    background: var(--ui-panel);
+    color: var(--ui-text-secondary);
+    border-color: var(--ui-border);
+    border-width: var(--ui-outline-width);
+    border-radius: var(--ui-radius);
+    padding: 4px 10px;
+}
+
+dock-tab:hover {
+    background: var(--ui-panel-hover);
+    border-color: var(--ui-border-hover);
+}
+
+dock-tab:checked {
+    background: var(--ui-accent-muted);
+    border-color: var(--ui-accent);
+    color: var(--ui-text);
+}
+
 main-menu-bar {
     background: var(--ui-window);
     border-color: var(--ui-border);
@@ -116,13 +113,14 @@ menu {
     padding: 4px 10px;
 }
 
-menu:hover, menu:checked {
+menu:hover,
+menu:checked {
     background: var(--ui-panel-hover);
 }
 
 menu-popup {
     background: var(--ui-panel);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-window-border);
     border-radius: var(--ui-radius);
     padding: 4px;
 }
@@ -134,14 +132,18 @@ menu-item {
     padding: 5px 10px;
 }
 
-menu-item:hover, menu-item:checked {
-    background: var(--ui-accent);
+menu-item:hover,
+menu-item:checked {
+    background: var(--ui-panel-hover);
     color: var(--ui-text);
 }
 
-/* ================= SCROLLING ================= */
-
 window-scrollbar {
+    background: var(--ui-panel);
+    accent: var(--ui-accent);
+}
+
+container-scrollbar {
     background: var(--ui-panel);
     accent: var(--ui-accent);
 }
@@ -152,22 +154,25 @@ window-resize {
 
 dock-preview {
     background: var(--ui-accent);
-    accent: var(--ui-accent-hover);
+    accent: var(--ui-accent);
     border-radius: var(--ui-radius);
 }
 
 dock-splitter {
     background: var(--ui-dock-splitter);
-    accent: var(--ui-accent-hover);
-    border-radius: var(--ui-radius);
+    accent: var(--ui-accent);
+    border-radius: 2px;
+}
+
+dock-splitter:hover,
+dock-splitter:active {
+    background: var(--ui-accent);
 }
 
 dock-menu {
     background: var(--ui-window);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-window-border);
     border-radius: var(--ui-radius);
-    shadow-color: var(--ui-dock-shadow);
-    shadow-blur: 12px;
 }
 
 dock-menu.docking-options {
@@ -175,8 +180,8 @@ dock-menu.docking-options {
 }
 
 dock-target {
-    background: var(--ui-window);
-    border: 1px solid var(--ui-border-hover);
+    background: var(--ui-panel);
+    border: var(--ui-outline-width) solid var(--ui-border-hover);
     border-radius: var(--ui-radius);
     color: var(--ui-text);
     font-size: 13px;
@@ -187,29 +192,33 @@ dock-target.docking-options {
 }
 
 dock-target.docking-options:hover {
-    background: var(--ui-accent-hover);
+    background: var(--ui-accent-muted);
     border-color: var(--ui-accent);
+}
+
+dock-highlight {
+    color: var(--ui-accent);
 }
 
 empty-widget {
     background: var(--ui-panel);
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
 
 empty-widget.brand {
     background: var(--ui-panel);
-    background-image: url("../src/Icons/FolderIcn.png");
+    background-image: url("../src/Icons/FolderIcn.svg");
     background-size: contain;
     background-position: center;
-    border: 1px solid var(--ui-border);
+    border: var(--ui-outline-width) solid var(--ui-border);
     border-radius: var(--ui-radius);
 }
 
 image-widget {
     background: var(--ui-panel);
     border-color: var(--ui-border);
-    border-width: 2px;
+    border-width: 1px;
     border-radius: var(--ui-radius);
     padding: 8px;
     background-size: contain;
@@ -222,31 +231,20 @@ image-widget.icon-card {
     padding: 8px;
 }
 
-empty-widget.gradient-demo {
-    background: var(--ui-demo-gradient);
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius);
-}
-
-/* ================= TEXT ================= */
-
 text {
-    color: var(--ui-text-muted);
+    color: var(--ui-text);
     padding: 2px 0;
 }
 
-text-label, image-label {
+text-label,
+image-label {
     gap: 6px;
 }
 
-text.gradient-text {
-    text-gradient: var(--ui-text-gradient);
-}
-
-/* ================= BUTTONS ================= */
-
-button, dropdown, image-button {
-    background: var(--ui-panel-hover);
+button,
+dropdown,
+image-button {
+    background: var(--ui-panel);
     color: var(--ui-text);
     border-color: var(--ui-border);
     border-width: 1px;
@@ -254,36 +252,28 @@ button, dropdown, image-button {
     padding: 6px 12px;
 }
 
-button:hover, dropdown:hover, image-button:hover {
-    background: var(--ui-panel-active);
+button:hover,
+dropdown:hover,
+image-button:hover {
+    background: #181B22;
     border-color: var(--ui-border-hover);
 }
 
 button:active {
-    background: var(--ui-accent-active);
+    background: var(--ui-accent);
+    border-color: var(--ui-accent);
 }
 
 button.primary {
     background: var(--ui-accent);
     border-color: var(--ui-accent);
-    color: var(--ui-text);
+    color: #FFFFFF;
 }
 
 button.primary:hover {
-    background: var(--ui-accent-hover);
-    border-color: var(--ui-accent-hover);
+    background: #347BE8;
+    border-color: #347BE8;
 }
-
-button.primary.emphasis {
-}
-
-button.gradient-demo {
-    background: var(--ui-demo-gradient);
-    border-color: var(--ui-accent);
-    color: var(--ui-text);
-}
-
-/* ================= DESTRUCTIVE BUTTONS ================= */
 
 button.danger {
     background: var(--ui-danger);
@@ -294,21 +284,161 @@ button.danger:hover {
     background: var(--ui-danger-hover);
 }
 
-/* ================= CHECKBOXES ================= */
+progress-bar {
+    background: var(--ui-sunken);
+    accent: var(--ui-accent);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 2px 6px;
+}
 
-checkbox, radio {
+tile-container {
+    background: var(--ui-sunken);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px;
+    gap: 6px;
+}
+
+tile {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px;
+}
+
+tile:hover,
+tile:checked {
+    background: var(--ui-panel-active);
+    border-color: var(--ui-accent);
+}
+
+console-output {
+    background: #000000;
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px 8px;
+}
+
+console-input {
+    background: var(--ui-sunken);
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px 8px;
+}
+
+popup {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-window-border);
+    border-radius: var(--ui-radius);
+    padding: 8px;
+    shadow-color: rgba(0, 0, 0, 0.67);
+    shadow-blur: 14px;
+}
+
+input-text {
+    background: var(--ui-sunken);
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px 8px;
+}
+
+input-text:active {
+    border-color: var(--ui-accent);
+}
+
+selectable,
+tree-node {
+    color: var(--ui-text);
+    padding: 5px 8px;
+}
+
+selectable:hover,
+tree-node:hover,
+collapsing-header:hover {
     background: var(--ui-panel-hover);
-    border-color: var(--ui-border-hover);
+}
+
+selectable:checked {
+    background: var(--ui-accent-muted);
+}
+
+collapsing-header {
+    background: var(--ui-panel);
+    color: var(--ui-text);
+    padding: 6px 8px;
+}
+
+separator {
+    color: var(--ui-border-hover);
+    border-width: 1px;
+}
+
+console-output-normal {
+    color: var(--ui-text);
+}
+
+console-output-warning {
+    color: #FFC857;
+}
+
+console-output-error {
+    color: var(--ui-danger-hover);
+}
+
+context-menu {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-window-border);
+    border-radius: var(--ui-radius);
+    padding: 4px;
+}
+
+context-menu-item {
+    background: transparent;
+    color: var(--ui-text-muted);
+    border-radius: var(--ui-radius);
+    padding: 5px 10px;
+}
+
+context-menu-item:hover {
+    background: var(--ui-panel-hover);
+    color: var(--ui-text);
+}
+
+hint,
+notification {
+    background: var(--ui-panel);
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border-hover);
+    border-radius: var(--ui-radius);
+    padding: 7px 11px;
+    shadow-enabled: true;
+    shadow-color: rgba(0, 0, 0, 0.72);
+    shadow-blur: 12px;
+}
+
+notification {
+    border-color: var(--ui-accent);
+    padding: 9px 16px;
+    shadow-blur: 18px;
+}
+
+checkbox,
+radio {
+    background: var(--ui-panel-hover);
+    border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
     accent: var(--ui-accent);
 }
 
-checkbox:hover, radio:hover {
-    border-color: var(--ui-accent-hover);
+checkbox:hover,
+radio:hover {
+    border-color: var(--ui-accent);
 }
-
-/* ================= TOGGLES ================= */
 
 toggle {
     background: var(--ui-panel-active);
@@ -316,8 +446,6 @@ toggle {
     color: var(--ui-text);
     gap: 8px;
 }
-
-/* ================= SLIDERS ================= */
 
 slider {
     background: var(--ui-panel-hover);
@@ -327,22 +455,20 @@ slider {
 }
 
 slider:hover {
-    accent: var(--ui-accent-hover);
+    accent: var(--ui-accent);
 }
 
-/* ================= PANELS ================= */
-
-container, collapsible-container,
-horizontal-list, vertical-list {
-    background: var(--ui-panel);
+container,
+collapsible-container,
+horizontal-list,
+vertical-list {
+    background: #0D0D0D;
     border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
     padding: 8px;
     gap: 6px;
 }
-
-/* ================= TABS ================= */
 
 tab {
     background: var(--ui-panel-hover);
@@ -352,8 +478,13 @@ tab {
     padding: 6px 10px;
 }
 
+tab:hover {
+    background: var(--ui-panel-active);
+    border-color: var(--ui-border-hover);
+}
+
 tab:checked {
-    background: var(--ui-accent);
+    background: var(--ui-accent-muted);
     border-color: var(--ui-accent);
     color: var(--ui-text);
 }

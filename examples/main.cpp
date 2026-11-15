@@ -1,6 +1,11 @@
 #define NOMINMAX
 #include <windows.h>
 #include <wincodec.h>
+#include <d2d1_1.h>
+#include <d2d1_3.h>
+#include <d2d1svg.h>
+#include <d3d11.h>
+#include <dxgi1_2.h>
 #include <GLFW/glfw3.h>
 #include "../src/FluidUI/FluidUI.h"
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -8,8 +13,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cstdio>
 #include <cmath>
+#include <cstring>
+#include <cstdlib>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -23,9 +31,52 @@ using namespace fluid;
 constexpr GLenum kGlMultisample = 0x809D;
 
 static float gMouseWheel = 0.f;
+static std::string gTextInput;
+static std::array<bool, InputState::KeyCount> gKeysDown{};
+static std::array<bool, InputState::KeyCount> gKeysPressed{};
+static bool gBackspacePressed = false;
+static bool gEnterPressed = false;
+static bool gSelectAllPressed = false;
+static bool gCopyPressed = false;
+static bool gPastePressed = false;
 
 static void OnScroll(GLFWwindow*, double, double yOffset) {
     gMouseWheel += static_cast<float>(yOffset);
+}
+
+static void OnChar(GLFWwindow*, unsigned int codepoint) {
+    if (codepoint <= 0x7Fu) {
+        gTextInput.push_back(static_cast<char>(codepoint));
+    } else if (codepoint <= 0x7FFu) {
+        gTextInput.push_back(static_cast<char>(0xC0u | (codepoint >> 6)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    } else if (codepoint <= 0xFFFFu) {
+        gTextInput.push_back(static_cast<char>(0xE0u | (codepoint >> 12)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 6) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    } else {
+        gTextInput.push_back(static_cast<char>(0xF0u | (codepoint >> 18)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 12) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 6) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    }
+}
+
+static void OnKey(GLFWwindow*, int key, int, int action, int mods) {
+    if (key >= 0 && static_cast<size_t>(key) < InputState::KeyCount) {
+        if (action == GLFW_PRESS) {
+            gKeysDown[static_cast<size_t>(key)] = true;
+            gKeysPressed[static_cast<size_t>(key)] = true;
+        } else if (action == GLFW_RELEASE) {
+            gKeysDown[static_cast<size_t>(key)] = false;
+        }
+    }
+    if (action != GLFW_PRESS && action != GLFW_REPEAT) return;
+    if (key == GLFW_KEY_BACKSPACE) gBackspacePressed = true;
+    if (key == GLFW_KEY_ENTER) gEnterPressed = true;
+    if (key == GLFW_KEY_A && (mods & GLFW_MOD_CONTROL)) gSelectAllPressed = true;
+    if (key == GLFW_KEY_C && (mods & GLFW_MOD_CONTROL)) gCopyPressed = true;
+    if (key == GLFW_KEY_V && (mods & GLFW_MOD_CONTROL)) gPastePressed = true;
 }
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
@@ -179,6 +230,258 @@ static GLuint CreateTextureFromImage(const std::filesystem::path& path, int& wid
     return texture;
 }
 
+static bool SvgDimension(const std::string& svg, std::string_view name, float& value) {
+    const size_t root = svg.find("<svg");
+    const size_t rootEnd = root == std::string::npos ? root : svg.find('>', root);
+    if (root == std::string::npos || rootEnd == std::string::npos) return false;
+    const std::string key = std::string(name) + "=";
+    size_t position = svg.find(key, root);
+    if (position == std::string::npos || position >= rootEnd) return false;
+    position += key.size();
+    if (position >= rootEnd || (svg[position] != '"' && svg[position] != '\'')) return false;
+    const char quote = svg[position++];
+    char* end = nullptr;
+    value = std::strtof(svg.c_str() + position, &end);
+    return end != svg.c_str() + position && end < svg.c_str() + rootEnd &&
+           std::isfinite(value) && value > 0.f;
+}
+
+static bool SvgPixelSize(const std::string& svg, int& width, int& height) {
+    float widthValue = 0.f, heightValue = 0.f;
+    const bool hasWidth = SvgDimension(svg, "width", widthValue);
+    const bool hasHeight = SvgDimension(svg, "height", heightValue);
+    if (!hasWidth || !hasHeight) {
+        const size_t root = svg.find("<svg");
+        const size_t viewBox = root == std::string::npos ? root : svg.find("viewBox=", root);
+        const size_t rootEnd = root == std::string::npos ? root : svg.find('>', root);
+        if (viewBox != std::string::npos && viewBox < rootEnd) {
+            const size_t valueStart = svg.find_first_of("\"'", viewBox + 8);
+            if (valueStart != std::string::npos && valueStart < rootEnd) {
+                char* end = nullptr;
+                const char* value = svg.c_str() + valueStart + 1;
+                float values[4]{};
+                bool parsed = true;
+                for (float& part : values) {
+                    while (*value == ' ' || *value == '\t' || *value == '\r' ||
+                           *value == '\n' || *value == ',')
+                        ++value;
+                    part = std::strtof(value, &end);
+                    if (end == value || !std::isfinite(part)) { parsed = false; break; }
+                    value = end;
+                }
+                if (parsed && values[2] > 0.f && values[3] > 0.f) {
+                    if (!hasWidth) widthValue = values[2];
+                    if (!hasHeight) heightValue = values[3];
+                }
+            }
+        }
+    }
+    if (!hasWidth && widthValue <= 0.f) widthValue = 256.f;
+    if (!hasHeight && heightValue <= 0.f) heightValue = 256.f;
+    if (widthValue <= 0.f || heightValue <= 0.f) return false;
+    const double widthDouble = widthValue, heightDouble = heightValue;
+    const double scale = std::min({1.0, 4096.0 / widthDouble, 4096.0 / heightDouble,
+        std::sqrt(16777216.0 / (widthDouble * heightDouble))});
+    width = std::max(1, static_cast<int>(std::lround(widthDouble * scale)));
+    height = std::max(1, static_cast<int>(std::lround(heightDouble * scale)));
+    return true;
+}
+
+static bool RasterizeSvg(const std::filesystem::path& path, int& width, int& height,
+                         std::vector<unsigned char>& pixels, std::string& error) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        error = "Could not open SVG image: " + path.string();
+        return false;
+    }
+    const std::string svg{std::istreambuf_iterator<char>(file),
+                          std::istreambuf_iterator<char>()};
+    if (svg.empty() || !SvgPixelSize(svg, width, height)) {
+        error = "SVG image is empty or has invalid dimensions: " + path.string();
+        return false;
+    }
+    if (svg.size() > static_cast<size_t>(std::numeric_limits<ULONG>::max())) {
+        error = "SVG image is too large to decode: " + path.string();
+        return false;
+    }
+
+    ID2D1Factory1* factory = nullptr;
+    ID3D11Device* d3dDevice = nullptr;
+    IDXGIDevice* dxgiDevice = nullptr;
+    ID2D1Device* d2dDevice = nullptr;
+    ID2D1DeviceContext* baseD2dContext = nullptr;
+    ID2D1DeviceContext5* d2dContext = nullptr;
+    ID2D1Bitmap1* targetBitmap = nullptr;
+    ID2D1Bitmap1* readbackBitmap = nullptr;
+    ID2D1SvgDocument* document = nullptr;
+    IStream* stream = nullptr;
+    auto release = [&]() {
+        if (stream) stream->Release();
+        if (document) document->Release();
+        if (readbackBitmap) readbackBitmap->Release();
+        if (targetBitmap) targetBitmap->Release();
+        if (d2dContext) d2dContext->Release();
+        if (baseD2dContext) baseD2dContext->Release();
+        if (d2dDevice) d2dDevice->Release();
+        if (dxgiDevice) dxgiDevice->Release();
+        if (d3dDevice) d3dDevice->Release();
+        if (factory) factory->Release();
+    };
+    auto fail = [&](const char* reason, HRESULT result) {
+        char message[160];
+        std::snprintf(message, sizeof(message), "%s (HRESULT 0x%08lX)",
+                      reason, static_cast<unsigned long>(result));
+        error = message;
+        release();
+        return false;
+    };
+
+    D2D1_FACTORY_OPTIONS factoryOptions{};
+    HRESULT result = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
+        __uuidof(ID2D1Factory1), &factoryOptions, reinterpret_cast<void**>(&factory));
+    if (FAILED(result)) return fail("Could not create Direct2D factory for SVG", result);
+
+    D3D_FEATURE_LEVEL featureLevel{};
+    result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr,
+        D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0, D3D11_SDK_VERSION,
+        &d3dDevice, &featureLevel, nullptr);
+    if (FAILED(result))
+        result = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_WARP, nullptr,
+            D3D11_CREATE_DEVICE_BGRA_SUPPORT, nullptr, 0, D3D11_SDK_VERSION,
+            &d3dDevice, &featureLevel, nullptr);
+    if (FAILED(result)) return fail("Could not create Direct3D device for SVG", result);
+
+    result = d3dDevice->QueryInterface(__uuidof(IDXGIDevice),
+                                       reinterpret_cast<void**>(&dxgiDevice));
+    if (FAILED(result)) return fail("Could not get DXGI device for SVG", result);
+    result = factory->CreateDevice(dxgiDevice, &d2dDevice);
+    if (FAILED(result)) return fail("Could not create Direct2D device for SVG", result);
+    result = d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE,
+                                             &baseD2dContext);
+    if (FAILED(result)) return fail("Could not create Direct2D context for SVG", result);
+    result = baseD2dContext->QueryInterface(__uuidof(ID2D1DeviceContext5),
+                                             reinterpret_cast<void**>(&d2dContext));
+    if (FAILED(result)) return fail("Direct2D SVG rendering requires Windows 10 or later", result);
+
+    HGLOBAL memory = GlobalAlloc(GMEM_MOVEABLE, svg.size());
+    if (!memory) return fail("Could not allocate SVG stream", E_OUTOFMEMORY);
+    void* memoryData = GlobalLock(memory);
+    if (!memoryData) {
+        GlobalFree(memory);
+        return fail("Could not lock SVG stream", E_OUTOFMEMORY);
+    }
+    std::memcpy(memoryData, svg.data(), svg.size());
+    GlobalUnlock(memory);
+    result = CreateStreamOnHGlobal(memory, TRUE, &stream);
+    if (FAILED(result)) {
+        GlobalFree(memory);
+        return fail("Could not create SVG stream", result);
+    }
+    result = d2dContext->CreateSvgDocument(stream,
+        D2D1_SIZE_F{static_cast<float>(width), static_cast<float>(height)}, &document);
+    if (FAILED(result)) return fail("Could not decode SVG document", result);
+
+    D2D1_BITMAP_PROPERTIES1 bitmapProperties{};
+    bitmapProperties.pixelFormat.format = DXGI_FORMAT_B8G8R8A8_UNORM;
+    bitmapProperties.pixelFormat.alphaMode = D2D1_ALPHA_MODE_PREMULTIPLIED;
+    bitmapProperties.dpiX = 96.f;
+    bitmapProperties.dpiY = 96.f;
+    bitmapProperties.bitmapOptions = D2D1_BITMAP_OPTIONS_TARGET;
+    result = d2dContext->CreateBitmap(D2D1_SIZE_U{static_cast<UINT>(width),
+        static_cast<UINT>(height)}, nullptr, 0, &bitmapProperties, &targetBitmap);
+    if (FAILED(result)) return fail("Could not create SVG render target", result);
+
+    d2dContext->SetTarget(targetBitmap);
+    d2dContext->BeginDraw();
+    d2dContext->Clear(D2D1_COLOR_F{0.f, 0.f, 0.f, 0.f});
+    d2dContext->DrawSvgDocument(document);
+    result = d2dContext->EndDraw();
+    if (FAILED(result)) return fail("Could not render SVG document", result);
+
+    D2D1_BITMAP_PROPERTIES1 readbackProperties = bitmapProperties;
+    readbackProperties.bitmapOptions = static_cast<D2D1_BITMAP_OPTIONS>(
+        D2D1_BITMAP_OPTIONS_CPU_READ | D2D1_BITMAP_OPTIONS_CANNOT_DRAW);
+    result = d2dContext->CreateBitmap(D2D1_SIZE_U{static_cast<UINT>(width),
+        static_cast<UINT>(height)}, nullptr, 0, &readbackProperties, &readbackBitmap);
+    if (FAILED(result)) return fail("Could not create SVG readback bitmap", result);
+    result = readbackBitmap->CopyFromBitmap(nullptr, targetBitmap, nullptr);
+    d2dContext->SetTarget(nullptr);
+    if (FAILED(result)) return fail("Could not copy rendered SVG pixels", result);
+    D2D1_MAPPED_RECT mapped{};
+    result = readbackBitmap->Map(D2D1_MAP_OPTIONS_READ, &mapped);
+    if (FAILED(result)) return fail("Could not read rendered SVG pixels", result);
+
+    pixels.resize(static_cast<size_t>(width) * static_cast<size_t>(height) * 4);
+    for (int y = 0; y < height; ++y) {
+        const auto* source = mapped.bits + static_cast<size_t>(height - 1 - y) * mapped.pitch;
+        unsigned char* destination = pixels.data() +
+            static_cast<size_t>(y) * static_cast<size_t>(width) * 4;
+        for (int x = 0; x < width; ++x) {
+            const unsigned char blue = source[x * 4];
+            const unsigned char green = source[x * 4 + 1];
+            const unsigned char red = source[x * 4 + 2];
+            const unsigned char alpha = source[x * 4 + 3];
+            destination[x * 4] = alpha == 0 ? 0 : static_cast<unsigned char>(
+                std::min(255u, (static_cast<unsigned int>(red) * 255u + alpha / 2u) / alpha));
+            destination[x * 4 + 1] = alpha == 0 ? 0 : static_cast<unsigned char>(
+                std::min(255u, (static_cast<unsigned int>(green) * 255u + alpha / 2u) / alpha));
+            destination[x * 4 + 2] = alpha == 0 ? 0 : static_cast<unsigned char>(
+                std::min(255u, (static_cast<unsigned int>(blue) * 255u + alpha / 2u) / alpha));
+            destination[x * 4 + 3] = alpha;
+        }
+    }
+    readbackBitmap->Unmap();
+    release();
+    error.clear();
+    return true;
+}
+
+static GLuint CreateTextureFromSvg(const std::filesystem::path& path, int& width, int& height,
+                                   std::string& error) {
+    std::vector<unsigned char> pixels;
+    if (!RasterizeSvg(path, width, height, pixels, error)) return 0;
+    GLuint texture = 0;
+    GLint previousTexture = 0, previousUnpackAlignment = 4;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &previousUnpackAlignment);
+    glGenTextures(1, &texture);
+    if (texture == 0) {
+        error = "OpenGL did not allocate a texture for the SVG image";
+        return 0;
+    }
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    constexpr GLint clampToEdge = 0x812F;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+    const GLenum uploadError = glGetError();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, previousUnpackAlignment);
+    glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(previousTexture));
+    if (uploadError != GL_NO_ERROR) {
+        glDeleteTextures(1, &texture);
+        error = "OpenGL texture upload failed for SVG image";
+        return 0;
+    }
+    error.clear();
+    return texture;
+}
+
+static GLuint CreateTextureFromFile(const std::filesystem::path& path, int& width, int& height,
+                                    std::string& error) {
+    std::string extension = path.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    if (extension == ".svg") return CreateTextureFromSvg(path, width, height, error);
+    if (extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+        return CreateTextureFromImage(path, width, height, error);
+    error = "Unsupported image format '" + extension + "' for " + path.string();
+    return 0;
+}
+
 struct DemoFontAtlas {
     static constexpr int Width = 512;
     static constexpr int Height = 512;
@@ -311,7 +614,21 @@ private:
     std::array<stbtt_bakedchar, DemoFontAtlas::CharacterCount> glyphs_;
 };
 
-int main() {
+int main(int argc, char** argv) {
+    std::filesystem::path layoutPath =
+        std::filesystem::current_path() / "fluidui-layout.ini";
+    for (int i = 1; i < argc; ++i) {
+        if (std::string_view(argv[i]) != "--layout" || i + 1 >= argc) {
+            std::fprintf(stderr, "Usage: %s [--layout <path>]\n", argv[0]);
+            return 1;
+        }
+        layoutPath = std::filesystem::path(argv[++i]);
+        if (layoutPath.empty()) {
+            std::fprintf(stderr, "Layout file path must not be empty\n");
+            return 1;
+        }
+    }
+
     if (!glfwInit()) return 1;
     glfwWindowHint(GLFW_SAMPLES, 4);
     GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI component and docking demo", nullptr, nullptr);
@@ -319,6 +636,8 @@ int main() {
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);
     glfwSetScrollCallback(win, OnScroll);
+    glfwSetCharCallback(win, OnChar);
+    glfwSetKeyCallback(win, OnKey);
 
     Context ui;
     ui.Style() = StyleSheet::Dark();
@@ -336,7 +655,7 @@ int main() {
         themePath.parent_path().parent_path() / "src" / "Images" / "Icon.jpg";
     int iconImageWidth = 0, iconImageHeight = 0;
     std::string imageError;
-    const GLuint iconTexture = CreateTextureFromImage(
+    const GLuint iconTexture = CreateTextureFromFile(
         iconImagePath, iconImageWidth, iconImageHeight, imageError);
     if (iconTexture == 0) {
         std::fprintf(stderr, "Could not load background image '%s': %s\n",
@@ -353,13 +672,13 @@ int main() {
     int emptyIconWidth = 0, emptyIconHeight = 0;
     int productImageWidth = 0, productImageHeight = 0;
     std::string assetError;
-    const GLuint folderIconTexture = CreateTextureFromImage(
-        repositoryPath / "src" / "Icons" / "FolderIcn.png",
+    const GLuint folderIconTexture = CreateTextureFromFile(
+        repositoryPath / "src" / "Icons" / "FolderIcn.svg",
         folderIconWidth, folderIconHeight, assetError);
-    const GLuint emptyIconTexture = folderIconTexture != 0 ? CreateTextureFromImage(
+    const GLuint emptyIconTexture = folderIconTexture != 0 ? CreateTextureFromFile(
         repositoryPath / "src" / "Icons" / "EmptyIcn.png",
         emptyIconWidth, emptyIconHeight, assetError) : 0;
-    const GLuint productImageTexture = emptyIconTexture != 0 ? CreateTextureFromImage(
+    const GLuint productImageTexture = emptyIconTexture != 0 ? CreateTextureFromFile(
         repositoryPath / "src" / "Images" / "Pr.png",
         productImageWidth, productImageHeight, assetError) : 0;
     if (folderIconTexture == 0 || emptyIconTexture == 0 || productImageTexture == 0) {
@@ -372,6 +691,18 @@ int main() {
         glfwTerminate();
         return 1;
     }
+    ui.Style().RegisterImage("../src/Icons/FolderIcn.svg",
+                             static_cast<GPUImageId>(folderIconTexture),
+                             {static_cast<float>(folderIconWidth),
+                              static_cast<float>(folderIconHeight)});
+    ui.Style().RegisterImage("../src/Icons/EmptyIcn.png",
+                             static_cast<GPUImageId>(emptyIconTexture),
+                             {static_cast<float>(emptyIconWidth),
+                              static_cast<float>(emptyIconHeight)});
+    ui.Style().RegisterImage("../src/Images/Pr.png",
+                             static_cast<GPUImageId>(productImageTexture),
+                             {static_cast<float>(productImageWidth),
+                              static_cast<float>(productImageHeight)});
     DemoFontAtlas fontAtlas;
     std::string fontError;
     const std::filesystem::path fontPath =
@@ -388,6 +719,23 @@ int main() {
     }
     DemoTextBackend demoText(fontAtlas);
     ui.SetTextBackend(&demoText);
+    std::error_code layoutPathError;
+    const bool layoutExists = std::filesystem::exists(layoutPath, layoutPathError);
+    bool layoutLoadFailed = false;
+    if (layoutPathError) {
+        std::fprintf(stderr, "Could not check layout path '%s': %s\n",
+                     layoutPath.string().c_str(), layoutPathError.message().c_str());
+        layoutLoadFailed = true;
+    } else if (layoutExists) {
+        std::string layoutError;
+        if (!ui.LoadLayout(layoutPath.string(), &layoutError)) {
+            std::fprintf(stderr, "%s\n", layoutError.c_str());
+            layoutLoadFailed = true;
+        } else {
+            std::fprintf(stdout, "Loaded window layout from '%s'\n",
+                         layoutPath.string().c_str());
+        }
+    }
     std::array<GLFWcursor*, 5> cursors{
         glfwCreateStandardCursor(GLFW_ARROW_CURSOR),
         glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR),
@@ -397,6 +745,8 @@ int main() {
     };
     GLFWcursor* currentCursor = nullptr;
     const std::vector<std::string_view> choices{"Small", "Medium", "Large"};
+    const std::vector<std::string_view> fileTiles{
+        "Assets", "Documents", "Images", "Projects"};
     const std::vector<Context::TabItem> textTabs{{"Overview", {}}, {"Details", {}}, {"Preview", {}}};
     const std::vector<Context::TabItem> iconTabs{
         {"Home", "H", false}, {"Files", "F", false}, {"Tools", "T", false}};
@@ -405,11 +755,24 @@ int main() {
     bool enabled = true, dockingEnabled = true, expanded = true, showDanger = false;
     bool networkConnected = false;
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
-    float volume = 0.62f;
+    float volume = 0.62f, dragValue = 0.35f;
+    float colorValue[3] = {0.25f, 0.55f, 0.9f};
+    int selectedTile = 0;
+    int lmbClickCount = 0;
+    int selectedItem = 0;
+    std::string consoleCommand, textInputValue, droppedPayload;
+    std::vector<Context::ConsoleLine> consoleOutput{
+        {"Fluid UI console ready.", Context::ConsoleTextType::Normal},
+        {"Type a command and press Enter.", Context::ConsoleTextType::Normal},
+        {"Select text and press Ctrl+C.", Context::ConsoleTextType::Normal},
+        {"Warning: sample warning message.", Context::ConsoleTextType::Warning},
+        {"Error: sample error message.", Context::ConsoleTextType::Error}
+    };
     constexpr std::string_view componentWindow = "Components##main";
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     constexpr std::string_view settingsWindow = "Settings##settings";
+    constexpr std::string_view advancedWindow = "Advanced controls##advanced";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -421,10 +784,33 @@ int main() {
         InputState in;
         in.mousePos = {static_cast<float>(mx), static_cast<float>(my)};
         in.mouseDown[0] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        in.mouseDown[1] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+        in.keysDown = gKeysDown;
+        in.keysPressed = gKeysPressed;
         in.mouseWheel = gMouseWheel;
         gMouseWheel = 0.f;
         in.deltaTime = static_cast<float>(now - last);
         in.displaySize = {static_cast<float>(w), static_cast<float>(h)};
+        const std::string frameTextInput = std::move(gTextInput);
+        gTextInput.clear();
+        in.textInput = frameTextInput;
+        in.keyBackspace = gBackspacePressed;
+        in.keyEnter = gEnterPressed;
+        in.keySelectAll = gSelectAllPressed;
+        in.keyCopy = gCopyPressed;
+        in.keyPaste = gPastePressed;
+        in.keyShift = in.keysDown[GLFW_KEY_LEFT_SHIFT] ||
+                      in.keysDown[GLFW_KEY_RIGHT_SHIFT];
+        in.keyControl = in.keysDown[GLFW_KEY_LEFT_CONTROL] ||
+                        in.keysDown[GLFW_KEY_RIGHT_CONTROL];
+        if (const char* clipboard = glfwGetClipboardString(win))
+            in.clipboardText = clipboard;
+        in.setClipboardText = [win](const std::string& text) {
+            glfwSetClipboardString(win, text.c_str());
+        };
+        gKeysPressed.fill(false);
+        gBackspacePressed = gEnterPressed = gSelectAllPressed = gCopyPressed =
+            gPastePressed = false;
         last = now;
         ui.NewFrame(in);
         ui.DockWindows(dockingEnabled);
@@ -435,7 +821,27 @@ int main() {
                     ui.SetWindowOpen(componentWindow, true);
                 if (ui.MenuItem("Settings..."))
                     ui.SetWindowOpen(settingsWindow, true);
+                if (ui.MenuItem("Advanced controls"))
+                    ui.SetWindowOpen(advancedWindow, true);
                 if (ui.MenuItem("Exit")) glfwSetWindowShouldClose(win, GLFW_TRUE);
+                ui.EndMenu();
+            }
+            if (ui.BeginMenu("Layout")) {
+                std::string layoutError;
+                if (ui.MenuItem("Save layout")) {
+                    if (!ui.SaveLayout(layoutPath.string(), &layoutError))
+                        std::fprintf(stderr, "%s\n", layoutError.c_str());
+                    else
+                        std::fprintf(stdout, "Saved window layout to '%s'\n",
+                                     layoutPath.string().c_str());
+                }
+                if (ui.MenuItem("Load layout")) {
+                    if (!ui.LoadLayout(layoutPath.string(), &layoutError))
+                        std::fprintf(stderr, "%s\n", layoutError.c_str());
+                    else
+                        std::fprintf(stdout, "Loaded window layout from '%s'\n",
+                                     layoutPath.string().c_str());
+                }
                 ui.EndMenu();
             }
             if (ui.BeginMenu("Edit")) {
@@ -462,15 +868,10 @@ int main() {
                     ui.SetWindowOpen(managerWindow, true);
                 ui.EndMenu();
             }
-            if (ui.BeginMenu("Network")) {
-                if (!networkConnected && ui.MenuItem("Connect")) networkConnected = true;
-                if (networkConnected && ui.MenuItem("Disconnect")) networkConnected = false;
-                ui.EndMenu();
-            }
 
-            if (ui.BeginMenu("Clouds")) {
-                if (ui.MenuItem("Create Clouds")) std::puts("Clouds created");
-                if (ui.MenuItem("Configure Clouds and Sky"))
+            if (ui.BeginMenu("Connect engine to Roblox Studio")) {
+                if (ui.MenuItem("Connect to Roblox Studio")) networkConnected = true;
+                if (ui.MenuItem("EDIT API KEY"))
                 ui.EndMenu();
             }
             ui.EndMainMenuBar();
@@ -522,6 +923,35 @@ int main() {
             if (ui.Dropdown("Text menu", choices, &sizeChoice)) {}
             if (ui.Dropdown("Icon menu", choices, &iconChoice, "+", false)) {}
             if (ui.Dropdown("Icon and text menu", choices, &mixedChoice, "*")) {}
+            ui.ProgressBar("Loading sample: 62%", 0.62f, {0, 28});
+            if (ui.TileContainer("Project files", fileTiles, &selectedTile, {0, 150},
+                                 static_cast<GPUImageId>(folderIconTexture),
+                                 {static_cast<float>(folderIconWidth),
+                                  static_cast<float>(folderIconHeight)})) {}
+            ui.Button("LMB_Start / LMB_End demo");
+            if (ui.LMB_Start()) {
+                ++lmbClickCount;
+                ui.LMB_End();
+            }
+            ui.Text("Left-click activations: " + std::to_string(lmbClickCount));
+            ui.Button("Hover for a hint");
+            ui.Hint("Hints appear while the previous widget is hovered.");
+            if (ui.Button("Show notification"))
+                ui.Notification("This is a demo notification.");
+            ui.Button("RMB_Start / RMB_End test");
+            if (ui.RMB_Start()) {
+                if (ui.RMB_Item("Refresh"))
+                    consoleOutput.push_back(
+                        {"Refreshed.", Context::ConsoleTextType::Normal});
+                if (ui.RMB_Item("Clear console")) consoleOutput.clear();
+                ui.RMB_End();
+            }
+            ui.ConsoleOutput("Console log", consoleOutput, {0, 66});
+            if (ui.ConsoleInput("Console command", &consoleCommand)) {
+                consoleOutput.push_back(
+                    {"> " + consoleCommand, Context::ConsoleTextType::Normal});
+                consoleCommand.clear();
+            }
 
             if (ui.BeginChild("Child demo", {0, 62})) {
                 ui.Text("A wrapper-friendly, padded child region.");
@@ -578,9 +1008,10 @@ int main() {
 
         if (ui.BeginWindow(managerWindow, {1120, 40, 390, 350})) {
             ui.Text("Window management");
-            ui.Text("Drag a title bar and choose a 3x3 dock target.");
+            ui.Text("Drag a title bar and choose a top, bottom, left, right, or center target.");
             ui.Text("Double-click a docked title bar to undock.");
             ui.Text("A live preview shows the snap area.");
+            ui.Text("Drop on the compass center to create a tabbed window group.");
             ui.Text("Docked windows resize with the display.");
             ui.Text("Resize floating windows from any edge or corner.");
             ui.Text("Click a window to bring it to the front.");
@@ -608,7 +1039,76 @@ int main() {
             ui.EndWindow();
         }
 
+        if (ui.BeginWindow(advancedWindow, {210, 100, 440, 620})) {
+            ui.TextWrapped("Additional controls and wrapper helpers from the attached project.");
+            ui.BeginDisabled();
+            ui.Button("Disabled button");
+            ui.EndDisabled();
+
+            ui.BeginPropertyGrid("advanced-properties");
+            ui.PropertyRow("Numeric value");
+            if (ui.DragFloat("Drag to adjust##value", &dragValue, 0.01f, 0.f, 1.f)) {}
+            ui.EndPropertyGrid();
+            ui.ColorEdit3("Editable color", colorValue);
+            ui.Text("Double-click the drag control to edit its value.");
+            if (ui.InputText("Text input", &textInputValue)) {}
+            if (ui.Selectable("Selectable row", selectedItem == 0)) selectedItem = 0;
+            if (ui.Selectable("Second row", selectedItem == 1)) selectedItem = 1;
+
+            if (ui.TreeNode("Tree node", Context::TreeNode_DefaultOpen)) {
+                ui.Text("Nested tree content");
+                ui.TreePop();
+            }
+            if (ui.CollapsingHeader("Collapsing header")) {
+                ui.Text("Header content is visible.");
+            }
+
+            if (ui.Button("Open popup")) ui.OpenPopup("Advanced popup");
+            if (ui.BeginPopup("Advanced popup")) {
+                ui.Text("This popup is independently layered.");
+                if (ui.Button("Close popup")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+            if (ui.Button("Right-click for popup")) {}
+            if (ui.BeginPopupContextItem("Item context popup")) {
+                ui.Text("Context popup contents");
+                if (ui.Button("Dismiss")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+            if (ui.Button("Open modal")) ui.OpenPopup("Advanced modal");
+            if (ui.BeginPopupModal("Advanced modal")) {
+                ui.Text("Modal popup");
+                if (ui.Button("Close modal")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+
+            if (ui.Button("Drag payload")) {}
+            if (ui.BeginDragSource()) {
+                ui.SetDragPayload("demo-text", "Fluid UI drag-and-drop");
+                ui.EndDragSource();
+            }
+            if (ui.Button("Drop payload here")) {}
+            if (ui.BeginDropTarget()) {
+                ui.AcceptDrop("demo-text", droppedPayload);
+                ui.EndDropTarget();
+            }
+            if (!droppedPayload.empty()) ui.Text(droppedPayload);
+
+            ui.TextDisabled("Disabled explanatory text");
+            if (ui.Button("Scroll window to bottom")) ui.ScrollToBottom();
+            ui.Text("Virtualized rows:");
+            ui.ClippedList(100, [&](int row) {
+                ui.Text("Virtual row " + std::to_string(row));
+            }, 24.f);
+            ui.EndWindow();
+        }
+
         const DrawList& dl = ui.EndFrame();
+        if (in.keyCopy) {
+            const std::string selectedText = ui.SelectedConsoleText();
+            if (!selectedText.empty())
+                glfwSetClipboardString(win, selectedText.c_str());
+        }
         GLFWcursor* requestedCursor = nullptr;
         switch (ui.Cursor()) {
             case CursorShape::Arrow: requestedCursor = cursors[0]; break;
@@ -625,6 +1125,14 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         RenderGL(dl, w, h);
         glfwSwapBuffers(win);
+    }
+    if (!layoutLoadFailed) {
+        std::string layoutError;
+        if (!ui.SaveLayout(layoutPath.string(), &layoutError))
+            std::fprintf(stderr, "%s\n", layoutError.c_str());
+        else
+            std::fprintf(stdout, "Saved window layout to '%s'\n",
+                         layoutPath.string().c_str());
     }
     glDeleteTextures(1, &iconTexture);
     glDeleteTextures(1, &folderIconTexture);
