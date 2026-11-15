@@ -59,14 +59,32 @@ overflows and has a black background by default. It also accepts
 `Error`; style their colors with the `console-output-normal`, `console-output-warning`, and
 `console-output-error` selectors. Retrieve selected bytes with `SelectedConsoleText()` for host
 clipboard integration.
+The controls also include `TextWrapped`, `TextDisabled`, `InputText`, `DragFloat`/`DragInt`,
+`ColorEdit3`/`ColorEdit4`, `Selectable`, `TreeNode`/`TreePop`, and `CollapsingHeader`.
+Use `BeginDisabled`/`EndDisabled` to disable a scope, `BeginGroup`/`EndGroup` to keep items
+together in layout, and `BeginPropertyGrid`/`EndPropertyGrid` with `PropertyRow` for label/value
+rows. `SetNextItemWidth` sets the next widget width, `GetContentRegionAvail` queries remaining
+space, `PushWindowPadding`/`PopWindowPadding` overrides window padding, `ClippedList` draws only
+visible fixed-height rows, and `ScrollToBottom` moves the current window to its end.
+`TreeNode` flags are `TreeNode_Selected`, `TreeNode_Leaf`, and `TreeNode_DefaultOpen`.
 Containers automatically show draggable scrollbars when their content exceeds the visible area.
 Vertical overflow also responds to the mouse wheel; style container bars with
 `container-scrollbar`.
-Input receives text and key events through `InputState::textInput`, `keyBackspace`, `keyEnter`,
-`keySelectAll`, and `keyCopy`. The host should fill those fields with events for the current
-frame. The GLFW example wires Ctrl+C to the OS clipboard.
+`InputText` receives UTF-8 through `InputState::textInput`; keyboard navigation uses the
+`keysDown`/`keysPressed` arrays (GLFW key codes), with legacy backspace/enter/select-all/copy
+flags retained. Clipboard integration is provided by `clipboardText` and `setClipboardText`.
+The GLFW example wires text input and clipboard events.
 Open dropdown popups render above window content; context menus and hints retain their higher
 priority layers.
+`OpenPopup`/`BeginPopup` and `BeginPopupModal` provide layered popup scopes; pair each
+successful begin with `EndPopup`. `BeginPopupContextItem` and `BeginPopupContextWindow` open
+right-click popups. Use `BeginDragSource`/`SetDragPayload`/`EndDragSource` and
+`BeginDropTarget`/`AcceptDrop`/`EndDropTarget` for typed drag-and-drop data.
+`IsItemHovered`, `IsItemClicked`, `IsItemDoubleClicked`, `IsAnyItemActive`,
+`IsWindowHovered`, `IsWindowFocused`, `WantsMouse`, `WantsMouseAt`, and `WantsKeyboard`
+expose interaction state. `ItemTooltip` shows a tooltip for the last hovered item.
+Custom draw helpers include `DrawLine`, `DrawPolyline`, `DrawTriangleFilled`,
+`DrawRectFilled`, and `DrawLabel`; `Separator` adds a themed divider.
 After an interactive widget, `RMB_Start()` opens its context menu on right-click; add options
 with `RMB_Item()` and close the scope with `RMB_End()`. The popup renders above windows,
 dock previews, and other UI layers.

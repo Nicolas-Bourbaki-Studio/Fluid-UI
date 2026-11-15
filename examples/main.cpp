@@ -32,10 +32,13 @@ constexpr GLenum kGlMultisample = 0x809D;
 
 static float gMouseWheel = 0.f;
 static std::string gTextInput;
+static std::array<bool, InputState::KeyCount> gKeysDown{};
+static std::array<bool, InputState::KeyCount> gKeysPressed{};
 static bool gBackspacePressed = false;
 static bool gEnterPressed = false;
 static bool gSelectAllPressed = false;
 static bool gCopyPressed = false;
+static bool gPastePressed = false;
 
 static void OnScroll(GLFWwindow*, double, double yOffset) {
     gMouseWheel += static_cast<float>(yOffset);
@@ -60,11 +63,20 @@ static void OnChar(GLFWwindow*, unsigned int codepoint) {
 }
 
 static void OnKey(GLFWwindow*, int key, int, int action, int mods) {
+    if (key >= 0 && static_cast<size_t>(key) < InputState::KeyCount) {
+        if (action == GLFW_PRESS) {
+            gKeysDown[static_cast<size_t>(key)] = true;
+            gKeysPressed[static_cast<size_t>(key)] = true;
+        } else if (action == GLFW_RELEASE) {
+            gKeysDown[static_cast<size_t>(key)] = false;
+        }
+    }
     if (action != GLFW_PRESS && action != GLFW_REPEAT) return;
     if (key == GLFW_KEY_BACKSPACE) gBackspacePressed = true;
     if (key == GLFW_KEY_ENTER) gEnterPressed = true;
     if (key == GLFW_KEY_A && (mods & GLFW_MOD_CONTROL)) gSelectAllPressed = true;
     if (key == GLFW_KEY_C && (mods & GLFW_MOD_CONTROL)) gCopyPressed = true;
+    if (key == GLFW_KEY_V && (mods & GLFW_MOD_CONTROL)) gPastePressed = true;
 }
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
@@ -743,10 +755,12 @@ int main(int argc, char** argv) {
     bool enabled = true, dockingEnabled = true, expanded = true, showDanger = false;
     bool networkConnected = false;
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
-    float volume = 0.62f;
+    float volume = 0.62f, dragValue = 0.35f;
+    float colorValue[3] = {0.25f, 0.55f, 0.9f};
     int selectedTile = 0;
     int lmbClickCount = 0;
-    std::string consoleCommand;
+    int selectedItem = 0;
+    std::string consoleCommand, textInputValue, droppedPayload;
     std::vector<Context::ConsoleLine> consoleOutput{
         {"Fluid UI console ready.", Context::ConsoleTextType::Normal},
         {"Type a command and press Enter.", Context::ConsoleTextType::Normal},
@@ -758,6 +772,7 @@ int main(int argc, char** argv) {
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
     constexpr std::string_view settingsWindow = "Settings##settings";
+    constexpr std::string_view advancedWindow = "Advanced controls##advanced";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -770,6 +785,8 @@ int main(int argc, char** argv) {
         in.mousePos = {static_cast<float>(mx), static_cast<float>(my)};
         in.mouseDown[0] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
         in.mouseDown[1] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+        in.keysDown = gKeysDown;
+        in.keysPressed = gKeysPressed;
         in.mouseWheel = gMouseWheel;
         gMouseWheel = 0.f;
         in.deltaTime = static_cast<float>(now - last);
@@ -781,7 +798,19 @@ int main(int argc, char** argv) {
         in.keyEnter = gEnterPressed;
         in.keySelectAll = gSelectAllPressed;
         in.keyCopy = gCopyPressed;
-        gBackspacePressed = gEnterPressed = gSelectAllPressed = gCopyPressed = false;
+        in.keyPaste = gPastePressed;
+        in.keyShift = in.keysDown[GLFW_KEY_LEFT_SHIFT] ||
+                      in.keysDown[GLFW_KEY_RIGHT_SHIFT];
+        in.keyControl = in.keysDown[GLFW_KEY_LEFT_CONTROL] ||
+                        in.keysDown[GLFW_KEY_RIGHT_CONTROL];
+        if (const char* clipboard = glfwGetClipboardString(win))
+            in.clipboardText = clipboard;
+        in.setClipboardText = [win](const std::string& text) {
+            glfwSetClipboardString(win, text.c_str());
+        };
+        gKeysPressed.fill(false);
+        gBackspacePressed = gEnterPressed = gSelectAllPressed = gCopyPressed =
+            gPastePressed = false;
         last = now;
         ui.NewFrame(in);
         ui.DockWindows(dockingEnabled);
@@ -792,6 +821,8 @@ int main(int argc, char** argv) {
                     ui.SetWindowOpen(componentWindow, true);
                 if (ui.MenuItem("Settings..."))
                     ui.SetWindowOpen(settingsWindow, true);
+                if (ui.MenuItem("Advanced controls"))
+                    ui.SetWindowOpen(advancedWindow, true);
                 if (ui.MenuItem("Exit")) glfwSetWindowShouldClose(win, GLFW_TRUE);
                 ui.EndMenu();
             }
@@ -1005,6 +1036,70 @@ int main(int argc, char** argv) {
                 ui.SetWindowOpen(tabsWindow, true);
                 ui.SetWindowOpen(managerWindow, true);
             }
+            ui.EndWindow();
+        }
+
+        if (ui.BeginWindow(advancedWindow, {210, 100, 440, 620})) {
+            ui.TextWrapped("Additional controls and wrapper helpers from the attached project.");
+            ui.BeginDisabled();
+            ui.Button("Disabled button");
+            ui.EndDisabled();
+
+            ui.BeginPropertyGrid("advanced-properties");
+            ui.PropertyRow("Numeric value");
+            if (ui.DragFloat("Drag to adjust##value", &dragValue, 0.01f, 0.f, 1.f)) {}
+            ui.EndPropertyGrid();
+            ui.ColorEdit3("Editable color", colorValue);
+            ui.Text("Double-click the drag control to edit its value.");
+            if (ui.InputText("Text input", &textInputValue)) {}
+            if (ui.Selectable("Selectable row", selectedItem == 0)) selectedItem = 0;
+            if (ui.Selectable("Second row", selectedItem == 1)) selectedItem = 1;
+
+            if (ui.TreeNode("Tree node", Context::TreeNode_DefaultOpen)) {
+                ui.Text("Nested tree content");
+                ui.TreePop();
+            }
+            if (ui.CollapsingHeader("Collapsing header")) {
+                ui.Text("Header content is visible.");
+            }
+
+            if (ui.Button("Open popup")) ui.OpenPopup("Advanced popup");
+            if (ui.BeginPopup("Advanced popup")) {
+                ui.Text("This popup is independently layered.");
+                if (ui.Button("Close popup")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+            if (ui.Button("Right-click for popup")) {}
+            if (ui.BeginPopupContextItem("Item context popup")) {
+                ui.Text("Context popup contents");
+                if (ui.Button("Dismiss")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+            if (ui.Button("Open modal")) ui.OpenPopup("Advanced modal");
+            if (ui.BeginPopupModal("Advanced modal")) {
+                ui.Text("Modal popup");
+                if (ui.Button("Close modal")) ui.CloseCurrentPopup();
+                ui.EndPopup();
+            }
+
+            if (ui.Button("Drag payload")) {}
+            if (ui.BeginDragSource()) {
+                ui.SetDragPayload("demo-text", "Fluid UI drag-and-drop");
+                ui.EndDragSource();
+            }
+            if (ui.Button("Drop payload here")) {}
+            if (ui.BeginDropTarget()) {
+                ui.AcceptDrop("demo-text", droppedPayload);
+                ui.EndDropTarget();
+            }
+            if (!droppedPayload.empty()) ui.Text(droppedPayload);
+
+            ui.TextDisabled("Disabled explanatory text");
+            if (ui.Button("Scroll window to bottom")) ui.ScrollToBottom();
+            ui.Text("Virtualized rows:");
+            ui.ClippedList(100, [&](int row) {
+                ui.Text("Virtual row " + std::to_string(row));
+            }, 24.f);
             ui.EndWindow();
         }
 

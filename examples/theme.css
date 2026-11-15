@@ -33,6 +33,10 @@
     transition-speed: 5;
 }
 
+*:disabled {
+    opacity: 0.55;
+}
+
 window {
     background: var(--ui-window);
     border-color: var(--ui-window-border);
@@ -323,6 +327,54 @@ console-input {
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
     padding: 6px 8px;
+}
+
+popup {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-window-border);
+    border-radius: var(--ui-radius);
+    padding: 8px;
+    shadow-color: rgba(0, 0, 0, 0.67);
+    shadow-blur: 14px;
+}
+
+input-text {
+    background: var(--ui-sunken);
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px 8px;
+}
+
+input-text:active {
+    border-color: var(--ui-accent);
+}
+
+selectable,
+tree-node {
+    color: var(--ui-text);
+    padding: 5px 8px;
+}
+
+selectable:hover,
+tree-node:hover,
+collapsing-header:hover {
+    background: var(--ui-panel-hover);
+}
+
+selectable:checked {
+    background: var(--ui-accent-muted);
+}
+
+collapsing-header {
+    background: var(--ui-panel);
+    color: var(--ui-text);
+    padding: 6px 8px;
+}
+
+separator {
+    color: var(--ui-border-hover);
+    border-width: 1px;
 }
 
 console-output-normal {

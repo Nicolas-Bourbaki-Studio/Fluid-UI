@@ -5,6 +5,8 @@
 #include "Style.h"
 
 #include <array>
+#include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -40,18 +42,52 @@ public:
     bool BeginContainer(std::string_view label, Vec2 size);
     bool BeginList(std::string_view label, Vec2 size, bool horizontal);
     void EndContainer();
+    void SetNextItemWidth(float width);
+    Vec2 GetContentRegionAvail() const;
+    void PushWindowPadding(Vec2 padding);
+    void PopWindowPadding();
+    void BeginDisabled(bool disabled = true);
+    void EndDisabled();
+    void BeginGroup();
+    void EndGroup();
+    bool BeginPropertyGrid(std::string_view id);
+    void EndPropertyGrid();
+    void PropertyRow(std::string_view label);
+    void ScrollToBottom();
+    void ClippedList(int count, const std::function<void(int)>& drawItem,
+                     float itemHeight = 0.f);
 
     bool BeginMainMenuBar();
     void EndMainMenuBar();
     bool BeginMenu(std::string_view label);
     void EndMenu();
     bool MenuItem(std::string_view label);
+    bool MenuItem(std::string_view label, std::string_view shortcut,
+                  bool selected, bool enabled);
+    bool OpenPopup(std::string_view id);
+    bool BeginPopup(std::string_view id);
+    bool BeginPopupModal(std::string_view title);
+    bool BeginPopupContextItem(std::string_view id = {});
+    bool BeginPopupContextWindow(std::string_view id = {});
+    void CloseCurrentPopup();
+    void EndPopup();
+    bool BeginDragSource();
+    void SetDragPayload(std::string_view type, std::string_view data);
+    void EndDragSource();
+    bool BeginDropTarget();
+    bool AcceptDrop(std::string_view type, std::string& data);
+    void EndDropTarget();
 
     enum class TabPosition : uint8_t { Top, Bottom, Left };
     struct TabItem {
         std::string_view label;
         std::string_view icon;
         bool showText = true;
+    };
+    enum TreeNodeFlags : uint32_t {
+        TreeNode_Selected = 1u << 0,
+        TreeNode_Leaf = 1u << 1,
+        TreeNode_DefaultOpen = 1u << 2
     };
     enum class ConsoleTextType : uint8_t { Normal, Warning, Error };
     struct ConsoleLine {
@@ -64,18 +100,33 @@ public:
 
     // Widgets. "Label##suffix" shows "Label" but hashes the full string for the ID.
     void Text(std::string_view text);
+    void TextWrapped(std::string_view text);
+    void TextDisabled(std::string_view text);
     void TextLabel(std::string_view text);
     void TextLabelLeft(std::string_view text, std::string_view icon);
     void TextLabelRight(std::string_view text, std::string_view icon);
     void TextLabelLeft(std::string_view text, GPUImageId icon, Vec2 iconSize);
     void TextLabelRight(std::string_view text, GPUImageId icon, Vec2 iconSize);
     bool Button(std::string_view label);
+    bool Button(std::string_view label, Vec2 size);
     bool ImageButton(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool Checkbox(std::string_view label, bool* value);
     bool Toggle(std::string_view label, bool* value);
     bool Radio(std::string_view label, int* value, int option);
     bool SliderFloat(std::string_view label, float* value, float minV, float maxV);
     bool ValueSlider(std::string_view label, float* value, float minV, float maxV);
+    bool DragFloat(std::string_view label, float* value, float speed,
+                   float minV, float maxV);
+    bool DragInt(std::string_view label, int* value, float speed, int minV, int maxV);
+    bool ColorEdit3(std::string_view label, float* value);
+    bool ColorEdit4(std::string_view label, float* value);
+    bool InputText(std::string_view label, std::string* value, bool multiline = false,
+                   bool submitOnEnter = false, bool* submitted = nullptr);
+    void SetKeyboardFocusHere();
+    bool Selectable(std::string_view label, bool selected = false);
+    bool TreeNode(std::string_view label, uint32_t flags = 0);
+    void TreePop();
+    bool CollapsingHeader(std::string_view label, bool defaultOpen = true);
     bool Dropdown(std::string_view label, const std::vector<std::string_view>& items,
                   int* selected, std::string_view icon = {}, bool showText = true);
     void ProgressBar(std::string_view label, float value, Vec2 size = {});
@@ -97,12 +148,34 @@ public:
     void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
     void Image(GPUImageId imageId, Vec2 size);
+    void Image(GPUImageId imageId, Vec2 size, bool flipY);
+    void InteractiveImage(GPUImageId imageId, Vec2 size, bool flipY = false);
+    bool ImageTile(std::string_view id, GPUImageId imageId, Vec2 size,
+                   bool selected, bool flipY, std::string_view fallbackLabel,
+                   Color fallbackColor);
     void ImageWidget(std::string_view id, GPUImageId imageId, Vec2 size);
     void EmptyWidget(std::string_view id, Vec2 size);
+    bool IsItemHovered() const;
+    bool IsItemClicked(int mouseButton = 0) const;
+    bool IsItemDoubleClicked() const;
+    bool IsItemActivated() const { return lastItemActivated_; }
+    bool IsItemDeactivated() const { return lastItemDeactivated_; }
+    bool IsAnyItemActive() const;
+    bool IsAnyItemHovered() const { return anyItemHovered_; }
+    bool IsWindowHovered() const;
+    bool IsWindowFocused() const;
+    Vec2 GetItemRectMin() const { return {lastItemRect_.x, lastItemRect_.y}; }
+    void ItemTooltip(std::string_view text);
+    void DrawLine(Vec2 a, Vec2 b, Color color, float thickness = 1.f);
+    void DrawPolyline(const std::vector<Vec2>& points, Color color, float thickness = 1.f);
+    void DrawTriangleFilled(Vec2 a, Vec2 b, Vec2 c, Color color);
+    void DrawRectFilled(Vec2 min, Vec2 max, Color color);
+    void DrawLabel(Vec2 position, Color color, std::string_view text);
 
     // Layout
     void SameLine();
     void Spacing(float pixels);
+    void Separator();
     void DockWindows(bool enabled) { dockingEnabled_ = enabled; }
 
     // Styling / IDs
@@ -110,9 +183,15 @@ public:
     void PopClass();
     void PushID(std::string_view id);
     void PopID();
+    bool WantsMouse() const { return wantsMouse_; }
+    bool WantsMouseAt(Vec2 position) const;
+    bool WantsKeyboard() const { return wantsKeyboard_; }
 
 private:
-    struct Interaction { bool hovered = false, held = false, pressed = false; };
+    struct Interaction {
+        bool hovered = false, held = false, pressed = false;
+        bool clicked = false, doubleClicked = false;
+    };
     enum class DockSide : uint8_t {
         None, Left, Right, Top, Bottom, Center,
         TopLeft, TopRight, BottomLeft, BottomRight
@@ -139,6 +218,44 @@ private:
         float cursorY = 0.f, lineTop = 0.f, lineBottom = 0.f, lastRight = 0.f;
         float cursorX = 0.f;
         bool sameLine = false, horizontal = false;
+    };
+    struct GroupState {
+        LayoutState outer;
+        Rect bounds;
+        bool hasBounds = false;
+    };
+    struct TextInputState {
+        size_t cursor = 0;
+        size_t selectionAnchor = 0;
+        float scrollX = 0.f;
+        bool initialized = false;
+    };
+    struct NumericInputState {
+        std::string text;
+        bool focus = true;
+    };
+    struct TreeNodeLayout {
+        float oldContentX = 0.f;
+        float oldContentWidth = 0.f;
+        bool indented = false;
+    };
+    struct PopupState {
+        Vec2 pos;
+        Vec2 size{280.f, 220.f};
+        Rect anchor, frame, clip;
+        WidgetId ownerWindowId = 0;
+        WidgetId parentPopupId = 0;
+        DrawList::Layer layer;
+        bool hasLayer = false;
+        bool open = false;
+        bool modal = false;
+    };
+    struct PopupStackEntry {
+        LayoutState outer;
+        DrawList::Layer layer;
+        WidgetId id = 0;
+        std::vector<Rect> restoreClips;
+        bool windowInputEnabled = true;
     };
     struct ContainerScrollState {
         float scrollX = 0.f, scrollY = 0.f;
@@ -214,6 +331,11 @@ private:
     void BringLayerToFront(DrawList::Layer& layer);
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
+    bool BeginPopupImpl(std::string_view id, bool modal);
+    void EndPopupImpl();
+    void ClosePopupAndChildren(WidgetId id);
+    void SetLastItem(WidgetId id, Rect rect, const Interaction& interaction);
+    bool IsDisabled() const;
     void ConsoleOutputImpl(std::string_view label, std::string_view text,
                            const std::vector<ConsoleTextType>& lineTypes, Vec2 size);
     Rect BeginMenuPopup(WidgetId id, Rect anchor, size_t depth);
@@ -227,6 +349,8 @@ private:
     InputState in_;
     bool prevMouseDown_ = false;
     bool prevRightMouseDown_ = false;
+    std::array<bool, 3> prevMouseDownButtons_{};
+    Vec2 prevMousePos_;
     WidgetId active_ = 0;
     WidgetId currentWindowId_ = 0;
     WidgetId activeDockSplitter_ = 0;
@@ -250,6 +374,8 @@ private:
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
     std::vector<ContainerState> containerStack_;
+    std::vector<GroupState> groupStack_;
+    std::vector<TreeNodeLayout> treeNodeStack_;
     std::unordered_map<WidgetId, ContainerScrollState> containerScrollStates_;
     std::vector<ScrollableContainerRect> scrollableContainerRects_;
     std::vector<ScrollableContainerRect> previousScrollableContainerRects_;
@@ -262,6 +388,29 @@ private:
     std::unordered_map<WidgetId, Vec2> menuPopupSizes_;
     std::vector<DockSplitter> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
+    std::unordered_map<WidgetId, TextInputState> textInputs_;
+    std::unordered_map<WidgetId, NumericInputState> numericInputs_;
+    std::unordered_map<WidgetId, bool> treeNodeOpen_;
+    std::unordered_map<WidgetId, double> lastItemClickTime_;
+    std::unordered_map<WidgetId, PopupState> popups_;
+    std::vector<WidgetId> openPopups_;
+    std::vector<PopupStackEntry> popupStack_;
+    std::string dragPayloadType_, dragPayloadData_;
+    WidgetId dragSourceId_ = 0;
+    Vec2 dragStartPosition_;
+    bool draggingPayload_ = false, dragPayloadDelivered_ = false;
+    bool dragSourceScope_ = false;
+    bool lastItemClicked_ = false, lastItemDoubleClicked_ = false;
+    bool lastItemActivated_ = false, lastItemDeactivated_ = false, anyItemHovered_ = false;
+    bool windowHovered_ = false, wantsMouse_ = false, wantsKeyboard_ = false;
+    bool focusNextTextInput_ = false, focusNextTextInputSelectAll_ = false;
+    WidgetId focusedTextInput_ = 0, deactivatedTextInput_ = 0;
+    Rect focusedTextInputRect_;
+    std::optional<float> nextItemWidth_;
+    std::vector<Edges> windowPaddingStack_;
+    std::vector<bool> disabledStack_;
+    std::vector<float> propertyGridWidths_;
+    bool scrollToBottom_ = false;
     std::unordered_map<WidgetId, TextSelection> consoleSelections_;
     WidgetId selectedConsole_ = 0;
     WidgetId focusedConsoleInput_ = 0;

@@ -1,7 +1,11 @@
 #pragma once
 #include "DrawList.h"
 #include "Types.h"
+#include <array>
+#include <functional>
+#include <string>
 #include <string_view>
+#include <vector>
 
 namespace fluid {
 
@@ -14,9 +18,16 @@ enum class CursorShape : uint8_t {
 };
 
 struct InputState {
+    static constexpr size_t KeyCount = 512;
     Vec2  mousePos;
     // GLFW-style ordering: left, right, middle.
     bool  mouseDown[3] = {false, false, false};
+    bool  mousePressed[3] = {false, false, false};
+    bool  mouseReleased[3] = {false, false, false};
+    std::array<bool, KeyCount> keysDown{};
+    std::array<bool, KeyCount> keysPressed{};
+    std::array<bool, KeyCount> keysReleased{};
+    Vec2 mouseDelta;
     float mouseWheel = 0.f;
     float deltaTime = 1.f / 60.f;
     Vec2  displaySize;
@@ -26,6 +37,17 @@ struct InputState {
     bool keyEnter = false;
     bool keySelectAll = false;
     bool keyCopy = false;
+    bool keyPaste = false;
+    bool keyLeft = false;
+    bool keyRight = false;
+    bool keyHome = false;
+    bool keyEnd = false;
+    bool keyDelete = false;
+    bool keyShift = false;
+    bool keyControl = false;
+    std::string clipboardText;
+    std::function<void(const std::string&)> setClipboardText;
+    std::vector<uint32_t> textInputCodepoints;
 };
 
 // Implement with stb_truetype / FreeType / the platform's text API.

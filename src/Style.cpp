@@ -1070,6 +1070,7 @@ StyleSheet StyleSheet::Dark() {
     using C = Color;
     StyleSheet s;
 
+    s.Rule("*:disabled").Opacity(0.55f);
     s.Rule("*").Foreground(C::FromHex(0xE7EDF7FF)).FontSize(15).Spacing(8).TransitionSpeed(16);
 
     s.Rule("window")
@@ -1118,6 +1119,24 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
     s.Rule("container-scrollbar")
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
+    s.Rule("popup").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(8)).ShadowColor(C::FromHex(0x000000AA)).ShadowBlur(14);
+    s.Rule("input-text").Background(C::FromHex(0x0C121BFF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).BorderColor(C::FromHex(0x526783FF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
+    s.Rule("input-text:active").BorderColor(C::FromHex(0x5A91F7FF));
+    s.Rule("selectable").Foreground(C::FromHex(0xDCE6F5FF))
+        .Padding(Edges(5, 8));
+    s.Rule("selectable:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("selectable:checked").Background(C::FromHex(0x2F5E9AFF));
+    s.Rule("tree-node").Foreground(C::FromHex(0xDCE6F5FF))
+        .Padding(Edges(4, 8));
+    s.Rule("tree-node:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("collapsing-header").Background(C::FromHex(0x1B2839FF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).Padding(Edges(6, 8));
+    s.Rule("collapsing-header:hover").Background(C::FromHex(0x253449FF));
+    s.Rule("separator").Foreground(C::FromHex(0x526783FF)).BorderWidth(1);
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
     s.Rule("dock-splitter").Background(C::FromHex(0x8999B0AA)).Rounding(2);
