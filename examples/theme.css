@@ -98,6 +98,8 @@ window {
     shadow-color: rgba(0, 0, 0, 0.699);
     shadow-blur: 14px;
     padding: 5px;
+    window-can-dock: true;
+    window-child-dock: true;
 }
 
 window-title {
@@ -309,6 +311,62 @@ button:hover, dropdown:hover, image-button:hover {
 button:active {
     background: var(--ui-accent-active);
     border-color: var(--ui-accent);
+}
+
+progress-bar {
+    background: var(--ui-sunken);
+    accent: var(--ui-accent);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 2px 6px;
+}
+
+tile-container {
+    background: var(--ui-sunken);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px;
+    gap: 6px;
+}
+
+tile {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    padding: 6px;
+}
+
+tile:hover, tile:checked {
+    background: var(--ui-panel-active);
+    border-color: var(--ui-accent);
+}
+
+console-output, console-input {
+    background: var(--ui-sunken);
+    color: var(--ui-text);
+    border: 1px solid var(--ui-border);
+    border-radius: 4px;
+    padding: 6px 8px;
+}
+
+context-menu {
+    background: var(--ui-panel);
+    border: 1px solid var(--ui-window-border);
+    border-radius: var(--ui-radius);
+    padding: 4px;
+    shadow-color: var(--ui-dock-shadow);
+    shadow-blur: 12px;
+}
+
+context-menu-item {
+    background: transparent;
+    color: var(--ui-text-muted);
+    padding: 5px 10px;
+}
+
+context-menu-item:hover {
+    background: var(--ui-accent);
+    color: var(--ui-text);
 }
 
 button.primary {

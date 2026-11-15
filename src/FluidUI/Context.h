@@ -73,6 +73,15 @@ public:
     bool ValueSlider(std::string_view label, float* value, float minV, float maxV);
     bool Dropdown(std::string_view label, const std::vector<std::string_view>& items,
                   int* selected, std::string_view icon = {}, bool showText = true);
+    void ProgressBar(std::string_view label, float value, Vec2 size = {});
+    bool TileContainer(std::string_view label, const std::vector<std::string_view>& items,
+                       int* selected, Vec2 size = {});
+    void ConsoleOutput(std::string_view label, std::string_view text, Vec2 size = {});
+    bool ConsoleInput(std::string_view label, std::string* value, Vec2 size = {});
+    std::string SelectedConsoleText() const;
+    bool RMB_Start();
+    bool RMB_Item(std::string_view label);
+    void RMB_End();
     void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
     void Image(GPUImageId imageId, Vec2 size);
@@ -109,6 +118,7 @@ private:
         DockSide dock = DockSide::None;
         uint8_t resizeEdges = 0;
         bool init = false, open = true, hasDrawLayer = false;
+        bool canDock = true, canBeChildDock = true;
         bool dragging = false, dockDragPending = false, resizing = false, scrolling = false;
     };
     struct Anim { float hover = 0.f, active = 0.f; };
@@ -135,6 +145,11 @@ private:
         float contentWidth = 0.f;
         bool hasParentPopup = false;
     };
+    struct TextSelection {
+        size_t anchor = 0, focus = 0;
+        std::string text;
+        bool selecting = false;
+    };
 
     WidgetId GetID(std::string_view label) const;
     ComputedStyle Resolve(std::string_view widget, uint8_t state) const;
@@ -142,7 +157,7 @@ private:
                           bool hovered, bool held);
     Interaction Behavior(WidgetId id, Rect r);
     bool IsFloatingWindowAt(Vec2 position) const;
-    WidgetId WindowTitleAt(Vec2 position, WidgetId exclude) const;
+    WidgetId WindowAt(Vec2 position, WidgetId exclude) const;
     void DetachTab(WidgetId id);
     void JoinTab(WidgetId id, WidgetId target);
     Rect Place(Vec2 size, float spacing);
@@ -171,6 +186,7 @@ private:
 
     InputState in_;
     bool prevMouseDown_ = false;
+    bool prevRightMouseDown_ = false;
     WidgetId active_ = 0;
     WidgetId currentWindowId_ = 0;
     WidgetId activeDockSplitter_ = 0;
@@ -197,9 +213,25 @@ private:
     std::vector<MenuState> menuStack_;
     std::vector<WidgetId> openMenus_;
     std::vector<Rect> menuPopupRects_;
+    std::vector<Rect> dropdownPopupRects_;
     std::unordered_map<WidgetId, Vec2> menuPopupSizes_;
     std::vector<DockSplitter> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
+    std::unordered_map<WidgetId, TextSelection> consoleSelections_;
+    WidgetId selectedConsole_ = 0;
+    WidgetId focusedConsoleInput_ = 0;
+    Rect focusedConsoleInputRect_;
+    WidgetId rmbPopupOwner_ = 0;
+    Rect rmbPopupRect_;
+    Vec2 rmbPopupAnchor_;
+    float rmbPopupCursorY_ = 0.f;
+    float rmbPopupWidth_ = 160.f;
+    float rmbPopupHeight_ = 0.f;
+    size_t rmbPopupItemCount_ = 0;
+    Rect lastItemRect_;
+    WidgetId lastItemId_ = 0;
+    bool rmbPopupActiveThisFrame_ = false;
+    bool rmbItemInteraction_ = false;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;
     bool windowInputEnabled_ = true;

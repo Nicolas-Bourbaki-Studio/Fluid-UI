@@ -11,7 +11,8 @@
 ## Components
 
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
-dropdown menus, text and image labels, image buttons, collapsible containers, containers,
+popup dropdown menus, progress bars, selectable console output and input, file-browser-style
+tile containers, text and image labels, image buttons, collapsible containers, containers,
 horizontal/vertical lists, tabbed containers, and class-styleable empty widgets.
 Text/icon labels can be combined as needed.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
@@ -29,6 +30,7 @@ const std::vector<std::string_view> options{"One", "Two", "Three"};
 ui.Toggle("Enabled", &enabled);
 ui.ValueSlider("Value", &value, 0.0f, 1.0f);
 ui.Dropdown("Choice", options, &selected);
+ui.ProgressBar("Download", 0.65f);
 ui.Image(myGpuImageId, {128.0f, 128.0f});
 
 if (ui.BeginContainer("Panel", {300.0f, 120.0f})) {
@@ -46,6 +48,13 @@ Call `EndContainer()` for each successful `BeginContainer`, `BeginList`,
 horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
 `TabPosition::Top`, `Bottom`, or `Left` setting. A `TabItem` with no icon displays text;
 one with an icon displays both by default, or just the icon when `showText` is false.
+`TileContainer` displays selectable file-style tiles from supplied labels. `ConsoleOutput`
+and `ConsoleInput` support mouse text selection; retrieve the selected bytes with
+`SelectedConsoleText()` for host clipboard integration. Input receives text and key events through
+`InputState::textInput`, `keyBackspace`, `keyEnter`, and `keySelectAll`. The host should fill
+those fields with events for the current frame. The GLFW example shows the callback wiring.
+After an interactive widget, `RMB_Start()` opens its context menu on right-click; add options
+with `RMB_Item()` and close the scope with `RMB_End()`.
 
 ## Wrapper-friendly windows and menus
 
@@ -130,6 +139,8 @@ aliases available. Unsupported
 declarations are ignored so themes can include properties not implemented by Fluid UI.
 Unsupported selectors and invalid values for supported properties report an error, and
 failed stylesheet loads do not partially modify the active theme.
+Window styles also support `window-can-dock` and `window-child-dock`, each accepting
+`true` or `false`.
 
 ```css
 button.primary {
@@ -161,6 +172,14 @@ window-title {
     background: #1A2637;
     color: #F1F5FC;
     padding: 7px 12px;
+}
+
+window.no-docking {
+    window-can-dock: false;
+}
+
+window.no-children {
+    window-child-dock: false;
 }
 ```
 
@@ -224,12 +243,16 @@ or center target to preview that layout, then release to dock. Docked windows ti
 overlapping; adding panels on other edges adjusts the available regions. Drag the boundary
 splitters to resize edge regions horizontally or vertically, or drag dividers between
 same-edge panels to resize individual windows. Dropping on the compass center stacks windows
-as selectable tabs in the center dock area. Click a tab to switch windows. To tabify windows,
-drag a window's title bar and release on another window's title bar; dropping on its content
-does not group them. This works between floating and docked windows, and preserves the
-target's dock region. Double-click a docked window's title bar to undock it. Drop a floating
+as selectable tabs in the center dock area. Click a tab to switch windows. Dropping on any
+part of an eligible window groups the dragged window as a tab. This works between floating
+and docked windows, and preserves the target's dock region. Dragging a grouped title bar keeps
+the group intact; double-click a docked title bar to undock it. Docked window corners are
+square, and the dock compass takes precedence over windows behind it. Drop a floating
 window on the compass center to add it to the center dock tab group. The layout
 adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
+CSS `window-can-dock: false` prevents a window from being docked, and
+`window-child-dock: false` prevents other windows from being grouped into it; both properties
+apply to `window` styles and default to `true`.
 
 Save and restore window positions, sizes, open state, dock sides, dock order, split
 proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files

@@ -23,9 +23,38 @@ using namespace fluid;
 constexpr GLenum kGlMultisample = 0x809D;
 
 static float gMouseWheel = 0.f;
+static std::string gTextInput;
+static bool gBackspacePressed = false;
+static bool gEnterPressed = false;
+static bool gSelectAllPressed = false;
 
 static void OnScroll(GLFWwindow*, double, double yOffset) {
     gMouseWheel += static_cast<float>(yOffset);
+}
+
+static void OnChar(GLFWwindow*, unsigned int codepoint) {
+    if (codepoint <= 0x7Fu) {
+        gTextInput.push_back(static_cast<char>(codepoint));
+    } else if (codepoint <= 0x7FFu) {
+        gTextInput.push_back(static_cast<char>(0xC0u | (codepoint >> 6)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    } else if (codepoint <= 0xFFFFu) {
+        gTextInput.push_back(static_cast<char>(0xE0u | (codepoint >> 12)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 6) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    } else {
+        gTextInput.push_back(static_cast<char>(0xF0u | (codepoint >> 18)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 12) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | ((codepoint >> 6) & 0x3Fu)));
+        gTextInput.push_back(static_cast<char>(0x80u | (codepoint & 0x3Fu)));
+    }
+}
+
+static void OnKey(GLFWwindow*, int key, int, int action, int mods) {
+    if (action != GLFW_PRESS && action != GLFW_REPEAT) return;
+    if (key == GLFW_KEY_BACKSPACE) gBackspacePressed = true;
+    if (key == GLFW_KEY_ENTER) gEnterPressed = true;
+    if (key == GLFW_KEY_A && (mods & GLFW_MOD_CONTROL)) gSelectAllPressed = true;
 }
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
@@ -333,6 +362,8 @@ int main(int argc, char** argv) {
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);
     glfwSetScrollCallback(win, OnScroll);
+    glfwSetCharCallback(win, OnChar);
+    glfwSetKeyCallback(win, OnKey);
 
     Context ui;
     ui.Style() = StyleSheet::Dark();
@@ -428,6 +459,8 @@ int main(int argc, char** argv) {
     };
     GLFWcursor* currentCursor = nullptr;
     const std::vector<std::string_view> choices{"Small", "Medium", "Large"};
+    const std::vector<std::string_view> fileTiles{
+        "Assets", "Documents", "Images", "Projects"};
     const std::vector<Context::TabItem> textTabs{{"Overview", {}}, {"Details", {}}, {"Preview", {}}};
     const std::vector<Context::TabItem> iconTabs{
         {"Home", "H", false}, {"Files", "F", false}, {"Tools", "T", false}};
@@ -437,6 +470,9 @@ int main(int argc, char** argv) {
     bool networkConnected = false;
     int radioValue = 1, sizeChoice = 1, iconChoice = 0, mixedChoice = 2, topTab = 0;
     float volume = 0.62f;
+    int selectedTile = 0;
+    std::string consoleCommand;
+    std::string consoleOutput = "Fluid UI console ready.\nType a command and press Enter.";
     constexpr std::string_view componentWindow = "Components##main";
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
@@ -452,10 +488,18 @@ int main(int argc, char** argv) {
         InputState in;
         in.mousePos = {static_cast<float>(mx), static_cast<float>(my)};
         in.mouseDown[0] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        in.mouseDown[1] = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
         in.mouseWheel = gMouseWheel;
         gMouseWheel = 0.f;
         in.deltaTime = static_cast<float>(now - last);
         in.displaySize = {static_cast<float>(w), static_cast<float>(h)};
+        const std::string frameTextInput = std::move(gTextInput);
+        gTextInput.clear();
+        in.textInput = frameTextInput;
+        in.keyBackspace = gBackspacePressed;
+        in.keyEnter = gEnterPressed;
+        in.keySelectAll = gSelectAllPressed;
+        gBackspacePressed = gEnterPressed = gSelectAllPressed = false;
         last = now;
         ui.NewFrame(in);
         ui.DockWindows(dockingEnabled);
@@ -566,6 +610,18 @@ int main(int argc, char** argv) {
             if (ui.Dropdown("Text menu", choices, &sizeChoice)) {}
             if (ui.Dropdown("Icon menu", choices, &iconChoice, "+", false)) {}
             if (ui.Dropdown("Icon and text menu", choices, &mixedChoice, "*")) {}
+            ui.ProgressBar("Loading sample: 62%", 0.62f, {0, 28});
+            if (ui.TileContainer("Project files", fileTiles, &selectedTile, {0, 150})) {}
+            ui.ConsoleOutput("Console log", consoleOutput, {0, 66});
+            if (ui.ConsoleInput("Console command", &consoleCommand)) {
+                consoleOutput += "\n> " + consoleCommand;
+                consoleCommand.clear();
+            }
+            if (ui.RMB_Start()) {
+                if (ui.RMB_Item("Refresh")) consoleOutput += "\nRefreshed.";
+                if (ui.RMB_Item("Clear console")) consoleOutput.clear();
+                ui.RMB_End();
+            }
 
             if (ui.BeginChild("Child demo", {0, 62})) {
                 ui.Text("A wrapper-friendly, padded child region.");

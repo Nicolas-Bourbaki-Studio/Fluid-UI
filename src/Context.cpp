@@ -64,12 +64,33 @@ void Context::NewFrame(const InputState& input) {
     in_ = input;
     timeSeconds_ += std::max(0.f, input.deltaTime);
     cursorShape_ = CursorShape::Arrow;
+    const bool leftPressed = in_.mouseDown[0] && !prevMouseDown_;
+    const bool rightPressed = in_.mouseDown[1] && !prevRightMouseDown_;
+    if (leftPressed && focusedConsoleInput_ != 0 &&
+        !focusedConsoleInputRect_.Contains(in_.mousePos))
+        focusedConsoleInput_ = 0;
     const bool menuClickOutside = in_.mouseDown[0] && !prevMouseDown_ &&
         !openMenus_.empty() && in_.mousePos.y >= menuBarHeight_ &&
         std::none_of(menuPopupRects_.begin(), menuPopupRects_.end(),
             [&](const Rect& popup) { return popup.Contains(in_.mousePos); });
     if (menuClickOutside) openMenus_.clear();
+    if (leftPressed && std::any_of(dropdowns_.begin(), dropdowns_.end(),
+            [](const auto& dropdown) { return dropdown.second; }) &&
+        std::none_of(dropdownPopupRects_.begin(), dropdownPopupRects_.end(),
+            [&](const Rect& popup) { return popup.Contains(in_.mousePos); })) {
+        for (auto& [id, open] : dropdowns_) {
+            (void)id;
+            open = false;
+        }
+    }
+    if (rmbPopupOwner_ != 0 && (leftPressed || rightPressed) &&
+        !rmbPopupRect_.Contains(in_.mousePos))
+        rmbPopupOwner_ = 0;
     menuPopupRects_.clear();
+    dropdownPopupRects_.clear();
+    lastItemRect_ = {};
+    lastItemId_ = 0;
+    rmbPopupActiveThisFrame_ = false;
     draw_.Clear();
     draw_.PushClipRect({0.f, 0.f, in_.displaySize.x, in_.displaySize.y});
     idStack_.clear();
@@ -205,6 +226,7 @@ const DrawList& Context::EndFrame() {
         active_ = 0;
         activeDockSplitter_ = 0;
     }
+    prevRightMouseDown_ = in_.mouseDown[1];
     return draw_;
 }
 
@@ -234,13 +256,18 @@ ComputedStyle Context::Animate(WidgetId id, std::string_view widget, uint8_t ext
 
 Context::Interaction Context::Behavior(WidgetId id, Rect r) {
     Interaction res;
+    lastItemId_ = id;
+    lastItemRect_ = r;
     const bool down = in_.mouseDown[0];
     const bool justPressed = down && !prevMouseDown_;
 
     const bool insideClip = std::all_of(interactionClips_.begin(), interactionClips_.end(),
         [&](const Rect& clip) { return clip.Contains(in_.mousePos); });
     const bool windowAllowsInput = windowInputEnabled_ || active_ == id;
-    res.hovered = windowAllowsInput && insideClip && r.Contains(in_.mousePos) &&
+    const bool blockedByContextMenu = rmbPopupOwner_ != 0 &&
+        rmbPopupRect_.Contains(in_.mousePos) && !rmbItemInteraction_;
+    res.hovered = windowAllowsInput && insideClip && !blockedByContextMenu &&
+                  r.Contains(in_.mousePos) &&
                   (active_ == 0 || active_ == id);
     if (res.hovered && justPressed && active_ == 0) active_ = id;
 
@@ -265,13 +292,9 @@ bool Context::IsFloatingWindowAt(Vec2 position) const {
     return false;
 }
 
-WidgetId Context::WindowTitleAt(Vec2 position, WidgetId exclude) const {
+WidgetId Context::WindowAt(Vec2 position, WidgetId exclude) const {
     WidgetId hit = 0;
     uint64_t topZ = 0;
-    const WindowState* topWindow = nullptr;
-    const ComputedStyle fallbackTitleStyle = style_.Resolve("window-title", {}, 0);
-    const float fallbackTitleHeight =
-        fallbackTitleStyle.fontSize * 1.2f + fallbackTitleStyle.padding.Vertical();
     const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
     for (const auto& [id, window] : windows_) {
         if (id == exclude || !window.open || !window.init) continue;
@@ -286,16 +309,9 @@ WidgetId Context::WindowTitleAt(Vec2 position, WidgetId exclude) const {
                 .Contains(position) && window.zOrder >= topZ) {
             hit = id;
             topZ = window.zOrder;
-            topWindow = &window;
         }
     }
-    if (topWindow) {
-        const float titleHeight = topWindow->titleHeight > 0.f
-            ? topWindow->titleHeight : fallbackTitleHeight;
-        if (position.y >= topWindow->pos.y + std::min(topWindow->size.y, titleHeight))
-            return 0;
-    }
-    return hit;
+    return hit != 0 && windows_.at(hit).canBeChildDock ? hit : 0;
 }
 
 void Context::DetachTab(WidgetId id) {
@@ -331,7 +347,8 @@ void Context::JoinTab(WidgetId id, WidgetId target) {
     auto dragged = windows_.find(id);
     auto targetWindow = windows_.find(target);
     if (dragged == windows_.end() || targetWindow == windows_.end() ||
-        !dragged->second.open || !targetWindow->second.open)
+        !dragged->second.open || !targetWindow->second.open ||
+        !dragged->second.canDock || !targetWindow->second.canBeChildDock)
         return;
 
     const DockSide targetDock = targetWindow->second.dock;
@@ -1411,6 +1428,10 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         w.zOrder = ++nextWindowZ_;
     }
     if (!w.open) return false;
+    const ComputedStyle ws = Resolve("window", 0);
+    const ComputedStyle ts = Resolve("window-title", 0);
+    w.canDock = ws.windowCanDock;
+    w.canBeChildDock = ws.windowChildDock;
     const auto& centerGroup = dockedWindows_[static_cast<size_t>(DockSide::Center)];
     if (w.dock == DockSide::Center && centerGroup.size() > 1 &&
         activeCenterTab_ != id)
@@ -1454,8 +1475,6 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
         focusedWindow_ = id;
     }
 
-    const ComputedStyle ws = Resolve("window", 0);
-    const ComputedStyle ts = Resolve("window-title", 0);
     const std::string_view text = DisplayLabel(title);
     const float titleH = ts.fontSize * 1.2f + ts.padding.Vertical();
     w.titleHeight = titleH;
@@ -1513,55 +1532,78 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
             const float dx = in_.mousePos.x - w.dockDragStartPos.x;
             const float dy = in_.mousePos.y - w.dockDragStartPos.y;
             if (dx * dx + dy * dy > 25.f) {
-                tabDropTarget_ = dockingEnabled_ ? WindowTitleAt(in_.mousePos, id) : 0;
+                const Rect selector{in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
+                                    in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
+                                    kDockCompassSize, kDockCompassSize};
+                tabDropTarget_ = dockingEnabled_ && w.canDock &&
+                    !selector.Contains(in_.mousePos) ? WindowAt(in_.mousePos, id) : 0;
             }
         } else if (w.dockDragPending && !in_.mouseDown[0]) {
             const float dx = in_.mousePos.x - w.dockDragStartPos.x;
             const float dy = in_.mousePos.y - w.dockDragStartPos.y;
+            const Rect selector{in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
+                                in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
+                                kDockCompassSize, kDockCompassSize};
             const WidgetId targetWindow =
-                dx * dx + dy * dy > 25.f && dockingEnabled_
-                    ? WindowTitleAt(in_.mousePos, id) : 0;
+                dx * dx + dy * dy > 25.f && dockingEnabled_ && w.canDock &&
+                !selector.Contains(in_.mousePos)
+                    ? WindowAt(in_.mousePos, id) : 0;
             if (targetWindow != 0) {
                 JoinTab(id, targetWindow);
                 tabDropTarget_ = targetWindow;
             }
             w.dockDragPending = false;
         }
+    } else if (drag.pressed && w.tabGroup != 0 && !wasDragging) {
+        w.dockDragPending = false;
+        const float dx = in_.mousePos.x - w.lastTitleClickPos.x;
+        const float dy = in_.mousePos.y - w.lastTitleClickPos.y;
+        const bool doubleClick = w.lastTitleClickTime >= 0.0 &&
+            timeSeconds_ - static_cast<float>(w.lastTitleClickTime) <= 0.35f &&
+            dx * dx + dy * dy <= 100.f;
+        if (doubleClick) {
+            DetachTab(id);
+            w.lastTitleClickTime = -1.0;
+            dockLayoutDone_ = false;
+        } else {
+            w.lastTitleClickTime = timeSeconds_;
+            w.lastTitleClickPos = in_.mousePos;
+        }
     } else if (drag.held) {
         if (!wasDragging) {
-            w.dragOff = in_.mousePos - w.pos;
             if (w.tabGroup != 0) {
                 if (!w.dockDragPending) {
                     w.dockDragPending = true;
                     w.dockDragStartPos = in_.mousePos;
+                    w.dragOff = in_.mousePos - w.pos;
                 }
                 const float dx = in_.mousePos.x - w.dockDragStartPos.x;
                 const float dy = in_.mousePos.y - w.dockDragStartPos.y;
                 if (dx * dx + dy * dy > 25.f) {
-                    DetachTab(id);
-                    w.dock = DockSide::None;
                     w.dockDragPending = false;
                     w.dragging = true;
                 }
             } else {
+                w.dragOff = in_.mousePos - w.pos;
                 w.dragging = true;
             }
         } else if (w.dockDragPending) {
             const float dx = in_.mousePos.x - w.dockDragStartPos.x;
             const float dy = in_.mousePos.y - w.dockDragStartPos.y;
             if (dx * dx + dy * dy > 25.f) {
-                DetachTab(id);
                 w.dockDragPending = false;
                 w.dragging = true;
             }
         }
         if (w.dragging) {
             w.pos = in_.mousePos - w.dragOff;
-            tabDropTarget_ = WindowTitleAt(in_.mousePos, id);
             dockCompassRect_ = {in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
                                 in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
                                 kDockCompassSize, kDockCompassSize};
-            dockCompassVisible_ = dockingEnabled_ && tabDropTarget_ == 0;
+            const bool overSelector = dockCompassRect_.Contains(in_.mousePos);
+            tabDropTarget_ = dockingEnabled_ && w.canDock && !overSelector
+                ? WindowAt(in_.mousePos, id) : 0;
+            dockCompassVisible_ = dockingEnabled_ && w.canDock && tabDropTarget_ == 0;
             dockCompassSelection_ = dockCompassVisible_
                 ? DockTargetAt(in_.mousePos) : DockSide::None;
             SetDockPreview(dockCompassSelection_);
@@ -1569,8 +1611,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     } else if (w.dockDragPending && !in_.mouseDown[0]) {
         w.dockDragPending = false;
     } else if (wasDragging && !in_.mouseDown[0]) {
-        const WidgetId targetWindow = dockingEnabled_ ? WindowTitleAt(in_.mousePos, id) : 0;
-        const DockSide target = targetWindow == 0 && dockingEnabled_
+        const Rect selector{in_.displaySize.x * 0.5f - kDockCompassSize * 0.5f,
+                            in_.displaySize.y * 0.5f - kDockCompassSize * 0.5f,
+                            kDockCompassSize, kDockCompassSize};
+        const bool overSelector = selector.Contains(in_.mousePos);
+        const WidgetId targetWindow = dockingEnabled_ && w.canDock && !overSelector
+            ? WindowAt(in_.mousePos, id) : 0;
+        const DockSide target = targetWindow == 0 && dockingEnabled_ && w.canDock &&
+                                overSelector
             ? DockTargetAt(in_.mousePos) : DockSide::None;
         dockCompassVisible_ = false;
         dockCompassSelection_ = target;
@@ -1666,9 +1714,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     w.drawLayer = draw_.BeginLayer();
     w.hasDrawLayer = true;
     ComputedStyle windowStyle = ws;
-    if (w.dock != DockSide::None) windowStyle.shadowEnabled = false;
+    ComputedStyle titleStyle = ts;
+    if (w.dock != DockSide::None) {
+        windowStyle.shadowEnabled = false;
+        windowStyle.cornerRadii = {};
+        titleStyle.cornerRadii = {};
+    }
     DrawBox(frame, windowStyle);
-    DrawBox(bar, ts);
+    DrawBox(bar, titleStyle);
     float contentTop = titleH;
     const std::vector<WidgetId>* tabWindows = nullptr;
     WidgetId selectedTab = 0;
@@ -2246,20 +2299,420 @@ bool Context::Dropdown(std::string_view label, const std::vector<std::string_vie
     if (interaction.pressed) dropdowns_[id] = !dropdowns_[id];
 
     bool changed = false;
-    if (dropdowns_[id]) {
-        for (size_t i = 0; i < items.size(); ++i) {
-            PushID("##dropdown-options");
-            PushID(label);
-            PushID(items[i]);
-            if (Button(items[i])) {
-                *selected = static_cast<int>(i);
-                dropdowns_[id] = false;
-                changed = true;
-            }
-            PopID(); PopID(); PopID();
+    if (!dropdowns_[id]) return false;
+
+    const ComputedStyle popupStyle = Resolve("menu-popup", 0);
+    const ComputedStyle itemBase = Resolve("menu-item", 0);
+    const float rowHeight = std::max(itemBase.fontSize * 1.4f +
+                                     itemBase.padding.Vertical(), 1.f);
+    float width = r.w;
+    for (std::string_view item : items)
+        width = std::max(width, text_->Measure(item, itemBase.fontSize).x +
+                                itemBase.padding.Horizontal());
+    width += popupStyle.padding.Horizontal();
+    const Rect bounds = windowViewport_.w > 0.f && windowViewport_.h > 0.f
+        ? windowViewport_ : Rect{0.f, 0.f, in_.displaySize.x, in_.displaySize.y};
+    const float height = std::min(rowHeight * static_cast<float>(items.size()) +
+                                  popupStyle.padding.Vertical(), bounds.h);
+    float x = std::clamp(r.x, bounds.x, std::max(bounds.x, bounds.x + bounds.w - width));
+    float y = r.y + r.h;
+    if (y + height > bounds.y + bounds.h) y = r.y - height;
+    y = std::clamp(y, bounds.y, std::max(bounds.y, bounds.y + bounds.h - height));
+    const Rect popup{x, y, std::min(width, bounds.w), height};
+    DrawBox(popup, popupStyle);
+    draw_.PushClipRect(popup);
+    interactionClips_.push_back(popup);
+    menuPopupRects_.push_back(popup);
+    dropdownPopupRects_.push_back(popup);
+    float rowY = popup.y + popupStyle.padding.top;
+    for (size_t i = 0; i < items.size() && rowY + rowHeight <= popup.y + popup.h; ++i) {
+        const Rect row{popup.x + popupStyle.padding.left, rowY,
+                       std::max(0.f, popup.w - popupStyle.padding.Horizontal()), rowHeight};
+        const WidgetId itemId = HashStr(items[i], HashStr("##dropdown-items", id));
+        const bool isSelected = static_cast<int>(i) == current;
+        const Interaction itemInteraction = Behavior(itemId, row);
+        const ComputedStyle itemStyle = Animate(itemId, "menu-item",
+            isSelected ? State_Checked : State_None,
+            itemInteraction.hovered, itemInteraction.held);
+        DrawBox(row, itemStyle);
+        EmitText({row.x + itemStyle.padding.left,
+                  row.y + (row.h - text_->Measure(items[i], itemStyle.fontSize).y) * 0.5f},
+                 items[i], itemStyle);
+        if (itemInteraction.pressed) {
+            *selected = static_cast<int>(i);
+            dropdowns_[id] = false;
+            changed = true;
+        }
+        rowY += rowHeight;
+    }
+    draw_.PopClipRect();
+    interactionClips_.pop_back();
+    return changed;
+}
+
+void Context::ProgressBar(std::string_view label, float value, Vec2 size) {
+    const ComputedStyle style = Resolve("progress-bar", 0);
+    if (size.x <= 0.f) size.x = content_.w;
+    if (size.y <= 0.f) size.y = std::max(style.fontSize * 1.4f + style.padding.Vertical(), 20.f);
+    const Rect rect = Place(size, style.spacing);
+    DrawBox(rect, style);
+    const float fraction = std::clamp(value, 0.f, 1.f);
+    if (fraction > 0.f) {
+        const float inset = std::max(0.f, style.borderWidth);
+        const Rect inner{rect.x + inset, rect.y + inset,
+                         std::max(0.f, rect.w - inset * 2.f),
+                         std::max(0.f, rect.h - inset * 2.f)};
+        Rect fill{inner.x, inner.y, inner.w * fraction, inner.h};
+        DrawStyledColor(fill, style.accent, style.accentGradient,
+                        style.opacity, style.cornerRadii);
+    }
+    if (!label.empty())
+        DrawTextCentered(rect, label, style);
+}
+
+bool Context::TileContainer(std::string_view label,
+                            const std::vector<std::string_view>& items,
+                            int* selected, Vec2 size) {
+    if (!selected) return false;
+    PushID(label);
+    if (!BeginContainerImpl(size, false, "tile-container")) {
+        PopID();
+        return false;
+    }
+    const ComputedStyle style = Resolve("tile", 0);
+    const float gap = std::max(0.f, style.spacing);
+    const float cellHeight = std::max(style.fontSize * 4.f + style.padding.Vertical(), 64.f);
+    const float availableWidth = std::max(1.f, content_.w);
+    const size_t columns = std::max<size_t>(1, static_cast<size_t>(
+        std::floor((availableWidth + gap) / (96.f + gap))));
+    const float cellWidth = std::max(1.f,
+        (availableWidth - gap * static_cast<float>(columns - 1)) /
+        static_cast<float>(columns));
+    bool changed = false;
+    for (size_t i = 0; i < items.size(); ++i) {
+        sameLine_ = i % columns != 0;
+        const Rect cell = Place({cellWidth, cellHeight}, gap);
+        const WidgetId itemId = HashStr(items[i], GetID("##tile-items"));
+        const bool isSelected = *selected == static_cast<int>(i);
+        const Interaction interaction = Behavior(itemId, cell);
+        const ComputedStyle tileStyle = Animate(itemId, "tile",
+            isSelected ? State_Checked : State_None,
+            interaction.hovered, interaction.held);
+        DrawBox(cell, tileStyle);
+        const float iconWidth = std::min(30.f, cell.w * 0.38f);
+        const Rect folder{cell.x + (cell.w - iconWidth) * 0.5f,
+                          cell.y + tileStyle.padding.top + 5.f,
+                          iconWidth, iconWidth * 0.68f};
+        DrawStyledColor(folder, tileStyle.accent, tileStyle.accentGradient,
+                        tileStyle.opacity, tileStyle.cornerRadii);
+        DrawStyledColor({folder.x, folder.y - 3.f, folder.w * 0.45f,
+                         std::max(2.f, folder.h * 0.18f)},
+                        tileStyle.accent, tileStyle.accentGradient, tileStyle.opacity,
+                        tileStyle.cornerRadii);
+        const Vec2 textSize = text_->Measure(items[i], tileStyle.fontSize);
+        const float textY = folder.y + folder.h + 4.f;
+        draw_.PushClipRect(cell);
+        EmitText({cell.x + tileStyle.padding.left,
+                  textY + std::max(0.f, (cell.y + cell.h - tileStyle.padding.bottom -
+                                            textY - textSize.y) * 0.5f)},
+                 items[i], tileStyle);
+        draw_.PopClipRect();
+        if (interaction.pressed) {
+            *selected = static_cast<int>(i);
+            changed = true;
         }
     }
+    EndContainer();
     return changed;
+}
+
+void Context::ConsoleOutput(std::string_view label, std::string_view text, Vec2 size) {
+    PushID(label);
+    const WidgetId id = GetID("##console-output");
+    const ComputedStyle style = Resolve("console-output", 0);
+    if (size.x <= 0.f) size.x = content_.w;
+    const float lineHeight = std::max(style.fontSize * 1.25f, 1.f);
+    size_t lineCount = 1;
+    for (char ch : text) if (ch == '\n') ++lineCount;
+    if (size.y <= 0.f) size.y = lineHeight * static_cast<float>(lineCount) +
+                                style.padding.Vertical();
+    const Rect rect = Place(size, style.spacing);
+    const Interaction interaction = Behavior(id, rect);
+    DrawBox(rect, style);
+    const Rect inner{rect.x + style.padding.left, rect.y + style.padding.top,
+                     std::max(0.f, rect.w - style.padding.Horizontal()),
+                     std::max(0.f, rect.h - style.padding.Vertical())};
+    TextSelection& selection = consoleSelections_[id];
+    selection.anchor = std::min(selection.anchor, text.size());
+    selection.focus = std::min(selection.focus, text.size());
+    auto characterAt = [&](Vec2 position) {
+        size_t lineStart = 0;
+        size_t lineIndex = 0;
+        while (lineStart <= text.size()) {
+            const size_t lineEnd = text.find('\n', lineStart);
+            const size_t end = lineEnd == std::string_view::npos ? text.size() : lineEnd;
+            if (lineIndex == static_cast<size_t>(std::max(0.f,
+                    std::floor((position.y - inner.y) / lineHeight)))) {
+                const std::string_view line = text.substr(lineStart, end - lineStart);
+                const float targetX = std::max(0.f, position.x - inner.x);
+                size_t byte = 0, nearest = 0;
+                float nearestDistance = std::numeric_limits<float>::max();
+                while (byte < line.size()) {
+                    size_t next = byte + 1;
+                    while (next < line.size() &&
+                           (static_cast<unsigned char>(line[next]) & 0xC0u) == 0x80u)
+                        ++next;
+                    const float x = text_->Measure(line.substr(0, next), style.fontSize).x;
+                    const float distance = std::abs(targetX - x);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearest = next;
+                    }
+                    byte = next;
+                }
+                if (targetX < text_->Measure(line.substr(0, nearest), style.fontSize).x * 0.5f)
+                    nearest = 0;
+                return lineStart + nearest;
+            }
+            if (lineEnd == std::string_view::npos) break;
+            lineStart = lineEnd + 1;
+            ++lineIndex;
+        }
+        return text.size();
+    };
+    if (interaction.held) {
+        selectedConsole_ = id;
+        const size_t offset = characterAt(in_.mousePos);
+        if (!selection.selecting) {
+            selection.anchor = offset;
+            selection.selecting = true;
+        }
+        selection.focus = offset;
+    } else if (!in_.mouseDown[0] && selection.selecting) {
+        selection.selecting = false;
+    }
+    draw_.PushClipRect(inner);
+    size_t lineStart = 0;
+    size_t lineIndex = 0;
+    const size_t selectionStart = std::min(selection.anchor, selection.focus);
+    const size_t selectionEnd = std::max(selection.anchor, selection.focus);
+    selection.text = std::string(text.substr(selectionStart, selectionEnd - selectionStart));
+    while (lineStart <= text.size()) {
+        const size_t lineEnd = text.find('\n', lineStart);
+        const size_t end = lineEnd == std::string_view::npos ? text.size() : lineEnd;
+        const std::string_view line = text.substr(lineStart, end - lineStart);
+        const size_t selectedStart = std::clamp(selectionStart, lineStart, end);
+        const size_t selectedEnd = std::clamp(selectionEnd, lineStart, end);
+        if (selectedEnd > selectedStart) {
+            const float x0 = text_->Measure(text.substr(lineStart, selectedStart - lineStart),
+                                            style.fontSize).x;
+            const float x1 = text_->Measure(text.substr(lineStart, selectedEnd - lineStart),
+                                            style.fontSize).x;
+            DrawStyledColor({inner.x + x0, inner.y + lineHeight * static_cast<float>(lineIndex),
+                             std::max(0.f, x1 - x0), lineHeight},
+                            style.accent, style.accentGradient, style.opacity * 0.55f,
+                            style.cornerRadii);
+        }
+        EmitText({inner.x, inner.y + lineHeight * static_cast<float>(lineIndex)},
+                 line, style);
+        if (lineEnd == std::string_view::npos) break;
+        lineStart = lineEnd + 1;
+        ++lineIndex;
+    }
+    draw_.PopClipRect();
+    PopID();
+}
+
+bool Context::ConsoleInput(std::string_view label, std::string* value, Vec2 size) {
+    if (!value) return false;
+    const WidgetId id = GetID(label);
+    const ComputedStyle style = Resolve("console-input", 0);
+    if (size.x <= 0.f) size.x = content_.w;
+    if (size.y <= 0.f) size.y = style.fontSize * 1.5f + style.padding.Vertical();
+    const Rect rect = Place(size, style.spacing);
+    focusedConsoleInputRect_ = rect;
+    const Interaction interaction = Behavior(id, rect);
+    if (interaction.held) focusedConsoleInput_ = id;
+    if (interaction.pressed) focusedConsoleInput_ = id;
+    const bool focused = focusedConsoleInput_ == id;
+    TextSelection& selection = consoleSelections_[id];
+    selection.anchor = std::min(selection.anchor, value->size());
+    selection.focus = std::min(selection.focus, value->size());
+    const Rect inner{rect.x + style.padding.left, rect.y + style.padding.top,
+                     std::max(0.f, rect.w - style.padding.Horizontal()),
+                     std::max(0.f, rect.h - style.padding.Vertical())};
+    auto characterAt = [&]() {
+        const float targetX = std::max(0.f, in_.mousePos.x - inner.x);
+        size_t byte = 0, nearest = 0;
+        float nearestDistance = std::numeric_limits<float>::max();
+        while (byte < value->size()) {
+            size_t next = byte + 1;
+            while (next < value->size() &&
+                   (static_cast<unsigned char>((*value)[next]) & 0xC0u) == 0x80u)
+                ++next;
+            const float x = text_->Measure(std::string_view(*value).substr(0, next),
+                                           style.fontSize).x;
+            const float distance = std::abs(targetX - x);
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearest = next;
+            }
+            byte = next;
+        }
+        if (targetX < text_->Measure(std::string_view(*value).substr(0, nearest),
+                                    style.fontSize).x * 0.5f)
+            nearest = 0;
+        return nearest;
+    };
+    if (interaction.held) {
+        selectedConsole_ = id;
+        const size_t offset = characterAt();
+        if (!selection.selecting) {
+            selection.anchor = offset;
+            selection.selecting = true;
+        }
+        selection.focus = offset;
+    } else if (!in_.mouseDown[0] && selection.selecting) {
+        selection.selecting = false;
+    }
+
+    bool submitted = false;
+    if (focused && currentWindowId_ == focusedWindow_) {
+        if (in_.keySelectAll) {
+            selection.anchor = 0;
+            selection.focus = value->size();
+        }
+        if (in_.keyBackspace) {
+            const size_t first = std::min(selection.anchor, selection.focus);
+            const size_t last = std::max(selection.anchor, selection.focus);
+            if (last > first) {
+                value->erase(first, last - first);
+                selection.anchor = selection.focus = first;
+            } else if (first > 0) {
+                size_t previous = first - 1;
+                while (previous > 0 &&
+                       (static_cast<unsigned char>((*value)[previous]) & 0xC0u) == 0x80u)
+                    --previous;
+                value->erase(previous, first - previous);
+                selection.anchor = selection.focus = previous;
+            }
+        }
+        if (!in_.textInput.empty()) {
+            const size_t first = std::min(selection.anchor, selection.focus);
+            const size_t last = std::max(selection.anchor, selection.focus);
+            value->replace(first, last - first, in_.textInput);
+            selection.anchor = selection.focus = first + in_.textInput.size();
+        }
+        if (in_.keyEnter) {
+            submitted = true;
+            focusedConsoleInput_ = 0;
+        }
+    }
+    const size_t selectionStart = std::min(selection.anchor, selection.focus);
+    const size_t selectionEnd = std::max(selection.anchor, selection.focus);
+    selection.text = value->substr(selectionStart, selectionEnd - selectionStart);
+    DrawBox(rect, style);
+    draw_.PushClipRect(inner);
+    if (selectionEnd > selectionStart) {
+        const float x0 = text_->Measure(std::string_view(*value).substr(0, selectionStart),
+                                        style.fontSize).x;
+        const float x1 = text_->Measure(std::string_view(*value).substr(0, selectionEnd),
+                                        style.fontSize).x;
+        DrawStyledColor({inner.x + x0, inner.y, std::max(0.f, x1 - x0), inner.h},
+                        style.accent, style.accentGradient, style.opacity * 0.55f,
+                        style.cornerRadii);
+    }
+    EmitText({inner.x, inner.y + std::max(0.f,
+        (inner.h - text_->Measure(*value, style.fontSize).y) * 0.5f)}, *value, style);
+    if (focused && selectionStart == selectionEnd) {
+        const float caretX = text_->Measure(std::string_view(*value).substr(0, selectionEnd),
+                                            style.fontSize).x;
+        DrawStyledColor({inner.x + caretX, inner.y + 2.f, 1.f,
+                         std::max(0.f, inner.h - 4.f)},
+                        style.foreground, style.textGradient, style.opacity);
+    }
+    draw_.PopClipRect();
+    return submitted;
+}
+
+std::string Context::SelectedConsoleText() const {
+    const auto selection = consoleSelections_.find(selectedConsole_);
+    return selection == consoleSelections_.end() ? std::string{} : selection->second.text;
+}
+
+bool Context::RMB_Start() {
+    if (currentWindowId_ == 0 || lastItemId_ == 0) return false;
+    const bool rightPressed = in_.mouseDown[1] && !prevRightMouseDown_;
+    if (rightPressed && lastItemRect_.Contains(in_.mousePos) && windowInputEnabled_) {
+        rmbPopupOwner_ = lastItemId_;
+        rmbPopupAnchor_ = in_.mousePos;
+        rmbPopupWidth_ = 160.f;
+        rmbPopupHeight_ = 0.f;
+        rmbPopupItemCount_ = 0;
+    }
+    if (rmbPopupOwner_ != lastItemId_) return false;
+    const ComputedStyle style = Resolve("context-menu", 0);
+    const ComputedStyle itemStyle = Resolve("context-menu-item", 0);
+    const float rowHeight = itemStyle.fontSize * 1.4f + itemStyle.padding.Vertical();
+    const Rect bounds = windowViewport_.w > 0.f && windowViewport_.h > 0.f
+        ? windowViewport_ : Rect{0.f, 0.f, in_.displaySize.x, in_.displaySize.y};
+    const float height = std::clamp(std::max(rmbPopupHeight_, rowHeight) +
+                                    style.padding.Vertical(), 1.f,
+                                    std::max(1.f, bounds.h));
+    const float width = std::min(std::max(rmbPopupWidth_ + style.padding.Horizontal(), 1.f),
+                                 std::max(1.f, bounds.w));
+    float x = rmbPopupAnchor_.x;
+    float y = rmbPopupAnchor_.y;
+    if (x + width > bounds.x + bounds.w) x -= width;
+    if (y + height > bounds.y + bounds.h) y -= height;
+    x = std::clamp(x, bounds.x, std::max(bounds.x, bounds.x + bounds.w - width));
+    y = std::clamp(y, bounds.y, std::max(bounds.y, bounds.y + bounds.h - height));
+    rmbPopupRect_ = {x, y, width, height};
+    DrawBox(rmbPopupRect_, style);
+    draw_.PushClipRect(rmbPopupRect_);
+    interactionClips_.push_back(rmbPopupRect_);
+    menuPopupRects_.push_back(rmbPopupRect_);
+    rmbPopupCursorY_ = y + style.padding.top;
+    rmbPopupItemCount_ = 0;
+    rmbPopupWidth_ = 0.f;
+    rmbPopupActiveThisFrame_ = true;
+    return true;
+}
+
+bool Context::RMB_Item(std::string_view label) {
+    if (!rmbPopupActiveThisFrame_) return false;
+    const ComputedStyle base = Resolve("context-menu-item", 0);
+    const float rowHeight = base.fontSize * 1.4f + base.padding.Vertical();
+    const Rect row{rmbPopupRect_.x, rmbPopupCursorY_,
+                   rmbPopupRect_.w, rowHeight};
+    const WidgetId id = HashStr(label, rmbPopupOwner_);
+    rmbItemInteraction_ = true;
+    const Interaction interaction = Behavior(id, row);
+    rmbItemInteraction_ = false;
+    const ComputedStyle style = Animate(id, "context-menu-item", State_None,
+                                        interaction.hovered, interaction.held);
+    DrawBox(row, style);
+    EmitText({row.x + style.padding.left,
+              row.y + (row.h - text_->Measure(label, style.fontSize).y) * 0.5f},
+             label, style);
+    rmbPopupCursorY_ += rowHeight;
+    rmbPopupWidth_ = std::max(rmbPopupWidth_,
+        text_->Measure(label, style.fontSize).x + style.padding.Horizontal());
+    ++rmbPopupItemCount_;
+    if (interaction.pressed) rmbPopupOwner_ = 0;
+    return interaction.pressed;
+}
+
+void Context::RMB_End() {
+    if (!rmbPopupActiveThisFrame_) return;
+    const ComputedStyle style = Resolve("context-menu", 0);
+    const ComputedStyle itemStyle = Resolve("context-menu-item", 0);
+    rmbPopupHeight_ = static_cast<float>(rmbPopupItemCount_) *
+        (itemStyle.fontSize * 1.4f + itemStyle.padding.Vertical());
+    rmbPopupWidth_ += style.padding.Horizontal();
+    draw_.PopClipRect();
+    if (!interactionClips_.empty()) interactionClips_.pop_back();
+    rmbPopupActiveThisFrame_ = false;
 }
 
 bool Context::BeginCollapsible(std::string_view label, bool* open, Vec2 size) {
@@ -2268,7 +2721,7 @@ bool Context::BeginCollapsible(std::string_view label, bool* open, Vec2 size) {
     const std::string header = std::string(*open ? "v " : "> ") + std::string(DisplayLabel(label));
     if (Button(header)) *open = !*open;
     if (!*open) return false;
-    if (size.x <= 0.f) size.x = content_.w;
+    size.x = content_.w;
     PushID(label);
     return BeginContainerImpl(size, false, "collapsible-container");
 }
