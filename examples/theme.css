@@ -4,14 +4,14 @@
 
     --ui-window: #050506;
     --ui-sunken: #000000;
-    --ui-panel: #0c0e11;
+    --ui-panel: #030303;
     --ui-panel-hover: #101216;
     --ui-panel-active: #161A20;
     --ui-overlay: transparent;
 
     --ui-border: #141619;
     --ui-border-hover: #242932;
-    --ui-window-border: #000000;
+    --ui-window-border: #030303;
 
     --ui-text: #E8E8E8;
     --ui-text-secondary: #777E89;
@@ -21,7 +21,7 @@
     --ui-danger-hover: #E54850;
     --ui-danger-border: #B92D35;
 
-    --ui-radius: 8px;
+    --ui-radius: 10px;
     --ui-outline-width: 1px;
     --ui-dock-splitter: rgba(255, 255, 255, 0.045);
 }
