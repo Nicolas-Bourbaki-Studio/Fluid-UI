@@ -123,6 +123,39 @@ void DrawList::EndLayer(Layer& layer) {
 }
 
 void DrawList::BringLayerToFront(const Layer& layer) {
+    BringLayerToFrontImpl(layer, nullptr);
+}
+
+void DrawList::BringLayerToFront(const Layer& layer, Layer& trackedLayer) {
+    BringLayerToFrontImpl(layer, &trackedLayer);
+}
+
+void DrawList::BringLayerToFront(const Layer& layer, Layer& trackedLayer,
+                                 Layer& secondTrackedLayer) {
+    BringLayerToFrontImpl(layer, &trackedLayer, &secondTrackedLayer);
+}
+
+void DrawList::BringLayerToFront(Layer& layer,
+                                 const std::vector<Layer*>& trackedLayers) {
+    if (layer.vertexStart > layer.vertexEnd || layer.vertexEnd > vtx_.size() ||
+        layer.indexStart > layer.indexEnd || layer.indexEnd > idx_.size() ||
+        layer.commandStart > layer.commandEnd || layer.commandEnd > cmds_.size())
+        return;
+    const size_t vertexCount = layer.vertexEnd - layer.vertexStart;
+    const size_t indexCount = layer.indexEnd - layer.indexStart;
+    if (vertexCount == 0 || indexCount == 0) return;
+    BringLayerToFrontImpl(layer, nullptr, nullptr, &trackedLayers);
+    layer.vertexStart = vtx_.size() - vertexCount;
+    layer.vertexEnd = vtx_.size();
+    layer.indexStart = idx_.size() - indexCount;
+    layer.indexEnd = idx_.size();
+    layer.commandStart = cmds_.size() - (layer.commandEnd - layer.commandStart);
+    layer.commandEnd = cmds_.size();
+}
+
+void DrawList::BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer,
+                                     Layer* secondTrackedLayer,
+                                     const std::vector<Layer*>* trackedLayers) {
     if (layer.vertexStart > layer.vertexEnd || layer.vertexEnd > vtx_.size() ||
         layer.indexStart > layer.indexEnd || layer.indexEnd > idx_.size() ||
         layer.commandStart > layer.commandEnd || layer.commandEnd > cmds_.size()) return;
@@ -130,6 +163,38 @@ void DrawList::BringLayerToFront(const Layer& layer) {
     const size_t vertexCount = layer.vertexEnd - layer.vertexStart;
     const size_t indexCount = layer.indexEnd - layer.indexStart;
     if (vertexCount == 0 || indexCount == 0) return;
+
+    auto updateTrackedRange = [](size_t& trackedStart, size_t& trackedEnd,
+                                 size_t movedStart, size_t movedEnd, size_t total) {
+        const size_t movedCount = movedEnd - movedStart;
+        if (trackedStart >= movedStart && trackedEnd <= movedEnd) {
+            const size_t shift = total - movedEnd;
+            trackedStart += shift;
+            trackedEnd += shift;
+        } else if (trackedStart >= movedEnd) {
+            trackedStart -= movedCount;
+            trackedEnd -= movedCount;
+        }
+    };
+    auto updateTrackedLayer = [&](Layer* tracked) {
+        if (!tracked) return;
+        updateTrackedRange(tracked->vertexStart, tracked->vertexEnd,
+                           layer.vertexStart, layer.vertexEnd, vtx_.size());
+        updateTrackedRange(tracked->indexStart, tracked->indexEnd,
+                           layer.indexStart, layer.indexEnd, idx_.size());
+        updateTrackedRange(tracked->commandStart, tracked->commandEnd,
+                           layer.commandStart, layer.commandEnd, cmds_.size());
+    };
+    updateTrackedLayer(trackedLayer);
+    if (secondTrackedLayer != trackedLayer)
+        updateTrackedLayer(secondTrackedLayer);
+    if (trackedLayers) {
+        for (Layer* tracked : *trackedLayers) {
+            if (tracked != &layer && tracked != trackedLayer &&
+                tracked != secondTrackedLayer)
+                updateTrackedLayer(tracked);
+        }
+    }
 
     const size_t trailingVertices = vtx_.size() - layer.vertexEnd;
     const size_t trailingIndices = idx_.size() - layer.indexEnd;

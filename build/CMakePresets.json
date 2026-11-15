@@ -27,7 +27,7 @@
         {
             "name": "conan-debug",
             "configurePreset": "conan-debug",
-            "jobs": 12
+            "jobs": 4
         }
     ],
     "testPresets": [
@@ -35,7 +35,7 @@
             "name": "conan-debug",
             "configurePreset": "conan-debug",
             "execution": {
-                "jobs": 12
+                "jobs": 4
             }
         }
     ]

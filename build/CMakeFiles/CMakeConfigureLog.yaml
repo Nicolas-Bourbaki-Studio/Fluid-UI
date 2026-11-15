@@ -7,7 +7,7 @@ events:
       - "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeDetermineSystem.cmake:220 (message)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      The system is: Windows - 10.0.22621 - AMD64
+      The system is: Windows - 10.0.19045 - AMD64
   -
     kind: "find-v1"
     backtrace:
@@ -35,24 +35,18 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
       - "C:/msys64/ucrt64/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "/REGISTRY-NOTFOUND/bin/"
       - "c:/MinGW/bin/"
@@ -75,12 +69,8 @@ events:
       - "C:/Windows/System32/WindowsPowerShell/v1.0/mingw32-make.exe"
       - "C:/Windows/System32/OpenSSH/mingw32-make.exe.com"
       - "C:/Windows/System32/OpenSSH/mingw32-make.exe"
-      - "C:/Program Files/Git/cmd/mingw32-make.exe.com"
-      - "C:/Program Files/Git/cmd/mingw32-make.exe"
       - "C:/Program Files/nodejs/mingw32-make.exe.com"
       - "C:/Program Files/nodejs/mingw32-make.exe"
-      - "C:/Program Files/dotnet/mingw32-make.exe.com"
-      - "C:/Program Files/dotnet/mingw32-make.exe"
       - "C:/Program Files/CMake/bin/mingw32-make.exe.com"
       - "C:/Program Files/CMake/bin/mingw32-make.exe"
       - "C:/msys64/ucrt64/bin/mingw32-make.exe.com"
@@ -89,144 +79,240 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
     kind: "find-v1"
     backtrace:
-      - "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeDetermineCompiler.cmake:115 (find_program)"
-      - "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeDetermineCXXCompiler.cmake:71 (_cmake_find_compiler_path)"
+      - "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeDetermineCompiler.cmake:63 (find_program)"
+      - "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
-    variable: "CMAKE_CXX_COMPILER_WITH_PATH"
-    description: "Path to a program."
+    variable: "CMAKE_CXX_COMPILER"
+    description: "CXX compiler"
     settings:
       SearchFramework: "NEVER"
       SearchAppBundle: "NEVER"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: false
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
+      - "c++"
       - "g++"
+      - "cl"
+      - "bcc"
+      - "icx"
+      - "clang++"
+      - "dpclang++"
     candidate_directories:
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/"
       - "C:/Windows/System32/"
       - "C:/Windows/"
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
       - "C:/msys64/ucrt64/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++.com"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++.exe"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/bin/g++"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++.com"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++.exe"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/sbin/g++"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++.com"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++.exe"
-      - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/g++"
+      - "C:/Windows/System32/c++.com"
+      - "C:/Windows/System32/c++.exe"
+      - "C:/Windows/System32/c++"
       - "C:/Windows/System32/g++.com"
       - "C:/Windows/System32/g++.exe"
       - "C:/Windows/System32/g++"
+      - "C:/Windows/System32/cl.com"
+      - "C:/Windows/System32/cl.exe"
+      - "C:/Windows/System32/cl"
+      - "C:/Windows/System32/bcc.com"
+      - "C:/Windows/System32/bcc.exe"
+      - "C:/Windows/System32/bcc"
+      - "C:/Windows/System32/icx.com"
+      - "C:/Windows/System32/icx.exe"
+      - "C:/Windows/System32/icx"
+      - "C:/Windows/System32/clang++.com"
+      - "C:/Windows/System32/clang++.exe"
+      - "C:/Windows/System32/clang++"
+      - "C:/Windows/System32/dpclang++.com"
+      - "C:/Windows/System32/dpclang++.exe"
+      - "C:/Windows/System32/dpclang++"
+      - "C:/Windows/c++.com"
+      - "C:/Windows/c++.exe"
+      - "C:/Windows/c++"
       - "C:/Windows/g++.com"
       - "C:/Windows/g++.exe"
       - "C:/Windows/g++"
+      - "C:/Windows/cl.com"
+      - "C:/Windows/cl.exe"
+      - "C:/Windows/cl"
+      - "C:/Windows/bcc.com"
+      - "C:/Windows/bcc.exe"
+      - "C:/Windows/bcc"
+      - "C:/Windows/icx.com"
+      - "C:/Windows/icx.exe"
+      - "C:/Windows/icx"
+      - "C:/Windows/clang++.com"
+      - "C:/Windows/clang++.exe"
+      - "C:/Windows/clang++"
+      - "C:/Windows/dpclang++.com"
+      - "C:/Windows/dpclang++.exe"
+      - "C:/Windows/dpclang++"
+      - "C:/Windows/System32/wbem/c++.com"
+      - "C:/Windows/System32/wbem/c++.exe"
+      - "C:/Windows/System32/wbem/c++"
       - "C:/Windows/System32/wbem/g++.com"
       - "C:/Windows/System32/wbem/g++.exe"
       - "C:/Windows/System32/wbem/g++"
+      - "C:/Windows/System32/wbem/cl.com"
+      - "C:/Windows/System32/wbem/cl.exe"
+      - "C:/Windows/System32/wbem/cl"
+      - "C:/Windows/System32/wbem/bcc.com"
+      - "C:/Windows/System32/wbem/bcc.exe"
+      - "C:/Windows/System32/wbem/bcc"
+      - "C:/Windows/System32/wbem/icx.com"
+      - "C:/Windows/System32/wbem/icx.exe"
+      - "C:/Windows/System32/wbem/icx"
+      - "C:/Windows/System32/wbem/clang++.com"
+      - "C:/Windows/System32/wbem/clang++.exe"
+      - "C:/Windows/System32/wbem/clang++"
+      - "C:/Windows/System32/wbem/dpclang++.com"
+      - "C:/Windows/System32/wbem/dpclang++.exe"
+      - "C:/Windows/System32/wbem/dpclang++"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/c++.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/c++.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/c++"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/g++.com"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/g++.exe"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/g++"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/cl.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/cl.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/cl"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/bcc.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/bcc.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/bcc"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/icx.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/icx.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/icx"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/clang++.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/clang++.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/clang++"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/dpclang++.com"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/dpclang++.exe"
+      - "C:/Windows/System32/WindowsPowerShell/v1.0/dpclang++"
+      - "C:/Windows/System32/OpenSSH/c++.com"
+      - "C:/Windows/System32/OpenSSH/c++.exe"
+      - "C:/Windows/System32/OpenSSH/c++"
       - "C:/Windows/System32/OpenSSH/g++.com"
       - "C:/Windows/System32/OpenSSH/g++.exe"
       - "C:/Windows/System32/OpenSSH/g++"
-      - "C:/Program Files/Git/cmd/g++.com"
-      - "C:/Program Files/Git/cmd/g++.exe"
-      - "C:/Program Files/Git/cmd/g++"
+      - "C:/Windows/System32/OpenSSH/cl.com"
+      - "C:/Windows/System32/OpenSSH/cl.exe"
+      - "C:/Windows/System32/OpenSSH/cl"
+      - "C:/Windows/System32/OpenSSH/bcc.com"
+      - "C:/Windows/System32/OpenSSH/bcc.exe"
+      - "C:/Windows/System32/OpenSSH/bcc"
+      - "C:/Windows/System32/OpenSSH/icx.com"
+      - "C:/Windows/System32/OpenSSH/icx.exe"
+      - "C:/Windows/System32/OpenSSH/icx"
+      - "C:/Windows/System32/OpenSSH/clang++.com"
+      - "C:/Windows/System32/OpenSSH/clang++.exe"
+      - "C:/Windows/System32/OpenSSH/clang++"
+      - "C:/Windows/System32/OpenSSH/dpclang++.com"
+      - "C:/Windows/System32/OpenSSH/dpclang++.exe"
+      - "C:/Windows/System32/OpenSSH/dpclang++"
+      - "C:/Program Files/nodejs/c++.com"
+      - "C:/Program Files/nodejs/c++.exe"
+      - "C:/Program Files/nodejs/c++"
       - "C:/Program Files/nodejs/g++.com"
       - "C:/Program Files/nodejs/g++.exe"
       - "C:/Program Files/nodejs/g++"
-      - "C:/Program Files/dotnet/g++.com"
-      - "C:/Program Files/dotnet/g++.exe"
-      - "C:/Program Files/dotnet/g++"
+      - "C:/Program Files/nodejs/cl.com"
+      - "C:/Program Files/nodejs/cl.exe"
+      - "C:/Program Files/nodejs/cl"
+      - "C:/Program Files/nodejs/bcc.com"
+      - "C:/Program Files/nodejs/bcc.exe"
+      - "C:/Program Files/nodejs/bcc"
+      - "C:/Program Files/nodejs/icx.com"
+      - "C:/Program Files/nodejs/icx.exe"
+      - "C:/Program Files/nodejs/icx"
+      - "C:/Program Files/nodejs/clang++.com"
+      - "C:/Program Files/nodejs/clang++.exe"
+      - "C:/Program Files/nodejs/clang++"
+      - "C:/Program Files/nodejs/dpclang++.com"
+      - "C:/Program Files/nodejs/dpclang++.exe"
+      - "C:/Program Files/nodejs/dpclang++"
+      - "C:/Program Files/CMake/bin/c++.com"
+      - "C:/Program Files/CMake/bin/c++.exe"
+      - "C:/Program Files/CMake/bin/c++"
       - "C:/Program Files/CMake/bin/g++.com"
       - "C:/Program Files/CMake/bin/g++.exe"
       - "C:/Program Files/CMake/bin/g++"
-      - "C:/msys64/ucrt64/bin/g++.com"
-    found: "C:/msys64/ucrt64/bin/g++.exe"
+      - "C:/Program Files/CMake/bin/cl.com"
+      - "C:/Program Files/CMake/bin/cl.exe"
+      - "C:/Program Files/CMake/bin/cl"
+      - "C:/Program Files/CMake/bin/bcc.com"
+      - "C:/Program Files/CMake/bin/bcc.exe"
+      - "C:/Program Files/CMake/bin/bcc"
+      - "C:/Program Files/CMake/bin/icx.com"
+      - "C:/Program Files/CMake/bin/icx.exe"
+      - "C:/Program Files/CMake/bin/icx"
+      - "C:/Program Files/CMake/bin/clang++.com"
+      - "C:/Program Files/CMake/bin/clang++.exe"
+      - "C:/Program Files/CMake/bin/clang++"
+      - "C:/Program Files/CMake/bin/dpclang++.com"
+      - "C:/Program Files/CMake/bin/dpclang++.exe"
+      - "C:/Program Files/CMake/bin/dpclang++"
+      - "C:/msys64/ucrt64/bin/c++.com"
+    found: "C:/msys64/ucrt64/bin/c++.exe"
     search_context:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -257,33 +343,27 @@ events:
     found: "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeCXXCompilerId.cpp.in"
     search_context:
       CMAKE_INCLUDE_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include"
+        - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include"
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -295,7 +375,7 @@ events:
       - "CMakeLists.txt:2 (project)"
     message: |
       Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
-      Compiler: C:/msys64/ucrt64/bin/g++.exe 
+      Compiler: C:/msys64/ucrt64/bin/c++.exe 
       Build flags: -m64
       Id flags:  
       
@@ -306,7 +386,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.exe"
       
       The CXX compiler identification is GNU, found in:
-        C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/4.5.0-rc3/CompilerIdCXX/a.exe
+        C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/4.5.0/CompilerIdCXX/a.exe
       
   -
     kind: "find-v1"
@@ -334,23 +414,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/ar.com"
@@ -359,29 +433,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -410,23 +478,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/ranlib.com"
@@ -435,29 +497,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -486,23 +542,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/strip.com"
@@ -511,29 +561,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -562,23 +606,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/ld.com"
@@ -587,29 +625,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -638,23 +670,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/nm.com"
@@ -663,29 +689,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -714,23 +734,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/objdump.com"
@@ -739,29 +753,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -790,23 +798,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/objcopy.com"
@@ -815,29 +817,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -866,23 +862,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/readelf.com"
@@ -891,29 +881,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -942,23 +926,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/dlltool.com"
@@ -967,29 +945,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -1018,23 +990,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/addr2line.com"
@@ -1043,29 +1009,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -1094,23 +1054,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/tapi.com"
@@ -1131,24 +1085,15 @@ events:
       - "C:/Windows/System32/OpenSSH/tapi.com"
       - "C:/Windows/System32/OpenSSH/tapi.exe"
       - "C:/Windows/System32/OpenSSH/tapi"
-      - "C:/Program Files/Git/cmd/tapi.com"
-      - "C:/Program Files/Git/cmd/tapi.exe"
-      - "C:/Program Files/Git/cmd/tapi"
       - "C:/Program Files/nodejs/tapi.com"
       - "C:/Program Files/nodejs/tapi.exe"
       - "C:/Program Files/nodejs/tapi"
-      - "C:/Program Files/dotnet/tapi.com"
-      - "C:/Program Files/dotnet/tapi.exe"
-      - "C:/Program Files/dotnet/tapi"
       - "C:/Program Files/CMake/bin/tapi.com"
       - "C:/Program Files/CMake/bin/tapi.exe"
       - "C:/Program Files/CMake/bin/tapi"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/tapi.com"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/tapi.exe"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/tapi"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/tapi.com"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/tapi.exe"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/tapi"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/tapi.com"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/tapi.exe"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/tapi"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/tapi.com"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/tapi.exe"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/tapi"
@@ -1158,30 +1103,21 @@ events:
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/tapi.com"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/tapi.exe"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/tapi"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/tapi.com"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/tapi.exe"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/tapi"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/tapi.com"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/tapi.exe"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/tapi"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi.com"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi.exe"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi"
-      - "C:/Users/mike1/AppData/Roaming/npm/tapi.com"
-      - "C:/Users/mike1/AppData/Roaming/npm/tapi.exe"
-      - "C:/Users/mike1/AppData/Roaming/npm/tapi"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/tapi.com"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/tapi.exe"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/tapi"
-      - "C:/Users/mike1/.aftman/bin/tapi.com"
-      - "C:/Users/mike1/.aftman/bin/tapi.exe"
-      - "C:/Users/mike1/.aftman/bin/tapi"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/tapi.com"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/tapi.exe"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/tapi"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/tapi.com"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/tapi.exe"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/tapi"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/tapi.com"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/tapi.exe"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/tapi"
+      - "C:/Users/mike1/AppData/Roaming/npm/tapi.com"
+      - "C:/Users/mike1/AppData/Roaming/npm/tapi.exe"
+      - "C:/Users/mike1/AppData/Roaming/npm/tapi"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi.com"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi.exe"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/tapi"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.com"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi.exe"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi"
@@ -1190,29 +1126,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -1244,23 +1174,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/gcc-ar-16.2.com"
@@ -1278,29 +1202,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -1332,23 +1250,17 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
     searched_directories:
       - "C:/msys64/ucrt64/bin/gcc-ranlib-16.2.com"
@@ -1366,29 +1278,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
   -
@@ -1422,24 +1328,18 @@ events:
       - "C:/Windows/System32/wbem/"
       - "C:/Windows/System32/WindowsPowerShell/v1.0/"
       - "C:/Windows/System32/OpenSSH/"
-      - "C:/Program Files/Git/cmd/"
       - "C:/Program Files/nodejs/"
-      - "C:/Program Files/dotnet/"
       - "C:/Program Files/CMake/bin/"
       - "C:/msys64/ucrt64/bin/"
-      - "C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
-      - "C:/Users/mike1/AppData/Roaming/Python/Python314/Scripts/"
+      - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Lib/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/Scripts/"
       - "C:/Users/mike1/AppData/Local/Programs/Python/Python314/"
       - "C:/Users/mike1/AppData/Local/Microsoft/WindowsApps/"
-      - "C:/Users/mike1/AppData/Local/Unity/bin/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/"
-      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
-      - "C:/Users/mike1/AppData/Roaming/npm/"
-      - "C:/Users/mike1/AppData/Local/Microsoft/WinGet/Packages/pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe/"
-      - "C:/Users/mike1/.aftman/bin/"
+      - "C:/Users/mike1/AppData/Local/GitHubCopilotCLI/"
       - "C:/Users/mike1/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim/"
-      - "C:/Users/mike1/AppData/Local/Programs/cursor/resources/app/bin/"
+      - "C:/Users/mike1/AppData/Roaming/npm/"
+      - "C:/Users/mike1/AppData/Local/GitHubDesktop/bin/"
       - "C:/Users/mike1/AppData/Roaming/Code/User/globalStorage/github.copilot-chat/debugCommand/"
       - "C:/Program Files/bin/"
       - "C:/Program Files/sbin/"
@@ -1478,15 +1378,9 @@ events:
       - "C:/Windows/System32/OpenSSH/windres.com"
       - "C:/Windows/System32/OpenSSH/windres.exe"
       - "C:/Windows/System32/OpenSSH/windres"
-      - "C:/Program Files/Git/cmd/windres.com"
-      - "C:/Program Files/Git/cmd/windres.exe"
-      - "C:/Program Files/Git/cmd/windres"
       - "C:/Program Files/nodejs/windres.com"
       - "C:/Program Files/nodejs/windres.exe"
       - "C:/Program Files/nodejs/windres"
-      - "C:/Program Files/dotnet/windres.com"
-      - "C:/Program Files/dotnet/windres.exe"
-      - "C:/Program Files/dotnet/windres"
       - "C:/Program Files/CMake/bin/windres.com"
       - "C:/Program Files/CMake/bin/windres.exe"
       - "C:/Program Files/CMake/bin/windres"
@@ -1496,29 +1390,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
@@ -1536,8 +1424,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l"
-      binary: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l"
+      source: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd"
+      binary: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "-m64"
       CMAKE_CXX_FLAGS_DEBUG: "-g"
@@ -1549,23 +1437,23 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: false
       stdout: |
-        Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
+        Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd'
         
-        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_47b5b/fast
-        C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_47b5b.dir\\build.make CMakeFiles/cmTC_47b5b.dir/build
-        mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
-        Building CXX object CMakeFiles/cmTC_47b5b.dir/CMakeCXXCompilerABI.cpp.obj
-        C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"
+        Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_1c437/fast
+        C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_1c437.dir\\build.make CMakeFiles/cmTC_1c437.dir/build
+        mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd'
+        Building CXX object CMakeFiles/cmTC_1c437.dir/CMakeCXXCompilerABI.cpp.obj
+        C:\\msys64\\ucrt64\\bin\\c++.exe   -m64  -std=gnu++20   -v -o CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"
         Using built-in specs.
-        COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe
+        COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\c++.exe
         Target: x86_64-w64-mingw32
-        Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-tls --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-backtrace=yes --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/ucrt64 --with-mpfr=/ucrt64 --with-mpc=/ucrt64 --with-isl=/ucrt64 --with-pkgversion='Rev4, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --with-libstdcxx-zoneinfo=yes --disable-libstdcxx-debug --enable-lto --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+        Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-threads=posix --enable-tls --enable-fully-dynamic-string --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-system-zlib --with-isl --with-pkgversion='Rev7, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --disable-libstdcxx-debug --enable-plugin
         Thread model: posix
         Supported LTO compression algorithms: zlib zstd
-        gcc version 16.2.0 (Rev4, Built by MSYS2 project) 
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_47b5b.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s
-        GNU C++20 (Rev4, Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)
+        gcc version 16.2.0 (Rev7, Built by MSYS2 project) 
+        COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_1c437.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=gnu++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccGRP1Ka.s
+        GNU C++20 (Rev7, Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)
         	compiled by GNU C version 16.2.0, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.4.1, isl version isl-0.28-GMP
         
         GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
@@ -1586,35 +1474,35 @@ events:
          C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/include-fixed
          C:/msys64/ucrt64/bin/../../ucrt64/include
         End of search list.
-        Compiler executable checksum: 8e7d23a9ab3cd610d3de06f65ae43541
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s
+        Compiler executable checksum: 2c9f525242d4629fc574be603938ef7f
+        COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccGRP1Ka.s
         GNU assembler version 2.47 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.47.20260726
         COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/;C:/msys64/ucrt64/bin/../../ucrt64/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../;C:/msys64/ucrt64/bin/../../ucrt64/lib/
-        COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.'
-        Linking CXX executable cmTC_47b5b.exe
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_47b5b.dir\\link.txt --verbose=1
+        COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_1c437.exe
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_1c437.dir\\link.txt --verbose=1
         Using built-in specs.
-        COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe
+        COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\c++.exe
         COLLECT_LTO_WRAPPER=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe
         Target: x86_64-w64-mingw32
-        Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-tls --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-backtrace=yes --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/ucrt64 --with-mpfr=/ucrt64 --with-mpc=/ucrt64 --with-isl=/ucrt64 --with-pkgversion='Rev4, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --with-libstdcxx-zoneinfo=yes --disable-libstdcxx-debug --enable-lto --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+        Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-threads=posix --enable-tls --enable-fully-dynamic-string --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-system-zlib --with-isl --with-pkgversion='Rev7, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --disable-libstdcxx-debug --enable-plugin
         Thread model: posix
         Supported LTO compression algorithms: zlib zstd
-        gcc version 16.2.0 (Rev4, Built by MSYS2 project) 
+        gcc version 16.2.0 (Rev7, Built by MSYS2 project) 
         COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/
         LIBRARY_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/;C:/msys64/ucrt64/bin/../lib/gcc/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/;C:/msys64/ucrt64/bin/../../ucrt64/lib/../lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/;C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../;C:/msys64/ucrt64/bin/../../ucrt64/lib/
-        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.'
-         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
+        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_1c437.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_1c437.'
+         C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
         collect2 version 16.2.0
-        C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
+        C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o
         GNU ld (GNU Binutils) 2.47.20260726
-        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.'
-        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_47b5b.dir/objects.a
-        C:\\msys64\\ucrt64\\bin\\ar.exe qc CMakeFiles\\cmTC_47b5b.dir/objects.a @CMakeFiles\\cmTC_47b5b.dir\\objects1.rsp
-        C:\\msys64\\ucrt64\\bin\\g++.exe -m64  -m64 -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a -Wl,--no-whole-archive -o cmTC_47b5b.exe -Wl,--out-implib,libcmTC_47b5b.dll.a -Wl,--major-image-version,0,--minor-image-version,0
-        mingw32-make[1]: Leaving directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l'
+        COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_1c437.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_1c437.'
+        "C:\\Program Files\\CMake\\bin\\cmake.exe" -E rm -f CMakeFiles\\cmTC_1c437.dir/objects.a
+        C:\\msys64\\ucrt64\\bin\\ar.exe qc CMakeFiles\\cmTC_1c437.dir/objects.a @CMakeFiles\\cmTC_1c437.dir\\objects1.rsp
+        C:\\msys64\\ucrt64\\bin\\c++.exe -m64  -m64 -v -Wl,-v -Wl,--whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a -Wl,--no-whole-archive -o cmTC_1c437.exe -Wl,--out-implib,libcmTC_1c437.dll.a -Wl,--major-image-version,0,--minor-image-version,0
+        mingw32-make[1]: Leaving directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd'
         
       exitCode: 0
   -
@@ -1653,23 +1541,23 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|wild|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)(\\.exe)?"?( |$)]
         linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|wild))("|,| |$)]
-        ignore line: [Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l']
+        ignore line: [Change Dir: 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd']
         ignore line: []
-        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_47b5b/fast]
-        ignore line: [C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_47b5b.dir\\build.make CMakeFiles/cmTC_47b5b.dir/build]
-        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-8ct02l']
-        ignore line: [Building CXX object CMakeFiles/cmTC_47b5b.dir/CMakeCXXCompilerABI.cpp.obj]
-        ignore line: [C:\\msys64\\ucrt64\\bin\\g++.exe   -m64  -std=c++20   -v -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"]
+        ignore line: [Run Build Command(s): "C:/Program Files/CMake/bin/cmake.exe" -E env VERBOSE=1 C:/msys64/ucrt64/bin/mingw32-make.exe -f Makefile cmTC_1c437/fast]
+        ignore line: [C:/msys64/ucrt64/bin/mingw32-make.exe  -f CMakeFiles\\cmTC_1c437.dir\\build.make CMakeFiles/cmTC_1c437.dir/build]
+        ignore line: [mingw32-make[1]: Entering directory 'C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/CMakeScratch/TryCompile-o5l3jd']
+        ignore line: [Building CXX object CMakeFiles/cmTC_1c437.dir/CMakeCXXCompilerABI.cpp.obj]
+        ignore line: [C:\\msys64\\ucrt64\\bin\\c++.exe   -m64  -std=gnu++20   -v -o CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj -c "C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp"]
         ignore line: [Using built-in specs.]
-        ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe]
+        ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\c++.exe]
         ignore line: [Target: x86_64-w64-mingw32]
-        ignore line: [Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-tls --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-backtrace=yes --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/ucrt64 --with-mpfr=/ucrt64 --with-mpc=/ucrt64 --with-isl=/ucrt64 --with-pkgversion='Rev4, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --with-libstdcxx-zoneinfo=yes --disable-libstdcxx-debug --enable-lto --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++]
+        ignore line: [Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c c++ ada fortran lto objc obj-c++ jit --enable-threads=posix --enable-tls --enable-fully-dynamic-string --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-system-zlib --with-isl --with-pkgversion='Rev7  Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --disable-libstdcxx-debug --enable-plugin]
         ignore line: [Thread model: posix]
         ignore line: [Supported LTO compression algorithms: zlib zstd]
-        ignore line: [gcc version 16.2.0 (Rev4  Built by MSYS2 project) ]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\']
-        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_47b5b.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=c++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s]
-        ignore line: [GNU C++20 (Rev4  Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)]
+        ignore line: [gcc version 16.2.0 (Rev7  Built by MSYS2 project) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\']
+        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/cc1plus.exe -quiet -v -iprefix C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/ -isysroot C:/msys64/ucrt64/bin/../../ucrt64 -D_REENTRANT C:\\Program Files\\CMake\\share\\cmake-4.5\\Modules\\CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles\\cmTC_1c437.dir\\ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -m64 -mtune=generic -march=nocona -std=gnu++20 -version -o C:\\Users\\mike1\\AppData\\Local\\Temp\\ccGRP1Ka.s]
+        ignore line: [GNU C++20 (Rev7  Built by MSYS2 project) version 16.2.0 (x86_64-w64-mingw32)]
         ignore line: [	compiled by GNU C version 16.2.0  GMP version 6.3.0  MPFR version 4.2.2  MPC version 1.4.1  isl version isl-0.28-GMP]
         ignore line: []
         ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
@@ -1690,9 +1578,9 @@ events:
         ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/include-fixed]
         ignore line: [ C:/msys64/ucrt64/bin/../../ucrt64/include]
         ignore line: [End of search list.]
-        ignore line: [Compiler executable checksum: 8e7d23a9ab3cd610d3de06f65ae43541]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\']
-        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccYZ0hbT.s]
+        ignore line: [Compiler executable checksum: 2c9f525242d4629fc574be603938ef7f]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\']
+        ignore line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/as.exe -v --64 -o CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj C:\\Users\\mike1\\AppData\\Local\\Temp\\ccGRP1Ka.s]
         ignore line: [GNU assembler version 2.47 (x86_64-w64-mingw32) using BFD version (GNU Binutils) 2.47.20260726]
         ignore line: [COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/]
@@ -1705,17 +1593,17 @@ events:
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../]
         ignore line: [C:/msys64/ucrt64/bin/../../ucrt64/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=c++20' '-v' '-o' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_47b5b.dir\\CMakeCXXCompilerABI.cpp.']
-        ignore line: [Linking CXX executable cmTC_47b5b.exe]
-        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_47b5b.dir\\link.txt --verbose=1]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-std=gnu++20' '-v' '-o' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.obj' '-c' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'CMakeFiles\\cmTC_1c437.dir\\CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_1c437.exe]
+        ignore line: ["C:\\Program Files\\CMake\\bin\\cmake.exe" -E cmake_link_script CMakeFiles\\cmTC_1c437.dir\\link.txt --verbose=1]
         ignore line: [Using built-in specs.]
-        ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\g++.exe]
+        ignore line: [COLLECT_GCC=C:\\msys64\\ucrt64\\bin\\c++.exe]
         ignore line: [COLLECT_LTO_WRAPPER=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe]
         ignore line: [Target: x86_64-w64-mingw32]
-        ignore line: [Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c,c++,ada,fortran,lto,objc,obj-c++,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-tls --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-backtrace=yes --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/ucrt64 --with-mpfr=/ucrt64 --with-mpc=/ucrt64 --with-isl=/ucrt64 --with-pkgversion='Rev4, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --with-libstdcxx-zoneinfo=yes --disable-libstdcxx-debug --enable-lto --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++]
+        ignore line: [Configured with: ../gcc-16.2.0/configure --prefix=/ucrt64 --with-sysroot=/ucrt64 --with-build-sysroot=D:/M/msys64/ucrt64 --with-local-prefix=/local --with-native-system-header-dir=/include --libexecdir=/ucrt64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-mingw-wildcard --enable-languages=c c++ ada fortran lto objc obj-c++ jit --enable-threads=posix --enable-tls --enable-fully-dynamic-string --enable-libstdcxx-time --disable-libstdcxx-pch --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-system-zlib --with-isl --with-pkgversion='Rev7  Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --disable-libstdcxx-debug --enable-plugin]
         ignore line: [Thread model: posix]
         ignore line: [Supported LTO compression algorithms: zlib zstd]
-        ignore line: [gcc version 16.2.0 (Rev4  Built by MSYS2 project) ]
+        ignore line: [gcc version 16.2.0 (Rev7  Built by MSYS2 project) ]
         ignore line: [COMPILER_PATH=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/]
@@ -1727,13 +1615,13 @@ events:
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/]
         ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../]
         ignore line: [C:/msys64/ucrt64/bin/../../ucrt64/lib/]
-        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_47b5b.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_47b5b.']
-        link line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
+        ignore line: [COLLECT_GCC_OPTIONS='-m64' '-v' '-o' 'cmTC_1c437.exe' '-shared-libgcc' '-mtune=generic' '-march=nocona' '-dumpdir' 'cmTC_1c437.']
+        link line: [ C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/collect2.exe] ==> ignore
           arg [-plugin] ==> ignore, skip following value
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll] ==> skip value of -plugin
           arg [-plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe] ==> ignore
-          arg [-plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res] ==> ignore
+          arg [-plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res] ==> ignore
           arg [-plugin-opt=-pass-through=-lmingw32] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
           arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
@@ -1756,7 +1644,7 @@ events:
           arg [i386pep] ==> ignore
           arg [-Bdynamic] ==> search dynamic
           arg [-o] ==> ignore, skip following value
-          arg [cmTC_47b5b.exe] ==> skip value of -o
+          arg [cmTC_1c437.exe] ==> skip value of -o
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o]
           arg [-LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0] ==> dir [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0]
@@ -1769,10 +1657,10 @@ events:
           arg [-LC:/msys64/ucrt64/bin/../../ucrt64/lib] ==> dir [C:/msys64/ucrt64/bin/../../ucrt64/lib]
           arg [-v] ==> ignore
           arg [--whole-archive] ==> ignore
-          arg [CMakeFiles\\cmTC_47b5b.dir/objects.a] ==> ignore
+          arg [CMakeFiles\\cmTC_1c437.dir/objects.a] ==> ignore
           arg [--no-whole-archive] ==> ignore
           arg [--out-implib] ==> ignore
-          arg [libcmTC_47b5b.dll.a] ==> ignore
+          arg [libcmTC_1c437.dll.a] ==> ignore
           arg [--major-image-version] ==> ignore
           arg [0] ==> ignore
           arg [--minor-image-version] ==> ignore
@@ -1798,9 +1686,9 @@ events:
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o]
           arg [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> obj [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
         ignore line: [collect2 version 16.2.0]
-        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe]
-        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker architecture flags [-m;i386pep]
-        ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccmSefi4.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_47b5b.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_47b5b.dir/objects.a --no-whole-archive --out-implib libcmTC_47b5b.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
+        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe]
+        link line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o] ==> linker architecture flags [-m;i386pep]
+        ignore line: [C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe -plugin C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/liblto_plugin.dll -plugin-opt=C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/lto-wrapper.exe -plugin-opt=-fresolution=C:\\Users\\mike1\\AppData\\Local\\Temp\\ccSJCkdx.res -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lpthread -plugin-opt=-pass-through=-ladvapi32 -plugin-opt=-pass-through=-lshell32 -plugin-opt=-pass-through=-luser32 -plugin-opt=-pass-through=-lkernel32 -plugin-opt=-pass-through=-lmingw32 -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lmingwex -plugin-opt=-pass-through=-lmsvcrt -plugin-opt=-pass-through=-lkernel32 --sysroot=C:/msys64/ucrt64/bin/../../ucrt64 -m i386pep -Bdynamic -o cmTC_1c437.exe C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/crt2.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtbegin.o -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0 -LC:/msys64/ucrt64/bin/../lib/gcc -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib -LC:/msys64/ucrt64/bin/../../ucrt64/lib/../lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../x86_64-w64-mingw32/lib -LC:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../.. -LC:/msys64/ucrt64/bin/../../ucrt64/lib -v --whole-archive CMakeFiles\\cmTC_1c437.dir/objects.a --no-whole-archive --out-implib libcmTC_1c437.dll.a --major-image-version 0 --minor-image-version 0 -lstdc++ -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 -lpthread -ladvapi32 -lshell32 -luser32 -lkernel32 -lmingw32 -lgcc_s -lgcc -lmingwex -lmsvcrt -lkernel32 C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/../../../../lib/default-manifest.o C:/msys64/ucrt64/bin/../lib/gcc/x86_64-w64-mingw32/16.2.0/crtend.o]
         linker tool for 'CXX': C:/msys64/ucrt64/x86_64-w64-mingw32/bin/ld.exe -m;i386pep
         remove lib [msvcrt]
         remove lib [msvcrt]
@@ -1854,37 +1742,187 @@ events:
     names:
       - "glfw3"
     candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+      - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/"
+    found: "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/libglfw3.a"
     search_context:
       CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+        - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib"
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "C:/Program Files (x86)/FluidUI/bin"
+        - "C:/Program Files/CMake/bin"
+        - "/bin"
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "CMakeLists.txt:13 (find_package)"
+    name: "glfw3"
+    configs:
+      -
+        filename: "glfw3.cps"
+        kind: "cps"
+      -
+        filename: "glfw3Config.cmake"
+        kind: "cmake"
+      -
+        filename: "glfw3-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "required_explicit"
+      quiet: false
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      names:
+        - "glfw3"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3Config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/lib/cps/glfw3.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/share/cps/glfw3.cps"
+        mode: "cps"
+        reason: "no_exist"
+      -
+        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3Config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found:
+      path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3-config.cmake"
+      mode: "config"
+      version: "3.4"
+    search_context:
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files (x86)/FluidUI"
+      CMAKE_MODULE_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+...
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "build/cmakedeps_macros.cmake:32 (find_library)"
+      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
+      - "build/glfw3Targets.cmake:24 (include)"
+      - "build/glfw3-config.cmake:16 (include)"
+      - "CMakeLists.txt:13 (find_package)"
+    mode: "library"
+    variable: "CONAN_FOUND_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "glfw3"
+    candidate_directories:
+      - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/"
+    found: "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/libglfw3.a"
+    search_context:
+      CMAKE_LIBRARY_PATH:
+        - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib"
+      CMAKE_PREFIX_PATH:
+        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
+      ENV{PATH}:
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\msys64\\ucrt64\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
@@ -1966,29 +2004,23 @@ events:
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
@@ -1997,105 +2029,6 @@ events:
         - "C:/Program Files (x86)"
         - "C:/Program Files/CMake"
         - "C:/Program Files (x86)/FluidUI"
-  -
-    kind: "find_package-v1"
-    backtrace:
-      - "CMakeLists.txt:13 (find_package)"
-    name: "glfw3"
-    configs:
-      -
-        filename: "glfw3.cps"
-        kind: "cps"
-      -
-        filename: "glfw3Config.cmake"
-        kind: "cmake"
-      -
-        filename: "glfw3-config.cmake"
-        kind: "cmake"
-    version_request:
-      exact: false
-    settings:
-      required: "required_explicit"
-      quiet: false
-      global: false
-      policy_scope: true
-      bypass_provider: false
-      names:
-        - "glfw3"
-      path_suffixes:
-        - ""
-      paths:
-        CMAKE_FIND_USE_CMAKE_PATH: true
-        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
-        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
-        CMAKE_FIND_USE_INSTALL_PREFIX: true
-        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
-        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
-        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
-        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
-    candidates:
-      -
-        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/glfw3-config.cmake"
-        mode: "config"
-        reason: "no_exist"
-      -
-        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/lib/cps/glfw3.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/CMakeFiles/pkgRedirects/share/cps/glfw3.cps"
-        mode: "cps"
-        reason: "no_exist"
-      -
-        path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3Config.cmake"
-        mode: "config"
-        reason: "no_exist"
-    found:
-      path: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/glfw3-config.cmake"
-      mode: "config"
-      version: "3.4"
-    search_context:
-      CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
-      ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
-        - "C:\\Program Files\\CMake\\bin"
-        - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_PREFIX_PATH:
-        - "C:/Program Files"
-        - "C:/Program Files (x86)"
-        - "C:/Program Files/CMake"
-        - "C:/Program Files (x86)/FluidUI"
-      CMAKE_MODULE_PATH:
-        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
 ...
 
 ---
@@ -2122,37 +2055,31 @@ events:
     names:
       - "glfw3"
     candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+      - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/"
+    found: "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/libglfw3.a"
     search_context:
       CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+        - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib"
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
+        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
         - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
@@ -2191,246 +2118,33 @@ events:
     names:
       - "glfw3"
     candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
+      - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/"
+    found: "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/libglfw3.a"
     search_context:
       CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
+        - "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib"
       CMAKE_PREFIX_PATH:
         - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
       ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Windows\\system32"
+        - "C:\\Windows"
+        - "C:\\Windows\\System32\\Wbem"
+        - "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\Windows\\System32\\OpenSSH\\"
         - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
         - "C:\\Program Files\\CMake\\bin"
         - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Lib"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
         - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\mike1\\AppData\\Local\\GitHubCopilotCLI\\"
+        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
         - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_PREFIX_PATH:
-        - "C:/Program Files"
-        - "C:/Program Files (x86)"
-        - "C:/Program Files/CMake"
-        - "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files (x86)/FluidUI/bin"
-        - "C:/Program Files/CMake/bin"
-        - "/bin"
-...
-
----
-events:
-  -
-    kind: "find-v1"
-    backtrace:
-      - "build/cmakedeps_macros.cmake:32 (find_library)"
-      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
-      - "build/glfw3Targets.cmake:24 (include)"
-      - "build/glfw3-config.cmake:16 (include)"
-      - "CMakeLists.txt:13 (find_package)"
-    mode: "library"
-    variable: "CONAN_FOUND_LIBRARY"
-    description: "Path to a library."
-    settings:
-      SearchFramework: "NEVER"
-      SearchAppBundle: "NEVER"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
-      CMAKE_FIND_USE_INSTALL_PREFIX: true
-    names:
-      - "glfw3"
-    candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
-    search_context:
-      CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
-      CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
-      ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
-        - "C:\\Program Files\\CMake\\bin"
-        - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
         - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_PREFIX_PATH:
-        - "C:/Program Files"
-        - "C:/Program Files (x86)"
-        - "C:/Program Files/CMake"
-        - "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files (x86)/FluidUI/bin"
-        - "C:/Program Files/CMake/bin"
-        - "/bin"
-...
-
----
-events:
-  -
-    kind: "find-v1"
-    backtrace:
-      - "build/cmakedeps_macros.cmake:32 (find_library)"
-      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
-      - "build/glfw3Targets.cmake:24 (include)"
-      - "build/glfw3-config.cmake:16 (include)"
-      - "CMakeLists.txt:13 (find_package)"
-    mode: "library"
-    variable: "CONAN_FOUND_LIBRARY"
-    description: "Path to a library."
-    settings:
-      SearchFramework: "NEVER"
-      SearchAppBundle: "NEVER"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
-      CMAKE_FIND_USE_INSTALL_PREFIX: true
-    names:
-      - "glfw3"
-    candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
-    search_context:
-      CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
-      CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
-      ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
-        - "C:\\Program Files\\CMake\\bin"
-        - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "c:\\Users\\mike1\\AppData\\Roaming\\Code\\User\\globalStorage\\github.copilot-chat\\debugCommand"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-      CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_PREFIX_PATH:
-        - "C:/Program Files"
-        - "C:/Program Files (x86)"
-        - "C:/Program Files/CMake"
-        - "C:/Program Files (x86)/FluidUI"
-      CMAKE_SYSTEM_LIBRARY_PATH:
-        - "C:/Program Files (x86)/FluidUI/bin"
-        - "C:/Program Files/CMake/bin"
-        - "/bin"
-...
-
----
-events:
-  -
-    kind: "find-v1"
-    backtrace:
-      - "build/cmakedeps_macros.cmake:32 (find_library)"
-      - "build/glfw3-Target-debug.cmake:23 (conan_package_library_targets)"
-      - "build/glfw3Targets.cmake:24 (include)"
-      - "build/glfw3-config.cmake:16 (include)"
-      - "CMakeLists.txt:13 (find_package)"
-    mode: "library"
-    variable: "CONAN_FOUND_LIBRARY"
-    description: "Path to a library."
-    settings:
-      SearchFramework: "NEVER"
-      SearchAppBundle: "NEVER"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
-      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
-      CMAKE_FIND_USE_INSTALL_PREFIX: true
-    names:
-      - "glfw3"
-    candidate_directories:
-      - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/"
-    found: "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a"
-    search_context:
-      CMAKE_LIBRARY_PATH:
-        - "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib"
-      CMAKE_PREFIX_PATH:
-        - "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build"
-      ENV{PATH}:
-        - "C:\\WINDOWS\\system32"
-        - "C:\\WINDOWS"
-        - "C:\\WINDOWS\\System32\\Wbem"
-        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
-        - "C:\\WINDOWS\\System32\\OpenSSH\\"
-        - "C:\\Program Files\\Git\\cmd"
-        - "C:\\Program Files\\nodejs\\"
-        - "C:\\Program Files\\dotnet\\"
-        - "C:\\Program Files\\CMake\\bin"
-        - "C:\\msys64\\ucrt64\\bin"
-        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\Python\\Python314\\Scripts"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\Scripts\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Python\\Python314\\"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WindowsApps"
-        - "C:\\Users\\mike1\\AppData\\Local\\Unity\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\GitHubDesktop\\bin"
-        - "C:\\Users\\mike1\\AppData\\Roaming\\npm"
-        - "C:\\Users\\mike1\\AppData\\Local\\Microsoft\\WinGet\\Packages\\pnpm.pnpm_Microsoft.Winget.Source_8wekyb3d8bbwe"
-        - "C:\\Users\\mike1\\.aftman\\bin"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\copilot-shim"
-        - "C:\\Users\\mike1\\AppData\\Local\\Programs\\cursor\\resources\\app\\bin"
-        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@vscode\\ripgrep-universal\\bin\\win32-x64"
-        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\c4453f8ea4\\resources\\app\\node_modules.asar.unpacked\\@github\\copilot-sdk-win32-x64\\ripgrep\\bin\\win32-x64"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\69047191fc\\resources\\app\\node_modules.asar.unpacked\\@vscode\\ripgrep-universal\\bin\\win32-x64"
+        - "c:\\Users\\mike1\\AppData\\Local\\Programs\\Microsoft VS Code\\69047191fc\\resources\\app\\node_modules.asar.unpacked\\@github\\copilot-sdk-win32-x64\\ripgrep\\bin\\win32-x64"
       CMAKE_INSTALL_PREFIX: "C:/Program Files (x86)/FluidUI"
       CMAKE_SYSTEM_PREFIX_PATH:
         - "C:/Program Files"

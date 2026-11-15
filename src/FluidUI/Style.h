@@ -18,7 +18,7 @@ enum class Prop : uint8_t {
     OutlineWidth, Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
     BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
-    RoundingBottomRight, RoundingBottomLeft
+    RoundingBottomRight, RoundingBottomLeft, WindowCanDock, WindowChildDock
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
@@ -49,6 +49,8 @@ struct ComputedStyle {
     float spacing     = 6.f;
     float shadowBlur  = 0.f;
     bool shadowEnabled = true;
+    bool windowCanDock = true;
+    bool windowChildDock = true;
     float opacity     = 1.f;
     float transitionSpeed = 14.f; // higher = snappier
     Edges padding {4.f, 8.f, 4.f, 8.f};
@@ -96,6 +98,8 @@ public:
         RuleBuilder& Spacing(float v)         { return Num(Prop::Spacing, v); }
         RuleBuilder& ShadowBlur(float v)      { return Num(Prop::ShadowBlur, v); }
         RuleBuilder& ShadowEnabled(bool v)    { return Num(Prop::ShadowEnabled, v ? 1.f : 0.f); }
+        RuleBuilder& WindowCanDock(bool v)    { return Num(Prop::WindowCanDock, v ? 1.f : 0.f); }
+        RuleBuilder& WindowChildDock(bool v)  { return Num(Prop::WindowChildDock, v ? 1.f : 0.f); }
         RuleBuilder& Opacity(float v)         { return Num(Prop::Opacity, v); }
         RuleBuilder& TransitionSpeed(float v) { return Num(Prop::TransitionSpeed, v); }
         RuleBuilder& BackgroundImage(std::string source) {

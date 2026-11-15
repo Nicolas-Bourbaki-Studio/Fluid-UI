@@ -33,6 +33,11 @@ public:
     Layer BeginLayer();
     void EndLayer(Layer& layer);
     void BringLayerToFront(const Layer& layer);
+    void BringLayerToFront(const Layer& layer, Layer& trackedLayer);
+    void BringLayerToFront(const Layer& layer, Layer& trackedLayer,
+                           Layer& secondTrackedLayer);
+    void BringLayerToFront(Layer& layer,
+                           const std::vector<Layer*>& trackedLayers);
 
     void AddRectFilled(Rect r, Color c, float rounding = 0.f);
     void AddRectFilled(Rect r, Color c, CornerRadii rounding);
@@ -68,6 +73,9 @@ private:
     Rect CurrentClip() const;
     void PrepareCmd(GPUImageId imageId);
     void FinishPrimitive();
+    void BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer,
+                               Layer* secondTrackedLayer = nullptr,
+                               const std::vector<Layer*>* trackedLayers = nullptr);
     void AddConvexFill(const Vec2* pts, int n, Color c);
     void AddConvexFillGradient(const Vec2* pts, int n, const LinearGradient& gradient,
                                Rect bounds, float opacity);

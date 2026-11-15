@@ -30,6 +30,8 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.spacing     = Lerp(a.spacing,     b.spacing,     t);
     o.shadowBlur  = Lerp(a.shadowBlur,  b.shadowBlur,  t);
     o.shadowEnabled = t < 0.5f ? a.shadowEnabled : b.shadowEnabled;
+    o.windowCanDock = t < 0.5f ? a.windowCanDock : b.windowCanDock;
+    o.windowChildDock = t < 0.5f ? a.windowChildDock : b.windowChildDock;
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
     o.padding     = Lerp(a.padding,     b.padding,     t);
@@ -152,6 +154,7 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "font-size" || name == "gap" || name == "spacing" ||
         name == "shadow-blur" || name == "shadow-enabled" ||
         name == "opacity" || name == "transition-speed" ||
+        name == "window-can-dock" || name == "window-child-dock" ||
         name == "padding" || name == "border" || name == "background-image" ||
         name == "text-gradient" || name == "color-gradient" ||
         name == "foreground-gradient" ||
@@ -230,6 +233,8 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::Spacing:         s.spacing = v[0]; break;
         case Prop::ShadowBlur:      s.shadowBlur = v[0]; break;
         case Prop::ShadowEnabled:   s.shadowEnabled = v[0] != 0.f; break;
+        case Prop::WindowCanDock:   s.windowCanDock = v[0] != 0.f; break;
+        case Prop::WindowChildDock: s.windowChildDock = v[0] != 0.f; break;
         case Prop::Opacity:         s.opacity = v[0]; break;
         case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
@@ -561,6 +566,12 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     if (name == "shadow-enabled") {
         if (value != "true" && value != "false") return false;
         out.prop = Prop::ShadowEnabled;
+        out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "window-can-dock" || name == "window-child-dock") {
+        if (value != "true" && value != "false") return false;
+        out.prop = name == "window-can-dock" ? Prop::WindowCanDock : Prop::WindowChildDock;
         out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
         return true;
     }
@@ -1088,10 +1099,30 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
     s.Rule("menu-item:checked")
         .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("context-menu").Background(C::FromHex(0x182231FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(5)).ShadowColor(C::FromHex(0x00000088)).ShadowBlur(14);
+    s.Rule("context-menu-item").Background({0.f, 0.f, 0.f, 0.f})
+        .Foreground(C::FromHex(0xDCE6F5FF)).Padding(Edges(5, 10)).Rounding(4);
+    s.Rule("context-menu-item:hover")
+        .Background(C::FromHex(0x315A91FF)).Foreground(C::FromHex(0xFFFFFFFF));
+    s.Rule("hint").Background(C::FromHex(0x182231FF))
+        .Foreground(C::FromHex(0xDCE6F5FF)).BorderColor(C::FromHex(0x3A4B64FF))
+        .BorderWidth(1).Rounding(7).Padding(Edges(6, 10))
+        .ShadowColor(C::FromHex(0x000000AA)).ShadowBlur(12);
+    s.Rule("notification").Background(C::FromHex(0x182231FF))
+        .Foreground(C::FromHex(0xF1F5FCFF)).BorderColor(C::FromHex(0x5A91F7FF))
+        .BorderWidth(1).Rounding(8).Padding(Edges(8, 14))
+        .ShadowColor(C::FromHex(0x000000CC)).ShadowBlur(18);
     s.Rule("window-scrollbar")
+        .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
+    s.Rule("container-scrollbar")
         .Background(C::FromHex(0x263346FF)).Accent(C::FromHex(0x6885AFFF));
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
+    s.Rule("dock-splitter").Background(C::FromHex(0x8999B0AA)).Rounding(2);
+    s.Rule("dock-splitter:hover").Background(C::FromHex(0x5A91F7FF));
+    s.Rule("dock-splitter:active").Background(C::FromHex(0x82B2FFFF));
 
     s.Rule("text").Padding(Edges(2, 0)).Foreground(C::FromHex(0xCFD9E8FF));
 
@@ -1146,6 +1177,27 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
     s.Rule("dropdown:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("progress-bar").Background(C::FromHex(0x111A27FF))
+        .BorderColor(C::FromHex(0x34445AFF)).BorderWidth(1).Rounding(6)
+        .Accent(C::FromHex(0x5A91F7FF)).Padding(Edges(2, 6));
+    s.Rule("tile-container").Background(C::FromHex(0x111A27FF))
+        .BorderColor(C::FromHex(0x34445AFF)).BorderWidth(1).Rounding(8)
+        .Padding(Edges(6)).Spacing(6);
+    s.Rule("tile").Background(C::FromHex(0x1B2839FF))
+        .BorderColor(C::FromHex(0x344D6AFF)).BorderWidth(1).Rounding(7)
+        .Accent(C::FromHex(0x5A91F7FF)).Padding(Edges(6));
+    s.Rule("tile:hover").BorderColor(C::FromHex(0x7EA8E9FF));
+    s.Rule("tile:checked").Background(C::FromHex(0x2F5E9AFF))
+        .BorderColor(C::FromHex(0x6190E8FF));
+    s.Rule("console-output")
+        .Background(C::FromHex(0x000000FF)).BorderColor(C::FromHex(0x34445AFF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
+    s.Rule("console-output-normal").Foreground(C::FromHex(0xE2E8F0FF));
+    s.Rule("console-output-warning").Foreground(C::FromHex(0xFFC857FF));
+    s.Rule("console-output-error").Foreground(C::FromHex(0xFF6B6BFF));
+    s.Rule("console-input")
+        .Background(C::FromHex(0x0C121BFF)).BorderColor(C::FromHex(0x526783FF))
+        .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
     s.Rule("image-button")
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));

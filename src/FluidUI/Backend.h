@@ -15,10 +15,17 @@ enum class CursorShape : uint8_t {
 
 struct InputState {
     Vec2  mousePos;
+    // GLFW-style ordering: left, right, middle.
     bool  mouseDown[3] = {false, false, false};
     float mouseWheel = 0.f;
     float deltaTime = 1.f / 60.f;
     Vec2  displaySize;
+    std::string_view textInput;
+    // Frame events for text editing and host clipboard integration.
+    bool keyBackspace = false;
+    bool keyEnter = false;
+    bool keySelectAll = false;
+    bool keyCopy = false;
 };
 
 // Implement with stb_truetype / FreeType / the platform's text API.

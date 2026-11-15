@@ -23,8 +23,6 @@ endif()
 
 ########## 'compilers' block #############
 
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
 
 
 ########## 'arch_flags' block #############
@@ -60,9 +58,9 @@ function(conan_modify_std_watch variable access value current_list_file stack)
     unset(conan_watched_std_variable)
 endfunction()
 
-message(STATUS "Conan toolchain: C++ Standard 20 with extensions OFF")
+message(STATUS "Conan toolchain: C++ Standard 20 with extensions ON")
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 variable_watch(CMAKE_CXX_STANDARD conan_modify_std_watch)
 
@@ -156,9 +154,9 @@ list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 # Definition of CMAKE_PREFIX_PATH, CMAKE_XXXXX_PATH
 # The Conan local "generators" folder, where this toolchain is saved.
 list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR} )
-list(PREPEND CMAKE_LIBRARY_PATH "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib")
-list(PREPEND CMAKE_INCLUDE_PATH "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include")
-set(CONAN_RUNTIME_LIB_DIRS "C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/bin" )
+list(PREPEND CMAKE_LIBRARY_PATH "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib")
+list(PREPEND CMAKE_INCLUDE_PATH "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include")
+set(CONAN_RUNTIME_LIB_DIRS "C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/bin" )
 
 endif()
 
