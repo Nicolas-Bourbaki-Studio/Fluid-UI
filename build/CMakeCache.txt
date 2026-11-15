@@ -27,10 +27,8 @@ CMAKE_BUILD_TYPE:STRING=Debug
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
-//Full path to the compiler used for language <LANG>. Set by CMake
-// during compiler detection on the first configure; users may
-// override on the command line to select a specific toolchain.
-CMAKE_CXX_COMPILER:UNINITIALIZED=g++
+//CXX compiler
+CMAKE_CXX_COMPILER:FILEPATH=C:/msys64/ucrt64/bin/c++.exe
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -55,18 +53,8 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
-//Default value used to initialize the CXX_STANDARD target property
-// when a target is created. See the cmake-compile-features(7)
-// manual for the list of supported standards and compilers.
-CMAKE_CXX_STANDARD:UNINITIALIZED=20
-
 //Libraries linked by default with all C++ applications.
 CMAKE_CXX_STANDARD_LIBRARIES:STRING=-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
-
-//Full path to the compiler used for language <LANG>. Set by CMake
-// during compiler detection on the first configure; users may
-// override on the command line to select a specific toolchain.
-CMAKE_C_COMPILER:UNINITIALIZED=gcc
 
 //Path to a program.
 CMAKE_DLLTOOL:FILEPATH=C:/msys64/ucrt64/bin/dlltool.exe
@@ -240,7 +228,7 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 //Path to a CMake toolchain file, read early in the CMake run,
 // that specifies the compilers, toolchain utilities, and target-platform
 // information used when cross-compiling.
-CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\conan_toolchain.cmake
+CMAKE_TOOLCHAIN_FILE:UNINITIALIZED=build/conan_toolchain.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console

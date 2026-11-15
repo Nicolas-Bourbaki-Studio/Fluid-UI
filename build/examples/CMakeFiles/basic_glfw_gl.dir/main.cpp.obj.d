@@ -4,8 +4,7 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/_mingw_mac.h \
  C:/msys64/ucrt64/include/_mingw_secapi.h \
  C:/msys64/ucrt64/include/vadefs.h C:/msys64/ucrt64/include/sdkddkver.h \
- C:/msys64/ucrt64/include/excpt.h C:/msys64/ucrt64/include/crtdefs.h \
- C:/msys64/ucrt64/include/corecrt.h \
+ C:/msys64/ucrt64/include/excpt.h C:/msys64/ucrt64/include/corecrt.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdarg.h \
  C:/msys64/ucrt64/include/stdarg.h \
  C:/msys64/ucrt64/include/_mingw_stdarg.h \
@@ -242,7 +241,7 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/mcx.h C:/msys64/ucrt64/include/imm.h \
  C:/msys64/ucrt64/include/wincodec.h C:/msys64/ucrt64/include/ocidl.h \
  C:/msys64/ucrt64/include/dxgiformat.h C:/msys64/ucrt64/include/dcommon.h \
- C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/include/GLFW/glfw3.h \
+ C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/GL/gl.h \
  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h \
