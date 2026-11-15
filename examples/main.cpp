@@ -35,6 +35,7 @@ static std::string gTextInput;
 static bool gBackspacePressed = false;
 static bool gEnterPressed = false;
 static bool gSelectAllPressed = false;
+static bool gCopyPressed = false;
 
 static void OnScroll(GLFWwindow*, double, double yOffset) {
     gMouseWheel += static_cast<float>(yOffset);
@@ -63,6 +64,7 @@ static void OnKey(GLFWwindow*, int key, int, int action, int mods) {
     if (key == GLFW_KEY_BACKSPACE) gBackspacePressed = true;
     if (key == GLFW_KEY_ENTER) gEnterPressed = true;
     if (key == GLFW_KEY_A && (mods & GLFW_MOD_CONTROL)) gSelectAllPressed = true;
+    if (key == GLFW_KEY_C && (mods & GLFW_MOD_CONTROL)) gCopyPressed = true;
 }
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
@@ -745,7 +747,13 @@ int main(int argc, char** argv) {
     int selectedTile = 0;
     int lmbClickCount = 0;
     std::string consoleCommand;
-    std::string consoleOutput = "Fluid UI console ready.\nType a command and press Enter.";
+    std::vector<Context::ConsoleLine> consoleOutput{
+        {"Fluid UI console ready.", Context::ConsoleTextType::Normal},
+        {"Type a command and press Enter.", Context::ConsoleTextType::Normal},
+        {"Select text and press Ctrl+C.", Context::ConsoleTextType::Normal},
+        {"Warning: sample warning message.", Context::ConsoleTextType::Warning},
+        {"Error: sample error message.", Context::ConsoleTextType::Error}
+    };
     constexpr std::string_view componentWindow = "Components##main";
     constexpr std::string_view tabsWindow = "Tabs and panels##tabs";
     constexpr std::string_view managerWindow = "Window manager##manager";
@@ -772,7 +780,8 @@ int main(int argc, char** argv) {
         in.keyBackspace = gBackspacePressed;
         in.keyEnter = gEnterPressed;
         in.keySelectAll = gSelectAllPressed;
-        gBackspacePressed = gEnterPressed = gSelectAllPressed = false;
+        in.keyCopy = gCopyPressed;
+        gBackspacePressed = gEnterPressed = gSelectAllPressed = gCopyPressed = false;
         last = now;
         ui.NewFrame(in);
         ui.DockWindows(dockingEnabled);
@@ -894,15 +903,22 @@ int main(int argc, char** argv) {
                 ui.LMB_End();
             }
             ui.Text("Left-click activations: " + std::to_string(lmbClickCount));
+            ui.Button("Hover for a hint");
+            ui.Hint("Hints appear while the previous widget is hovered.");
+            if (ui.Button("Show notification"))
+                ui.Notification("This is a demo notification.");
             ui.Button("RMB_Start / RMB_End test");
             if (ui.RMB_Start()) {
-                if (ui.RMB_Item("Refresh")) consoleOutput += "\nRefreshed.";
+                if (ui.RMB_Item("Refresh"))
+                    consoleOutput.push_back(
+                        {"Refreshed.", Context::ConsoleTextType::Normal});
                 if (ui.RMB_Item("Clear console")) consoleOutput.clear();
                 ui.RMB_End();
             }
             ui.ConsoleOutput("Console log", consoleOutput, {0, 66});
             if (ui.ConsoleInput("Console command", &consoleCommand)) {
-                consoleOutput += "\n> " + consoleCommand;
+                consoleOutput.push_back(
+                    {"> " + consoleCommand, Context::ConsoleTextType::Normal});
                 consoleCommand.clear();
             }
 
@@ -993,6 +1009,11 @@ int main(int argc, char** argv) {
         }
 
         const DrawList& dl = ui.EndFrame();
+        if (in.keyCopy) {
+            const std::string selectedText = ui.SelectedConsoleText();
+            if (!selectedText.empty())
+                glfwSetClipboardString(win, selectedText.c_str());
+        }
         GLFWcursor* requestedCursor = nullptr;
         switch (ui.Cursor()) {
             case CursorShape::Arrow: requestedCursor = cursors[0]; break;

@@ -53,6 +53,11 @@ public:
         std::string_view icon;
         bool showText = true;
     };
+    enum class ConsoleTextType : uint8_t { Normal, Warning, Error };
+    struct ConsoleLine {
+        std::string text;
+        ConsoleTextType type = ConsoleTextType::Normal;
+    };
     bool BeginTabContainer(std::string_view label, Vec2 size,
                            const std::vector<TabItem>& tabs, int* selected,
                            TabPosition position = TabPosition::Top);
@@ -78,8 +83,12 @@ public:
                        int* selected, Vec2 size = {}, GPUImageId icon = 0,
                        Vec2 iconSize = {124.f, 124.f});
     void ConsoleOutput(std::string_view label, std::string_view text, Vec2 size = {});
+    void ConsoleOutput(std::string_view label, const std::vector<ConsoleLine>& lines,
+                       Vec2 size = {});
     bool ConsoleInput(std::string_view label, std::string* value, Vec2 size = {});
     std::string SelectedConsoleText() const;
+    void Hint(std::string_view message);
+    void Notification(std::string_view message);
     bool RMB_Start();
     bool RMB_Item(std::string_view label);
     void RMB_End();
@@ -131,10 +140,30 @@ private:
         float cursorX = 0.f;
         bool sameLine = false, horizontal = false;
     };
-    struct ContainerState { LayoutState outer; };
+    struct ContainerScrollState {
+        float scrollX = 0.f, scrollY = 0.f;
+        float contentWidth = 0.f, contentHeight = 0.f;
+        float scrollDragOffsetX = 0.f, scrollDragOffsetY = 0.f;
+        bool scrollingX = false, scrollingY = false;
+    };
+    struct ContainerState {
+        LayoutState outer;
+        WidgetId id = 0;
+        Rect frame, baseContent;
+        float contentRight = 0.f, contentBottom = 0.f;
+        float scrollX = 0.f, scrollY = 0.f;
+    };
+    struct ScrollableContainerRect {
+        Rect rect;
+        WidgetId windowId = 0;
+    };
     struct DockSplitter {
         Rect rect;
         WidgetId id = 0;
+        DockSide side = DockSide::None;
+        bool canvasBoundary = false;
+        bool hovered = false;
+        bool held = false;
     };
     struct TabGroup {
         std::vector<WidgetId> windows;
@@ -151,6 +180,10 @@ private:
     struct TextSelection {
         size_t anchor = 0, focus = 0;
         std::string text;
+        Rect outputRect;
+        WidgetId outputWindow = 0;
+        float scrollY = 0.f, scrollDragOffset = 0.f;
+        bool outputScrollable = false, scrolling = false;
         bool selecting = false;
     };
 
@@ -162,6 +195,7 @@ private:
     bool IsFloatingWindowAt(Vec2 position) const;
     WidgetId WindowAt(Vec2 position, WidgetId exclude) const;
     void DetachTab(WidgetId id);
+    void NormalizeTabGroupIdentity(WidgetId groupId);
     void JoinTab(WidgetId id, WidgetId target);
     Rect Place(Vec2 size, float spacing);
     void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
@@ -177,8 +211,11 @@ private:
     DockSide DockTargetAt(Vec2 position) const;
     void SetDockPreview(DockSide side, WidgetId newWindow = 0);
     void LayoutDockedWindows();
+    void BringLayerToFront(DrawList::Layer& layer);
     bool BeginContainerImpl(Vec2 size, bool horizontal,
                             std::string_view widget = "container");
+    void ConsoleOutputImpl(std::string_view label, std::string_view text,
+                           const std::vector<ConsoleTextType>& lineTypes, Vec2 size);
     Rect BeginMenuPopup(WidgetId id, Rect anchor, size_t depth);
     void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
 
@@ -213,10 +250,15 @@ private:
     uint64_t nextWindowZ_ = 0;
     std::unordered_map<WidgetId, Anim> anims_;
     std::vector<ContainerState> containerStack_;
+    std::unordered_map<WidgetId, ContainerScrollState> containerScrollStates_;
+    std::vector<ScrollableContainerRect> scrollableContainerRects_;
+    std::vector<ScrollableContainerRect> previousScrollableContainerRects_;
     std::vector<MenuState> menuStack_;
     std::vector<WidgetId> openMenus_;
     std::vector<Rect> menuPopupRects_;
     std::vector<Rect> dropdownPopupRects_;
+    std::vector<Rect> previousDropdownPopupRects_;
+    std::vector<DrawList::Layer> dropdownPopupLayers_;
     std::unordered_map<WidgetId, Vec2> menuPopupSizes_;
     std::vector<DockSplitter> dockSplitters_;
     std::unordered_map<WidgetId, bool> dropdowns_;
@@ -231,12 +273,19 @@ private:
     float rmbPopupWidth_ = 160.f;
     float rmbPopupHeight_ = 0.f;
     size_t rmbPopupItemCount_ = 0;
+    std::string notificationMessage_;
+    float notificationStartedAt_ = 0.f;
+    float notificationExpiresAt_ = 0.f;
+    DrawList::Layer hintLayer_;
     DrawList::Layer rmbPopupLayer_;
     Rect lastItemRect_;
     WidgetId lastItemId_ = 0;
     bool rmbPopupActiveThisFrame_ = false;
+    bool dropdownItemInteraction_ = false;
     bool rmbPopupHasLayer_ = false;
+    bool hintHasLayer_ = false;
     bool rmbItemInteraction_ = false;
+    bool lastItemHovered_ = false;
     bool lastItemPressed_ = false;
     bool lmbScopeActive_ = false;
     bool horizontalLayout_ = false;

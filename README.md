@@ -13,7 +13,8 @@
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
 popup dropdown menus, progress bars, selectable console output and input, file-browser-style
 tile containers, text and image labels, image buttons, collapsible containers, containers,
-horizontal/vertical lists, tabbed containers, and class-styleable empty widgets.
+horizontal/vertical lists, tabbed containers, hover hints, timed notifications, and
+class-styleable empty widgets.
 Text/icon labels can be combined as needed.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
@@ -52,16 +53,31 @@ horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
 one with an icon displays both by default, or just the icon when `showText` is false.
 `TileContainer` displays selectable file-style tiles from supplied labels; its optional
 GPU-image argument sets a shared tile icon. `ConsoleOutput`
-and `ConsoleInput` support mouse text selection; retrieve the selected bytes with
-`SelectedConsoleText()` for host clipboard integration. Input receives text and key events through
-`InputState::textInput`, `keyBackspace`, `keyEnter`, and `keySelectAll`. The host should fill
-those fields with events for the current frame. The GLFW example shows the callback wiring.
+and `ConsoleInput` support mouse text selection; `ConsoleOutput` scrolls when its content
+overflows and has a black background by default. It also accepts
+`std::vector<Context::ConsoleLine>` entries with `ConsoleTextType::Normal`, `Warning`, or
+`Error`; style their colors with the `console-output-normal`, `console-output-warning`, and
+`console-output-error` selectors. Retrieve selected bytes with `SelectedConsoleText()` for host
+clipboard integration.
+Containers automatically show draggable scrollbars when their content exceeds the visible area.
+Vertical overflow also responds to the mouse wheel; style container bars with
+`container-scrollbar`.
+Input receives text and key events through `InputState::textInput`, `keyBackspace`, `keyEnter`,
+`keySelectAll`, and `keyCopy`. The host should fill those fields with events for the current
+frame. The GLFW example wires Ctrl+C to the OS clipboard.
+Open dropdown popups render above window content; context menus and hints retain their higher
+priority layers.
 After an interactive widget, `RMB_Start()` opens its context menu on right-click; add options
 with `RMB_Item()` and close the scope with `RMB_End()`. The popup renders above windows,
 dock previews, and other UI layers.
 The GLFW example includes a dedicated RMB test button with Refresh and Clear console actions.
 Call `LMB_Start()` immediately after an interactive widget to detect its left-click
 activation, and pair a successful call with `LMB_End()`.
+Call `Hint(message)` immediately after an interactive widget to show a tooltip while it is
+hovered; hints render above all other UI. `Notification(message)` displays a shadowed toast
+at the bottom center of the app for three seconds; a new notification replaces the current
+one. The GLFW demo includes
+controls for both, and docking a window automatically shows the undocking hint.
 
 ## Wrapper-friendly windows and menus
 
@@ -112,9 +128,11 @@ bottom, left, right, and center targets in a 3x3 layout with a live pane preview
 windows hide their close control, have no drop shadow,
 and require a title-bar double-click to undock. Dragging a docked title bar does not undock
 it; drop on another window's title bar to group the windows as tabs. Floating windows retain
-their shadows. The GLFW demo smooths rounded geometry with
-multisampling and higher-resolution corner tessellation, and uses linear filtering for
-images; multisampling is kept off for textured draws so it does not add antialiasing
+their shadows. Visible separators mark the canvas boundary of edge-docked panels for resizing;
+window-to-window splitters remain independently draggable. Canvas-boundary separators are drawn
+in the adjacent docked panel's layer, so floating windows can cover them. The GLFW demo smooths
+rounded geometry with multisampling and higher-resolution corner tessellation, and uses linear
+filtering for images; multisampling is kept off for textured draws so it does not add antialiasing
 to the text.
 
 ## CSS-like themes and classes
@@ -267,7 +285,8 @@ window while dragging another window onto it.
 Save and restore window positions, sizes, open state, dock sides, dock order, split
 proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files
 are versioned and validated before being applied; tab groups and the selected center dock tab
-are saved too. Version 1 layouts are still accepted. Keep window titles and any surrounding
+are saved too. Version 1 layouts are still accepted, and older tab groups whose original anchor
+was removed are normalized when loaded. Keep window titles and any surrounding
 `PushID` scopes stable between runs so saved window IDs continue to identify the same windows.
 
 The demo loads its layout at startup and saves it when the application exits. By default,
