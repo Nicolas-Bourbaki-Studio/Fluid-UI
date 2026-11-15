@@ -90,7 +90,10 @@ void Context::NewFrame(const InputState& input) {
     dropdownPopupRects_.clear();
     lastItemRect_ = {};
     lastItemId_ = 0;
+    lastItemPressed_ = false;
+    lmbScopeActive_ = false;
     rmbPopupActiveThisFrame_ = false;
+    rmbPopupHasLayer_ = false;
     draw_.Clear();
     draw_.PushClipRect({0.f, 0.f, in_.displaySize.x, in_.displaySize.y});
     idStack_.clear();
@@ -120,9 +123,17 @@ void Context::NewFrame(const InputState& input) {
 const DrawList& Context::EndFrame() {
     if (const auto focused = windows_.find(focusedWindow_);
         focused != windows_.end() && focused->second.hasDrawLayer) {
-        draw_.BringLayerToFront(focused->second.drawLayer);
+        if (rmbPopupHasLayer_)
+            draw_.BringLayerToFront(focused->second.drawLayer, rmbPopupLayer_);
+        else
+            draw_.BringLayerToFront(focused->second.drawLayer);
     }
-    if (menuBarLayerActive_) draw_.BringLayerToFront(menuBarLayer_);
+    if (menuBarLayerActive_) {
+        if (rmbPopupHasLayer_)
+            draw_.BringLayerToFront(menuBarLayer_, rmbPopupLayer_);
+        else
+            draw_.BringLayerToFront(menuBarLayer_);
+    }
     for (const DockSplitter& dockSplitter : dockSplitters_) {
         const Rect& splitter = dockSplitter.rect;
         const bool vertical = splitter.h >= splitter.w;
@@ -170,20 +181,18 @@ const DrawList& Context::EndFrame() {
         const auto target = windows_.find(tabDropTarget_);
         if (target != windows_.end()) {
             const Rect rect{target->second.pos.x, target->second.pos.y,
-                            target->second.size.x,
-                            std::min(target->second.size.y,
-                                     target->second.titleHeight)};
-            const ComputedStyle style = Resolve("dock-tab", State_Checked);
+                            target->second.size.x, target->second.size.y};
+            const ComputedStyle style = Resolve("dock-highlight", State_Checked);
             constexpr float border = 3.f;
             DrawStyledColor({rect.x, rect.y, rect.w, border},
-                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+                            style.foreground, style.textGradient, style.opacity, border * 0.5f);
             DrawStyledColor({rect.x, rect.y + rect.h - border, rect.w, border},
-                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+                            style.foreground, style.textGradient, style.opacity, border * 0.5f);
             DrawStyledColor({rect.x, rect.y + border, border, rect.h - border * 2.f},
-                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+                            style.foreground, style.textGradient, style.opacity, border * 0.5f);
             DrawStyledColor({rect.x + rect.w - border, rect.y + border, border,
                              rect.h - border * 2.f},
-                            style.accent, style.accentGradient, style.opacity, border * 0.5f);
+                            style.foreground, style.textGradient, style.opacity, border * 0.5f);
         }
     }
     if (dockCompassVisible_) {
@@ -191,12 +200,16 @@ const DrawList& Context::EndFrame() {
         dockClasses.emplace_back("docking-options");
         const ComputedStyle menuStyle = style_.Resolve("dock-menu", dockClasses, 0);
         DrawBox(dockCompassRect_, menuStyle);
-        constexpr DockSide sides[] = {
+        constexpr DockSide targets[] = {
+            DockSide::Top, DockSide::Left, DockSide::Center,
+            DockSide::Right, DockSide::Bottom
+        };
+        constexpr DockSide gridCells[] = {
             DockSide::TopLeft, DockSide::Top, DockSide::TopRight,
             DockSide::Left, DockSide::Center, DockSide::Right,
             DockSide::BottomLeft, DockSide::Bottom, DockSide::BottomRight
         };
-        for (DockSide side : sides) {
+        for (DockSide side : targets) {
             const Rect target = DockTargetRect(side);
             const bool hovered = target.Contains(in_.mousePos);
             ComputedStyle style = style_.Resolve(
@@ -208,7 +221,7 @@ const DrawList& Context::EndFrame() {
             const float cellSize = (icon.w - 2.f * cellGap) / 3.f;
             for (int row = 0; row < 3; ++row) {
                 for (int column = 0; column < 3; ++column) {
-                    const DockSide cellSide = sides[row * 3 + column];
+                    const DockSide cellSide = gridCells[row * 3 + column];
                     const bool selectedCell = side == cellSide;
                     const Color cellColor = selectedCell
                         ? style.accent : style.background;
@@ -220,6 +233,7 @@ const DrawList& Context::EndFrame() {
             }
         }
     }
+    if (rmbPopupHasLayer_) draw_.BringLayerToFront(rmbPopupLayer_);
     draw_.PopClipRect();
     prevMouseDown_ = in_.mouseDown[0];
     if (!in_.mouseDown[0]) {
@@ -279,6 +293,7 @@ Context::Interaction Context::Behavior(WidgetId id, Rect r) {
             active_ = 0;
         }
     }
+    lastItemPressed_ = res.pressed;
     return res;
 }
 
@@ -1052,12 +1067,11 @@ Rect Context::DockTargetRect(DockSide side) const {
 }
 
 Context::DockSide Context::DockTargetAt(Vec2 position) const {
-    constexpr DockSide sides[] = {
-        DockSide::TopLeft, DockSide::Top, DockSide::TopRight,
-        DockSide::Left, DockSide::Center, DockSide::Right,
-        DockSide::BottomLeft, DockSide::Bottom, DockSide::BottomRight
+    constexpr DockSide targets[] = {
+        DockSide::Top, DockSide::Left, DockSide::Center,
+        DockSide::Right, DockSide::Bottom
     };
-    for (DockSide side : sides)
+    for (DockSide side : targets)
         if (DockTargetRect(side).Contains(position)) return side;
     return DockSide::None;
 }
@@ -2372,7 +2386,7 @@ void Context::ProgressBar(std::string_view label, float value, Vec2 size) {
 
 bool Context::TileContainer(std::string_view label,
                             const std::vector<std::string_view>& items,
-                            int* selected, Vec2 size) {
+                            int* selected, Vec2 size, GPUImageId icon, Vec2 iconSize) {
     if (!selected) return false;
     PushID(label);
     if (!BeginContainerImpl(size, false, "tile-container")) {
@@ -2399,18 +2413,21 @@ bool Context::TileContainer(std::string_view label,
             isSelected ? State_Checked : State_None,
             interaction.hovered, interaction.held);
         DrawBox(cell, tileStyle);
-        const float iconWidth = std::min(30.f, cell.w * 0.38f);
-        const Rect folder{cell.x + (cell.w - iconWidth) * 0.5f,
-                          cell.y + tileStyle.padding.top + 5.f,
-                          iconWidth, iconWidth * 0.68f};
-        DrawStyledColor(folder, tileStyle.accent, tileStyle.accentGradient,
-                        tileStyle.opacity, tileStyle.cornerRadii);
-        DrawStyledColor({folder.x, folder.y - 3.f, folder.w * 0.45f,
-                         std::max(2.f, folder.h * 0.18f)},
-                        tileStyle.accent, tileStyle.accentGradient, tileStyle.opacity,
-                        tileStyle.cornerRadii);
+        const float iconWidth = std::min({iconSize.x, iconSize.y, 36.f, cell.w * 0.48f});
+        const float iconHeight = iconSize.x > 0.f
+            ? iconWidth * iconSize.y / iconSize.x : iconWidth;
+        const Rect iconRect{cell.x + (cell.w - iconWidth) * 0.5f,
+                            cell.y + tileStyle.padding.top + 5.f,
+                            iconWidth, iconHeight};
+        if (icon != 0) {
+            draw_.AddQuad(iconRect, {0.f, 1.f, 1.f, -1.f},
+                          Fade(Color{}, tileStyle.opacity), icon);
+        } else {
+            DrawStyledColor(iconRect, tileStyle.accent, tileStyle.accentGradient,
+                            tileStyle.opacity, tileStyle.cornerRadii);
+        }
         const Vec2 textSize = text_->Measure(items[i], tileStyle.fontSize);
-        const float textY = folder.y + folder.h + 4.f;
+        const float textY = iconRect.y + iconRect.h + 4.f;
         draw_.PushClipRect(cell);
         EmitText({cell.x + tileStyle.padding.left,
                   textY + std::max(0.f, (cell.y + cell.h - tileStyle.padding.bottom -
@@ -2668,6 +2685,7 @@ bool Context::RMB_Start() {
     x = std::clamp(x, bounds.x, std::max(bounds.x, bounds.x + bounds.w - width));
     y = std::clamp(y, bounds.y, std::max(bounds.y, bounds.y + bounds.h - height));
     rmbPopupRect_ = {x, y, width, height};
+    rmbPopupLayer_ = draw_.BeginLayer();
     DrawBox(rmbPopupRect_, style);
     draw_.PushClipRect(rmbPopupRect_);
     interactionClips_.push_back(rmbPopupRect_);
@@ -2712,7 +2730,18 @@ void Context::RMB_End() {
     rmbPopupWidth_ += style.padding.Horizontal();
     draw_.PopClipRect();
     if (!interactionClips_.empty()) interactionClips_.pop_back();
+    draw_.EndLayer(rmbPopupLayer_);
+    rmbPopupHasLayer_ = true;
     rmbPopupActiveThisFrame_ = false;
+}
+
+bool Context::LMB_Start() {
+    lmbScopeActive_ = lastItemId_ != 0 && lastItemPressed_ && !in_.mouseDown[0];
+    return lmbScopeActive_;
+}
+
+void Context::LMB_End() {
+    lmbScopeActive_ = false;
 }
 
 bool Context::BeginCollapsible(std::string_view label, bool* open, Vec2 size) {

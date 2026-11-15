@@ -1,83 +1,30 @@
-/* ================= COLORS & VARIABLES ================= */
+:root {
+    --ui-accent: #006EFF;
+    --ui-accent-muted: rgba(0, 110, 255, 0.12);
 
-*:root {
-    /* Accent */
-    --ui-accent: #f29d38;
-    --ui-accent-hover: #ffb454;
-    --ui-accent-active: #d97820;
-    --ui-accent-muted: #70451f;
-
-    /* Charcoal editor surfaces */
-    --ui-window: #101114;
-    --ui-window-end: #191b20;
-    --ui-sunken: #0c0d10;
-    --ui-panel: #191b20;
-    --ui-panel-hover: #22252b;
-    --ui-panel-active: #2c3038;
+    --ui-window: #08090C;
+    --ui-sunken: #050609;
+    --ui-panel: #0D0F13;
+    --ui-panel-hover: #14171D;
+    --ui-panel-active: #1B2029;
     --ui-overlay: transparent;
 
-    /* Borders / outlines */
-    --ui-border: #30343b;
-    --ui-border-hover: #454c57;
-    --ui-border-active: #f29d38;
-    --ui-window-border: #3c424c;
+    --ui-border: #20242C;
+    --ui-border-hover: #303641;
+    --ui-window-border: #292F39;
 
-    /* Text */
-    --ui-text: #f3f4f6;
-    --ui-text-secondary: #b5bac3;
-    --ui-text-muted: #d6d9de;
+    --ui-text: #F4F6F8;
+    --ui-text-secondary: #AEB5C0;
+    --ui-text-muted: #D0D5DD;
 
-    /* Danger */
-    --ui-danger: #e62626;
-    --ui-danger-hover: #f74848;
-    --ui-danger-border: #be1c1c;
+    --ui-danger: #D9363E;
+    --ui-danger-hover: #E54850;
+    --ui-danger-border: #B92D35;
 
-    /* Gradient stops */
-    --ui-grad-1: #9c4d1f;
-    --ui-grad-2: #d97820;
-    --ui-grad-3: #f29d38;
-    --ui-grad-4: #f5b952;
-    --ui-grad-5: #ffd27a;
-
-    --ui-text-grad-1: #a9c6d9;
-    --ui-text-grad-2: #7eb1c7;
-    --ui-text-grad-3: #b4c6cf;
-    --ui-text-grad-4: #f2a843;
-    --ui-text-grad-5: #ffd27a;
-
-    /* Gradients */
-    --ui-window-gradient: linear-gradient(
-        180deg,
-        var(--ui-window) 0%,
-        var(--ui-window-end) 100%
-    );
-
-    --ui-demo-gradient: linear-gradient(
-        90deg,
-        var(--ui-grad-1) 0%,
-        var(--ui-grad-2) 25%,
-        var(--ui-grad-3) 50%,
-        var(--ui-grad-4) 75%,
-        var(--ui-grad-5) 100%
-    );
-
-    --ui-text-gradient: linear-gradient(
-        90deg,
-        var(--ui-text-grad-1) 0%,
-        var(--ui-text-grad-2) 25%,
-        var(--ui-text-grad-3) 50%,
-        var(--ui-text-grad-4) 75%,
-        var(--ui-text-grad-5) 100%
-    );
-
-    /* Miscellaneous */
     --ui-radius: 6px;
     --ui-outline-width: 1px;
-    --ui-dock-splitter: rgba(112, 122, 137, 0.5);
-    --ui-dock-shadow: rgba(0, 0, 0, 0.85);
+    --ui-dock-splitter: rgba(100, 110, 125, 0.25);
 }
-
-/* ================= GLOBAL ================= */
 
 * {
     color: var(--ui-text);
@@ -86,17 +33,13 @@
     transition-speed: 5;
 }
 
-/* ================= WINDOW ================= */
-
 window {
-    background: var(--ui-window-gradient);
+    background: var(--ui-window);
     border-color: var(--ui-window-border);
     border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
     outline: 1px solid var(--ui-window-border);
-    shadow-enabled: true;
-    shadow-color: rgba(0, 0, 0, 0.699);
-    shadow-blur: 14px;
+    shadow-enabled: false;
     padding: 5px;
     window-can-dock: true;
     window-child-dock: true;
@@ -106,7 +49,7 @@ window-title {
     background: var(--ui-panel);
     color: var(--ui-text-secondary);
     font-size: 16px;
-    padding: 7px 7px;
+    padding: 7px;
     border-radius-top-left: var(--ui-radius);
     border-radius-top-right: var(--ui-radius);
     border-radius-bottom-left: 0px;
@@ -126,11 +69,12 @@ dock-tab {
     color: var(--ui-text-secondary);
     border-color: var(--ui-border);
     border-width: var(--ui-outline-width);
+    border-radius: var(--ui-radius);
     padding: 4px 10px;
 }
 
 dock-tab:hover {
-    background: var(--ui-panel-active);
+    background: var(--ui-panel-hover);
     border-color: var(--ui-border-hover);
 }
 
@@ -188,8 +132,6 @@ menu-item:hover, menu-item:checked {
     color: var(--ui-text);
 }
 
-/* ================= SCROLLING ================= */
-
 window-scrollbar {
     background: var(--ui-panel);
     accent: var(--ui-accent);
@@ -201,13 +143,13 @@ window-resize {
 
 dock-preview {
     background: var(--ui-accent);
-    accent: var(--ui-accent-hover);
+    accent: var(--ui-accent);
     border-radius: var(--ui-radius);
 }
 
 dock-splitter {
     background: var(--ui-dock-splitter);
-    accent: var(--ui-accent-hover);
+    accent: var(--ui-accent);
     border-radius: var(--ui-radius);
 }
 
@@ -215,8 +157,6 @@ dock-menu {
     background: var(--ui-window);
     border: var(--ui-outline-width) solid var(--ui-window-border);
     border-radius: var(--ui-radius);
-    shadow-color: var(--ui-dock-shadow);
-    shadow-blur: 12px;
 }
 
 dock-menu.docking-options {
@@ -236,8 +176,12 @@ dock-target.docking-options {
 }
 
 dock-target.docking-options:hover {
-    background: var(--ui-accent-hover);
+    background: var(--ui-accent-muted);
     border-color: var(--ui-accent);
+}
+
+dock-highlight {
+    color: var(--ui-accent);
 }
 
 empty-widget {
@@ -248,7 +192,7 @@ empty-widget {
 
 empty-widget.brand {
     background: var(--ui-panel);
-    background-image: url("../src/Icons/FolderIcn.png");
+    background-image: url("../src/Icons/FolderIcn.svg");
     background-size: contain;
     background-position: center;
     border: var(--ui-outline-width) solid var(--ui-border);
@@ -258,7 +202,7 @@ empty-widget.brand {
 image-widget {
     background: var(--ui-panel);
     border-color: var(--ui-border);
-    border-width: 2px;
+    border-width: 1px;
     border-radius: var(--ui-radius);
     padding: 8px;
     background-size: contain;
@@ -271,14 +215,6 @@ image-widget.icon-card {
     padding: 8px;
 }
 
-empty-widget.gradient-demo {
-    background: var(--ui-demo-gradient);
-    border: var(--ui-outline-width) solid var(--ui-border);
-    border-radius: var(--ui-radius);
-}
-
-/* ================= TEXT ================= */
-
 text {
     color: var(--ui-text-muted);
     padding: 2px 0;
@@ -288,16 +224,10 @@ text-label, image-label {
     gap: 6px;
 }
 
-text.gradient-text {
-    text-gradient: var(--ui-text-gradient);
-}
-
-/* ================= BUTTONS ================= */
-
 button, dropdown, image-button {
     background: var(--ui-panel-hover);
     color: var(--ui-text);
-    border-color: var(--ui-border-hover);
+    border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
     padding: 6px 12px;
@@ -305,11 +235,11 @@ button, dropdown, image-button {
 
 button:hover, dropdown:hover, image-button:hover {
     background: var(--ui-panel-active);
-    border-color: var(--ui-border-active);
+    border-color: var(--ui-border-hover);
 }
 
 button:active {
-    background: var(--ui-accent-active);
+    background: var(--ui-accent-muted);
     border-color: var(--ui-accent);
 }
 
@@ -345,7 +275,7 @@ console-output, console-input {
     background: var(--ui-sunken);
     color: var(--ui-text);
     border: 1px solid var(--ui-border);
-    border-radius: 4px;
+    border-radius: var(--ui-radius);
     padding: 6px 8px;
 }
 
@@ -354,13 +284,12 @@ context-menu {
     border: 1px solid var(--ui-window-border);
     border-radius: var(--ui-radius);
     padding: 4px;
-    shadow-color: var(--ui-dock-shadow);
-    shadow-blur: 12px;
 }
 
 context-menu-item {
     background: transparent;
     color: var(--ui-text-muted);
+    border-radius: var(--ui-radius);
     padding: 5px 10px;
 }
 
@@ -371,25 +300,14 @@ context-menu-item:hover {
 
 button.primary {
     background: var(--ui-accent);
-    border-color: var(--ui-accent-hover);
-    color: var(--ui-text);
+    border-color: var(--ui-accent);
+    color: #FFFFFF;
 }
 
 button.primary:hover {
-    background: var(--ui-accent-hover);
-    border-color: var(--ui-accent-hover);
-}
-
-button.primary.emphasis {
-}
-
-button.gradient-demo {
-    background: var(--ui-demo-gradient);
+    background: var(--ui-accent);
     border-color: var(--ui-accent);
-    color: var(--ui-text);
 }
-
-/* ================= DESTRUCTIVE BUTTONS ================= */
 
 button.danger {
     background: var(--ui-danger);
@@ -400,21 +318,17 @@ button.danger:hover {
     background: var(--ui-danger-hover);
 }
 
-/* ================= CHECKBOXES ================= */
-
 checkbox, radio {
     background: var(--ui-panel-hover);
-    border-color: var(--ui-border-hover);
+    border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
     accent: var(--ui-accent);
 }
 
 checkbox:hover, radio:hover {
-    border-color: var(--ui-accent-hover);
+    border-color: var(--ui-accent);
 }
-
-/* ================= TOGGLES ================= */
 
 toggle {
     background: var(--ui-panel-active);
@@ -422,8 +336,6 @@ toggle {
     color: var(--ui-text);
     gap: 8px;
 }
-
-/* ================= SLIDERS ================= */
 
 slider {
     background: var(--ui-panel-hover);
@@ -433,10 +345,8 @@ slider {
 }
 
 slider:hover {
-    accent: var(--ui-accent-hover);
+    accent: var(--ui-accent);
 }
-
-/* ================= PANELS ================= */
 
 container, collapsible-container,
 horizontal-list, vertical-list {
@@ -447,8 +357,6 @@ horizontal-list, vertical-list {
     padding: 8px;
     gap: 6px;
 }
-
-/* ================= TABS ================= */
 
 tab {
     background: var(--ui-panel-hover);
@@ -464,7 +372,7 @@ tab:hover {
 }
 
 tab:checked {
-    background: var(--ui-accent);
-    border-color: var(--ui-accent-hover);
+    background: var(--ui-accent-muted);
+    border-color: var(--ui-accent);
     color: var(--ui-text);
 }

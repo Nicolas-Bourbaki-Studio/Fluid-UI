@@ -33,6 +33,7 @@ public:
     Layer BeginLayer();
     void EndLayer(Layer& layer);
     void BringLayerToFront(const Layer& layer);
+    void BringLayerToFront(const Layer& layer, Layer& trackedLayer);
 
     void AddRectFilled(Rect r, Color c, float rounding = 0.f);
     void AddRectFilled(Rect r, Color c, CornerRadii rounding);
@@ -68,6 +69,7 @@ private:
     Rect CurrentClip() const;
     void PrepareCmd(GPUImageId imageId);
     void FinishPrimitive();
+    void BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer);
     void AddConvexFill(const Vec2* pts, int n, Color c);
     void AddConvexFillGradient(const Vec2* pts, int n, const LinearGradient& gradient,
                                Rect bounds, float opacity);

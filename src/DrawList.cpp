@@ -123,6 +123,14 @@ void DrawList::EndLayer(Layer& layer) {
 }
 
 void DrawList::BringLayerToFront(const Layer& layer) {
+    BringLayerToFrontImpl(layer, nullptr);
+}
+
+void DrawList::BringLayerToFront(const Layer& layer, Layer& trackedLayer) {
+    BringLayerToFrontImpl(layer, &trackedLayer);
+}
+
+void DrawList::BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer) {
     if (layer.vertexStart > layer.vertexEnd || layer.vertexEnd > vtx_.size() ||
         layer.indexStart > layer.indexEnd || layer.indexEnd > idx_.size() ||
         layer.commandStart > layer.commandEnd || layer.commandEnd > cmds_.size()) return;
@@ -130,6 +138,27 @@ void DrawList::BringLayerToFront(const Layer& layer) {
     const size_t vertexCount = layer.vertexEnd - layer.vertexStart;
     const size_t indexCount = layer.indexEnd - layer.indexStart;
     if (vertexCount == 0 || indexCount == 0) return;
+
+    auto updateTrackedRange = [](size_t& trackedStart, size_t& trackedEnd,
+                                 size_t movedStart, size_t movedEnd, size_t total) {
+        const size_t movedCount = movedEnd - movedStart;
+        if (trackedStart >= movedStart && trackedEnd <= movedEnd) {
+            const size_t shift = total - movedEnd;
+            trackedStart += shift;
+            trackedEnd += shift;
+        } else if (trackedStart >= movedEnd) {
+            trackedStart -= movedCount;
+            trackedEnd -= movedCount;
+        }
+    };
+    if (trackedLayer) {
+        updateTrackedRange(trackedLayer->vertexStart, trackedLayer->vertexEnd,
+                           layer.vertexStart, layer.vertexEnd, vtx_.size());
+        updateTrackedRange(trackedLayer->indexStart, trackedLayer->indexEnd,
+                           layer.indexStart, layer.indexEnd, idx_.size());
+        updateTrackedRange(trackedLayer->commandStart, trackedLayer->commandEnd,
+                           layer.commandStart, layer.commandEnd, cmds_.size());
+    }
 
     const size_t trailingVertices = vtx_.size() - layer.vertexEnd;
     const size_t trailingIndices = idx_.size() - layer.indexEnd;

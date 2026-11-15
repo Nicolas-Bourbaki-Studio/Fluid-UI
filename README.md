@@ -17,6 +17,8 @@ horizontal/vertical lists, tabbed containers, and class-styleable empty widgets.
 Text/icon labels can be combined as needed.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
+The Windows GLFW example loads PNG and JPEG with WIC and SVG with Direct2D (Windows 10 or
+later), then registers the resulting OpenGL textures with the stylesheet.
 
 ```cpp
 fluid::Context ui;
@@ -48,13 +50,18 @@ Call `EndContainer()` for each successful `BeginContainer`, `BeginList`,
 horizontal list; `false` creates a vertical list. `BeginTabContainer` accepts a
 `TabPosition::Top`, `Bottom`, or `Left` setting. A `TabItem` with no icon displays text;
 one with an icon displays both by default, or just the icon when `showText` is false.
-`TileContainer` displays selectable file-style tiles from supplied labels. `ConsoleOutput`
+`TileContainer` displays selectable file-style tiles from supplied labels; its optional
+GPU-image argument sets a shared tile icon. `ConsoleOutput`
 and `ConsoleInput` support mouse text selection; retrieve the selected bytes with
 `SelectedConsoleText()` for host clipboard integration. Input receives text and key events through
 `InputState::textInput`, `keyBackspace`, `keyEnter`, and `keySelectAll`. The host should fill
 those fields with events for the current frame. The GLFW example shows the callback wiring.
 After an interactive widget, `RMB_Start()` opens its context menu on right-click; add options
-with `RMB_Item()` and close the scope with `RMB_End()`.
+with `RMB_Item()` and close the scope with `RMB_End()`. The popup renders above windows,
+dock previews, and other UI layers.
+The GLFW example includes a dedicated RMB test button with Refresh and Clear console actions.
+Call `LMB_Start()` immediately after an interactive widget to detect its left-click
+activation, and pair a successful call with `LMB_End()`.
 
 ## Wrapper-friendly windows and menus
 
@@ -100,8 +107,9 @@ if (ui.BeginMainMenuBar()) {
 Menu visuals can be themed with `main-menu-bar`, `menu`, `menu-popup`, and `menu-item`
 CSS selectors. The GLFW demo includes File, Edit, View, Project, and Network menus,
 a Settings window, and uses `src/Fonts/OpenSans.ttf` for its text atlas.
-Floating windows can be resized from any edge or corner. Docking offers a 3x3 target
-grid with a live pane preview; docked windows hide their close control, have no drop shadow,
+Floating windows can be resized from any edge or corner. The dock compass arranges top,
+bottom, left, right, and center targets in a 3x3 layout with a live pane preview; docked
+windows hide their close control, have no drop shadow,
 and require a title-bar double-click to undock. Dragging a docked title bar does not undock
 it; drop on another window's title bar to group the windows as tabs. Floating windows retain
 their shadows. The GLFW demo smooths rounded geometry with
@@ -253,6 +261,8 @@ adapts when the display changes size. Use `Context::DockWindows(false)` to disab
 CSS `window-can-dock: false` prevents a window from being docked, and
 `window-child-dock: false` prevents other windows from being grouped into it; both properties
 apply to `window` styles and default to `true`.
+The `dock-highlight` selector's `color` sets the outline color shown across the full target
+window while dragging another window onto it.
 
 Save and restore window positions, sizes, open state, dock sides, dock order, split
 proportions, and focus with `Context::SaveLayout` and `Context::LoadLayout`. Layout files

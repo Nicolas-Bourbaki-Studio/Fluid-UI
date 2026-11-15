@@ -149,6 +149,7 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Docu
   C:/msys64/ucrt64/include/c++/16.2.0/cstdint \
   C:/msys64/ucrt64/include/c++/16.2.0/cstdio \
   C:/msys64/ucrt64/include/c++/16.2.0/cstdlib \
+  C:/msys64/ucrt64/include/c++/16.2.0/cstring \
   C:/msys64/ucrt64/include/c++/16.2.0/ctime \
   C:/msys64/ucrt64/include/c++/16.2.0/cwchar \
   C:/msys64/ucrt64/include/c++/16.2.0/cwctype \
@@ -243,6 +244,30 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Docu
   C:/msys64/ucrt64/include/corecrt_wstring.h \
   C:/msys64/ucrt64/include/corecrt_wtime.h \
   C:/msys64/ucrt64/include/ctype.h \
+  C:/msys64/ucrt64/include/d2d1.h \
+  C:/msys64/ucrt64/include/d2d1_1.h \
+  C:/msys64/ucrt64/include/d2d1_1helper.h \
+  C:/msys64/ucrt64/include/d2d1_2.h \
+  C:/msys64/ucrt64/include/d2d1_2helper.h \
+  C:/msys64/ucrt64/include/d2d1_3.h \
+  C:/msys64/ucrt64/include/d2d1_3helper.h \
+  C:/msys64/ucrt64/include/d2d1effects.h \
+  C:/msys64/ucrt64/include/d2d1effects_1.h \
+  C:/msys64/ucrt64/include/d2d1effects_2.h \
+  C:/msys64/ucrt64/include/d2d1helper.h \
+  C:/msys64/ucrt64/include/d2d1svg.h \
+  C:/msys64/ucrt64/include/d2dbasetypes.h \
+  C:/msys64/ucrt64/include/d2derr.h \
+  C:/msys64/ucrt64/include/d3d10.h \
+  C:/msys64/ucrt64/include/d3d10_1.h \
+  C:/msys64/ucrt64/include/d3d10_1shader.h \
+  C:/msys64/ucrt64/include/d3d10effect.h \
+  C:/msys64/ucrt64/include/d3d10misc.h \
+  C:/msys64/ucrt64/include/d3d10sdklayers.h \
+  C:/msys64/ucrt64/include/d3d10shader.h \
+  C:/msys64/ucrt64/include/d3d11.h \
+  C:/msys64/ucrt64/include/d3d11sdklayers.h \
+  C:/msys64/ucrt64/include/d3dcommon.h \
   C:/msys64/ucrt64/include/datetimeapi.h \
   C:/msys64/ucrt64/include/dcommon.h \
   C:/msys64/ucrt64/include/dde.h \
@@ -251,7 +276,11 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Docu
   C:/msys64/ucrt64/include/dlgs.h \
   C:/msys64/ucrt64/include/dpapi.h \
   C:/msys64/ucrt64/include/driverspecs.h \
+  C:/msys64/ucrt64/include/dxgi.h \
+  C:/msys64/ucrt64/include/dxgi1_2.h \
+  C:/msys64/ucrt64/include/dxgicommon.h \
   C:/msys64/ucrt64/include/dxgiformat.h \
+  C:/msys64/ucrt64/include/dxgitype.h \
   C:/msys64/ucrt64/include/errhandlingapi.h \
   C:/msys64/ucrt64/include/errno.h \
   C:/msys64/ucrt64/include/excpt.h \
@@ -589,8 +618,6 @@ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Types.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_ios.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/raointintrin.h:
-
 C:/msys64/ucrt64/include/_mingw_unicode.h:
 
 C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h:
@@ -721,6 +748,8 @@ C:/msys64/ucrt64/include/c++/16.2.0/bits/cxxabi_init_exception.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/cwctype:
 
+C:/msys64/ucrt64/include/d3d10sdklayers.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/bits/enable_special_members.h:
 
 C:/msys64/ucrt64/include/corecrt_stdio_config.h:
@@ -737,9 +766,9 @@ C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_fwd.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/localefwd.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/localefwd.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h:
 
@@ -879,6 +908,8 @@ C:/msys64/ucrt64/include/ddeml.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/sstream.tcc:
 
+C:/msys64/ucrt64/include/d3d10effect.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/bits/stdexcept_except.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avxvnniintrin.h:
@@ -886,6 +917,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avxvnniintrin.h:
 C:/msys64/ucrt64/include/c++/16.2.0/bits/stdexcept_throw.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++locale.h:
+
+C:/msys64/ucrt64/include/d3d10.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512vpopcntdqvlintrin.h:
 
@@ -965,6 +998,8 @@ C:/msys64/ucrt64/include/c++/16.2.0/cstdint:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/uses_allocator_args.h:
 
+C:/msys64/ucrt64/include/d2d1.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/bits/utility.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/vector.tcc:
@@ -995,6 +1030,8 @@ C:/msys64/ucrt64/include/c++/16.2.0/cstddef:
 
 C:/msys64/ucrt64/include/c++/16.2.0/cstdlib:
 
+C:/msys64/ucrt64/include/c++/16.2.0/cstring:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avxvnniint16intrin.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/ctime:
@@ -1011,15 +1048,17 @@ C:/msys64/ucrt64/include/vadefs.h:
 
 C:/msys64/ucrt64/include/memoryapi.h:
 
+C:/msys64/ucrt64/include/wow64apiset.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/wmmintrin.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/ext/aligned_buffer.h:
 
 C:/msys64/ucrt64/include/ocidl.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/wmmintrin.h:
-
-C:/msys64/ucrt64/include/wow64apiset.h:
-
 C:/msys64/ucrt64/include/c++/16.2.0/ext/alloc_traits.h:
+
+C:/msys64/ucrt64/include/d2d1effects_1.h:
 
 C:/msys64/ucrt64/include/jobapi.h:
 
@@ -1043,9 +1082,9 @@ C:/msys64/ucrt64/include/c++/16.2.0/filesystem:
 
 C:/msys64/ucrt64/include/c++/16.2.0/fstream:
 
-C:/msys64/ucrt64/include/c++/16.2.0/initializer_list:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/wbnoinvdintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/initializer_list:
 
 C:/msys64/ucrt64/include/rpcasync.h:
 
@@ -1056,6 +1095,8 @@ C:/msys64/ucrt64/include/minwindef.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/cldemoteintrin.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/ios:
+
+C:/msys64/ucrt64/include/d2d1_1.h:
 
 C:/msys64/ucrt64/include/winperf.h:
 
@@ -1113,9 +1154,9 @@ C:/msys64/ucrt64/include/c++/16.2.0/tr1/exp_integral.tcc:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/bmiintrin.h:
 
-C:/msys64/ucrt64/include/winnls.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/vpclmulqdqintrin.h:
+
+C:/msys64/ucrt64/include/winnls.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/tr1/hypergeometric.tcc:
 
@@ -1130,6 +1171,8 @@ C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_hermite.tcc:
 C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_laguerre.tcc:
 
 C:/msys64/ucrt64/include/c++/16.2.0/tr1/special_function_util.h:
+
+C:/msys64/ucrt64/include/d3d11.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/tuple:
 
@@ -1159,11 +1202,15 @@ C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++io.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/cpu_defines.h:
 
+C:/msys64/ucrt64/include/d3dcommon.h:
+
 C:/msys64/ucrt64/include/locale.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/error_constants.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/gthr-default.h:
+
+C:/msys64/ucrt64/include/d2d1effects_2.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/gthr.h:
 
@@ -1179,6 +1226,8 @@ C:/msys64/ucrt64/include/cderr.h:
 
 C:/msys64/ucrt64/include/combaseapi.h:
 
+C:/msys64/ucrt64/include/dxgi.h:
+
 C:/msys64/ucrt64/include/commdlg.h:
 
 C:/msys64/ucrt64/include/concurrencysal.h:
@@ -1191,17 +1240,19 @@ C:/msys64/ucrt64/include/consoleapi.h:
 
 C:/msys64/ucrt64/include/corecrt_memory.h:
 
-C:/msys64/ucrt64/include/corecrt_startup.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/tmmintrin.h:
-
 C:/msys64/ucrt64/include/rpcnterr.h:
 
 C:/msys64/ucrt64/include/winerror.h:
 
-C:/msys64/ucrt64/include/ctype.h:
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/tmmintrin.h:
+
+C:/msys64/ucrt64/include/corecrt_startup.h:
 
 C:/msys64/ucrt64/include/corecrt_wctype.h:
+
+C:/msys64/ucrt64/include/dxgicommon.h:
+
+C:/msys64/ucrt64/include/ctype.h:
 
 C:/msys64/ucrt64/include/timezoneapi.h:
 
@@ -1221,6 +1272,44 @@ C:/msys64/ucrt64/include/time.h:
 
 C:/msys64/ucrt64/include/corecrt_wtime.h:
 
+C:/msys64/ucrt64/include/d2d1_1helper.h:
+
+C:/msys64/ucrt64/include/dxgitype.h:
+
+C:/msys64/ucrt64/include/d2d1_2.h:
+
+C:/msys64/ucrt64/include/d2d1_2helper.h:
+
+C:/msys64/ucrt64/include/d2d1_3.h:
+
+C:/msys64/ucrt64/include/d2d1_3helper.h:
+
+C:/msys64/ucrt64/include/psdk_inc/_xmitfile.h:
+
+C:/msys64/ucrt64/include/d2d1effects.h:
+
+C:/msys64/ucrt64/include/d2d1helper.h:
+
+C:/msys64/ucrt64/include/d2d1svg.h:
+
+C:/msys64/ucrt64/include/d2dbasetypes.h:
+
+C:/msys64/ucrt64/include/d2derr.h:
+
+C:/msys64/ucrt64/include/d3d10_1.h:
+
+C:/msys64/ucrt64/include/d3d10_1shader.h:
+
+C:/msys64/ucrt64/include/mmeapi.h:
+
+C:/msys64/ucrt64/include/d3d10misc.h:
+
+C:/msys64/ucrt64/include/d3d10shader.h:
+
+C:/msys64/ucrt64/include/unknwn.h:
+
+C:/msys64/ucrt64/include/d3d11sdklayers.h:
+
 C:/msys64/ucrt64/include/datetimeapi.h:
 
 C:/msys64/ucrt64/include/ktmtypes.h:
@@ -1235,6 +1324,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/fma4intrin.h:
 
 C:/msys64/ucrt64/include/dpapi.h:
 
+C:/msys64/ucrt64/include/dxgi1_2.h:
+
 C:/msys64/ucrt64/include/dxgiformat.h:
 
 C:/msys64/ucrt64/include/errhandlingapi.h:
@@ -1245,9 +1336,9 @@ C:/msys64/ucrt64/include/excpt.h:
 
 C:/msys64/ucrt64/include/fltwinerror.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/enqcmdintrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sha512intrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/enqcmdintrin.h:
 
 C:/msys64/ucrt64/include/guiddef.h:
 
@@ -1259,9 +1350,9 @@ C:/msys64/ucrt64/include/inaddr.h:
 
 C:/msys64/ucrt64/include/joystickapi.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/bmi2intrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/serializeintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/bmi2intrin.h:
 
 C:/msys64/ucrt64/include/libloaderapi.h:
 
@@ -1274,8 +1365,6 @@ C:/msys64/ucrt64/include/malloc.h:
 C:/msys64/ucrt64/include/mcx.h:
 
 C:/msys64/ucrt64/include/math.h:
-
-C:/msys64/ucrt64/include/mmeapi.h:
 
 C:/msys64/ucrt64/include/mmsyscom.h:
 
@@ -1297,15 +1386,13 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/ammintrin.h:
 
 C:/msys64/ucrt64/include/namespaceapi.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sm4intrin.h:
+
 C:/msys64/ucrt64/include/ncrypt.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx10_2copyintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sm4intrin.h:
-
 C:/msys64/ucrt64/include/oaidl.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/smmintrin.h:
 
 C:/msys64/ucrt64/include/oleauto.h:
 
@@ -1328,10 +1415,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/cetintrin.h:
 C:/msys64/ucrt64/include/psdk_inc/_wsadata.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bitalgintrin.h:
-
-C:/msys64/ucrt64/include/psdk_inc/_xmitfile.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdarg.h:
 
 C:/msys64/ucrt64/include/psdk_inc/intrin-impl.h:
 
@@ -1367,9 +1450,9 @@ C:/msys64/ucrt64/include/rpcndr.h:
 
 C:/msys64/ucrt64/include/rpcsal.h:
 
-C:/msys64/ucrt64/include/sal.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/prfchiintrin.h:
+
+C:/msys64/ucrt64/include/sal.h:
 
 C:/msys64/ucrt64/include/sdkddkver.h:
 
@@ -1391,9 +1474,9 @@ C:/msys64/ucrt64/include/synchapi.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/amxint8intrin.h:
 
-C:/msys64/ucrt64/include/sys/types.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/vaesintrin.h:
+
+C:/msys64/ucrt64/include/sys/types.h:
 
 C:/msys64/ucrt64/include/sysinfoapi.h:
 
@@ -1402,8 +1485,6 @@ C:/msys64/ucrt64/include/threadpoolapiset.h:
 C:/msys64/ucrt64/include/threadpoollegacyapiset.h:
 
 C:/msys64/ucrt64/include/tvout.h:
-
-C:/msys64/ucrt64/include/unknwn.h:
 
 C:/msys64/ucrt64/include/wchar.h:
 
@@ -1463,8 +1544,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx2intrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bf16vlintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/tsxldtrkintrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bitalgvlintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bmmvlintrin.h:
@@ -1511,21 +1590,19 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/lzcntintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/movrsintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mm_malloc.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sm3intrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mm_malloc.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/movdirintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/uintrintrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/pconfigintrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/shaintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/popcntintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/prfchwintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/raointintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/rdseedintrin.h:
 
@@ -1533,11 +1610,21 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/rtmintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sgxintrin.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/shaintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/smmintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdarg.h:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stddef.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/syslimits.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/tbmintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/tsxldtrkintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/uintrintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/usermsrintrin.h:
 

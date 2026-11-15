@@ -75,13 +75,16 @@ public:
                   int* selected, std::string_view icon = {}, bool showText = true);
     void ProgressBar(std::string_view label, float value, Vec2 size = {});
     bool TileContainer(std::string_view label, const std::vector<std::string_view>& items,
-                       int* selected, Vec2 size = {});
+                       int* selected, Vec2 size = {}, GPUImageId icon = 0,
+                       Vec2 iconSize = {124.f, 124.f});
     void ConsoleOutput(std::string_view label, std::string_view text, Vec2 size = {});
     bool ConsoleInput(std::string_view label, std::string* value, Vec2 size = {});
     std::string SelectedConsoleText() const;
     bool RMB_Start();
     bool RMB_Item(std::string_view label);
     void RMB_End();
+    bool LMB_Start();
+    void LMB_End();
     void ImageLabel(std::string_view label, GPUImageId imageId, Vec2 imageSize);
     bool BeginCollapsible(std::string_view label, bool* open, Vec2 size = {0.f, 120.f});
     void Image(GPUImageId imageId, Vec2 size);
@@ -228,10 +231,14 @@ private:
     float rmbPopupWidth_ = 160.f;
     float rmbPopupHeight_ = 0.f;
     size_t rmbPopupItemCount_ = 0;
+    DrawList::Layer rmbPopupLayer_;
     Rect lastItemRect_;
     WidgetId lastItemId_ = 0;
     bool rmbPopupActiveThisFrame_ = false;
+    bool rmbPopupHasLayer_ = false;
     bool rmbItemInteraction_ = false;
+    bool lastItemPressed_ = false;
+    bool lmbScopeActive_ = false;
     bool horizontalLayout_ = false;
     bool dockingEnabled_ = true;
     bool windowInputEnabled_ = true;
