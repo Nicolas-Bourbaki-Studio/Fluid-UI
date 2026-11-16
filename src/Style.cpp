@@ -894,7 +894,12 @@ void StyleSheet::RegisterImage(std::string_view source, GPUImageId image, Vec2 s
     ++version_;
 }
 
-void StyleSheet::Clear() { rules_.clear(); cache_.clear(); ++version_; }
+void StyleSheet::Clear() {
+    rules_.clear();
+    variables_.clear();
+    cache_.clear();
+    ++version_;
+}
 
 bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
     std::string source(css);
@@ -907,7 +912,7 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
         source.erase(start, end + 2 - start);
     }
 
-    std::unordered_map<std::string, std::string> variables;
+    std::unordered_map<std::string, std::string> variables = variables_;
     CollectVariables(source, variables);
     StyleSheet candidate = *this;
     std::string_view rest(source);
@@ -997,6 +1002,7 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
         }
         rest.remove_prefix(close + 1);
     }
+    candidate.variables_ = std::move(variables);
     *this = std::move(candidate);
     if (error) error->clear();
     return true;
@@ -1036,8 +1042,10 @@ ComputedStyle StyleSheet::Resolve(std::string_view widget,
                        + 4 * std::popcount(static_cast<unsigned>(r.stateMask));
         hits.emplace_back(spec, &r);
     }
-    std::stable_sort(hits.begin(), hits.end(),
-                     [](const auto& a, const auto& b) { return a.first < b.first; });
+    std::stable_sort(hits.begin(), hits.end(), [](const auto& a, const auto& b) {
+        if (a.second->builtIn != b.second->builtIn) return a.second->builtIn;
+        return a.first < b.first;
+    });
 
     ComputedStyle out;
     for (const auto& h : hits) {
@@ -1224,6 +1232,7 @@ StyleSheet StyleSheet::Dark() {
     s.Rule("text-label").Spacing(7);
     s.Rule("image-label").Spacing(7);
 
+    for (StyleRule& rule : s.rules_) rule.builtIn = true;
     return s;
 }
 

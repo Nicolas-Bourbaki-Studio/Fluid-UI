@@ -157,8 +157,11 @@ to the text.
 
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
 Selectors support widget names, multiple stacked classes, grouped selectors, and widget
-states (`hover`, `active`, `checked`, `disabled`). Global custom properties can be declared
-in `:root` and referenced with `var(--name)` (including a fallback). Colors support 3/4/6/8
+states (`hover`, `active`, `checked`, `disabled`). User rules override the built-in dark
+theme defaults; selector specificity still determines precedence between user rules. Global
+custom properties can be declared
+in `:root`, retained across successive `LoadCSS` calls, and referenced with `var(--name)`
+(including a fallback). Colors support 3/4/6/8
 digit hex, common named colors, `rgb()`/`rgba()`, `hsl()`/`hsla()`, and `transparent`;
 numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,

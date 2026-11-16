@@ -1,9 +1,9 @@
 :root {
-    --ui-accent: #2B6ED9;
-    --ui-accent-muted: rgba(10, 26, 53, 0.09);
+    --ui-accent: rgb(19, 39, 105);
+    --ui-accent-muted: rgb(14, 28, 71);
 
-    --ui-window: #050506;
-    --ui-sunken: #000000;
+    --ui-window: linear-gradient(180deg, #080808 0%, #000000 100%);
+    --ui-sunken: linear-gradient(180deg, #080808 0%, #000000 100%);
     --ui-panel: #030303;
     --ui-panel-hover: #101216;
     --ui-panel-active: #161A20;
@@ -21,16 +21,17 @@
     --ui-danger-hover: #E54850;
     --ui-danger-border: #B92D35;
 
-    --ui-radius: 10px;
+    --ui-radius: 8px;
     --ui-outline-width: 1px;
     --ui-dock-splitter: rgba(255, 255, 255, 0.045);
 }
 
 * {
     color: var(--ui-text);
-    font-size: 18px;
+    font-size: 20px;
     gap: 6px;
-    transition-speed: 5;
+    transition-speed: 20;
+    shadow-color: rgba(233, 51, 51, 0.521);
 }
 
 *:disabled {
@@ -38,7 +39,7 @@
 }
 
 window {
-    background: var(--ui-window);
+    background: #fff;
     border-color: var(--ui-window-border);
     border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
@@ -50,8 +51,8 @@ window {
 }
 
 window-title {
-    background: #141414;
-    color: var(--ui-text-secondary);
+    background: linear-gradient(180deg, #141414 0%, #0C0C0C 100%);
+    color: var(--ui-text);
     font-size: 16px;
     padding: 7px;
     border-radius-top-left: var(--ui-radius);

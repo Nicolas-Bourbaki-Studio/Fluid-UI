@@ -1,0 +1,10 @@
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/lib/libFluidUI.dll.a
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/bin/libFluidUI.dll
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/Backend.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/Context.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/DrawList.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/Export.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/FluidUI.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/Style.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/include/FluidUI/Types.h
+C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\output/bin/basic_glfw_gl.exe

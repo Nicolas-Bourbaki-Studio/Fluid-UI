@@ -76,6 +76,7 @@ struct StyleRule {
     std::vector<std::string> classes;
     uint8_t stateMask = 0;   // all bits must be present in the current state
     std::vector<StyleDecl> decls;
+    bool builtIn = false;
 };
 
 class FLUID_API StyleSheet {
@@ -167,6 +168,7 @@ private:
     struct ImageResource { GPUImageId id = 0; Vec2 size; };
     std::vector<StyleRule> rules_;
     std::unordered_map<std::string, ImageResource> images_;
+    std::unordered_map<std::string, std::string> variables_;
     mutable std::unordered_map<uint32_t, ComputedStyle> cache_; // not thread-safe
     uint32_t version_ = 0;
 };
