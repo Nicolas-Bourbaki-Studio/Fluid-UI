@@ -1,17 +1,17 @@
 :root {
-    --ui-accent: rgb(19, 39, 105);
-    --ui-accent-muted: rgb(14, 28, 71);
+    --ui-accent: rgb(31, 83, 255);
+    --ui-accent-muted: rgb(12, 50, 165);
 
-    --ui-window: linear-gradient(180deg, #080808 0%, #000000 100%);
+    --ui-window: #080808;
     --ui-sunken: linear-gradient(180deg, #080808 0%, #000000 100%);
     --ui-panel: #030303;
     --ui-panel-hover: #101216;
     --ui-panel-active: #161A20;
     --ui-overlay: transparent;
 
-    --ui-border: #141619;
+    --ui-border: #22222277;
     --ui-border-hover: #242932;
-    --ui-window-border: #030303;
+    --ui-window-border: linear-gradient(180deg, #080808 0%, #000000 100%);
 
     --ui-text: #E8E8E8;
     --ui-text-secondary: #777E89;
@@ -26,12 +26,21 @@
     --ui-dock-splitter: rgba(255, 255, 255, 0.045);
 }
 
-* {
-    color: var(--ui-text);
-    font-size: 20px;
+
+#ThemeTextTest{
+    color: #ee2ece;
+    font-size: 138px;
     gap: 6px;
     transition-speed: 20;
-    shadow-color: rgba(233, 51, 51, 0.521);
+    shadow-color: rgba(0, 0, 0, 0.521);
+}
+
+* {
+    color: var(--ui-text);
+    font-size: 18px;
+    gap: 6px;
+    transition-speed: 20;
+    shadow-color: rgba(0, 0, 0, 0.521);
 }
 
 *:disabled {
@@ -39,11 +48,11 @@
 }
 
 window {
-    background: #fff;
+    background: var(--ui-window);
     border-color: var(--ui-window-border);
     border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
-    outline: 1px solid var(--ui-window-border);
+    outline: 2px solid var(--ui-window-border);
     shadow-enabled: true;
     padding: 5px;
     window-can-dock: true;
@@ -53,7 +62,7 @@ window {
 window-title {
     background: linear-gradient(180deg, #141414 0%, #0C0C0C 100%);
     color: var(--ui-text);
-    font-size: 16px;
+    font-size: 15px;
     padding: 7px;
     border-radius-top-left: var(--ui-radius);
     border-radius-top-right: var(--ui-radius);
@@ -256,6 +265,20 @@ image-button {
 button:hover,
 dropdown:hover,
 image-button:hover {
+    background: #181B22;
+    border-color: var(--ui-border-hover);
+}
+
+interactive-image {
+    background: var(--ui-panel);
+    color: var(--ui-text);
+    border-color: var(--ui-border);
+    border-width: 1px;
+    border-radius: var(--ui-radius);
+    padding: 6px 12px;
+}
+
+interactive-image:hover {
     background: #181B22;
     border-color: var(--ui-border-hover);
 }

@@ -7,9 +7,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(FLUIDUI_BUILD_EXAMPLES "Build examples" ON)
 
+include(CTest)
+
 add_subdirectory(src)
 
 if(FLUIDUI_BUILD_EXAMPLES)
     find_package(glfw3 REQUIRED)
     add_subdirectory(examples)
+endif()
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
 endif()

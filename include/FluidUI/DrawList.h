@@ -1,0 +1,94 @@
+#pragma once
+#include "Export.h"
+#include "Types.h"
+#include <vector>
+
+namespace fluid {
+
+struct Vertex {
+    Vec2 pos;
+    Vec2 uv;
+    uint32_t col; // see Color::ToU32()
+};
+
+struct DrawCmd {
+    Rect clip;
+    GPUImageId texture = 0; // 0 = untextured; otherwise caller-owned image ID for the renderer to bind
+    uint32_t idxOffset = 0;
+    uint32_t idxCount = 0;
+};
+
+// Backend-agnostic geometry. Triangles are NOT guaranteed a particular winding: disable culling.
+class FLUID_API DrawList {
+public:
+    struct Layer {
+        size_t vertexStart = 0, indexStart = 0, commandStart = 0;
+        size_t vertexEnd = 0, indexEnd = 0, commandEnd = 0;
+    };
+
+    void Clear();
+
+    void PushClipRect(Rect r);
+    void PopClipRect();
+    Layer BeginLayer();
+    void EndLayer(Layer& layer);
+    void BringLayerToFront(const Layer& layer);
+    void BringLayerToFront(const Layer& layer, Layer& trackedLayer);
+    void BringLayerToFront(const Layer& layer, Layer& trackedLayer,
+                           Layer& secondTrackedLayer);
+    void BringLayerToFront(Layer& layer,
+                           const std::vector<Layer*>& trackedLayers);
+
+    void AddRectFilled(Rect r, Color c, float rounding = 0.f);
+    void AddRectFilled(Rect r, Color c, CornerRadii rounding);
+    void AddRectFilledGradient(Rect r, const LinearGradient& gradient,
+                               float opacity = 1.f, float rounding = 0.f);
+    void AddRectFilledGradient(Rect r, const LinearGradient& gradient,
+                               float opacity, CornerRadii rounding);
+    void AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float blur, float rounding = 0.f);
+    void AddShadowGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float blur, CornerRadii rounding);
+    void AddBox(Rect r, Color bg, Color border, float borderWidth, float rounding);
+    void AddBox(Rect r, Color bg, Color border, float borderWidth, CornerRadii rounding);
+    void AddBorder(Rect r, Color color, float borderWidth, float rounding);
+    void AddBorder(Rect r, Color color, float borderWidth, CornerRadii rounding);
+    void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float borderWidth, float rounding);
+    void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
+                           float borderWidth, CornerRadii rounding);
+    void AddShadow(Rect r, Color c, float blur, float rounding);
+    void AddShadow(Rect r, Color c, float blur, CornerRadii rounding);
+    void AddTriangleFilled(Vec2 a, Vec2 b, Vec2 c, Color col);
+    void AddTriangleFilledGradient(Vec2 a, Vec2 b, Vec2 c,
+                                   const LinearGradient& gradient, float opacity = 1.f);
+    // Textured quad using a caller-owned GPU image ID; the rendering backend resolves/binds it.
+    void AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId);
+    void ApplyLinearGradient(size_t vertexStart, size_t vertexEnd, Rect bounds,
+                             const LinearGradient& gradient, float opacity = 1.f);
+
+    const std::vector<Vertex>&  Vertices()  const { return vtx_; }
+    const std::vector<uint32_t>& Indices()  const { return idx_; }
+    const std::vector<DrawCmd>& Commands()  const { return cmds_; }
+
+private:
+    Rect CurrentClip() const;
+    void PrepareCmd(GPUImageId imageId);
+    void FinishPrimitive();
+    void BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer,
+                               Layer* secondTrackedLayer = nullptr,
+                               const std::vector<Layer*>* trackedLayers = nullptr);
+    void AddBorderRing(Rect r, Color color, const LinearGradient* gradient,
+                       float opacity, float borderWidth, CornerRadii rounding);
+    void AddConvexFill(const Vec2* pts, int n, Color c);
+    void AddConvexFillGradient(const Vec2* pts, int n, const LinearGradient& gradient,
+                               Rect bounds, float opacity);
+
+    std::vector<Vertex> vtx_;
+    std::vector<uint32_t> idx_;
+    std::vector<DrawCmd> cmds_;
+    std::vector<Rect> clipStack_;
+    bool breakCommand_ = false;
+};
+
+} // namespace fluid

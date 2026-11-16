@@ -51,6 +51,8 @@ public:
                            float blur, CornerRadii rounding);
     void AddBox(Rect r, Color bg, Color border, float borderWidth, float rounding);
     void AddBox(Rect r, Color bg, Color border, float borderWidth, CornerRadii rounding);
+    void AddBorder(Rect r, Color color, float borderWidth, float rounding);
+    void AddBorder(Rect r, Color color, float borderWidth, CornerRadii rounding);
     void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
                            float borderWidth, float rounding);
     void AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
@@ -76,6 +78,8 @@ private:
     void BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer,
                                Layer* secondTrackedLayer = nullptr,
                                const std::vector<Layer*>* trackedLayers = nullptr);
+    void AddBorderRing(Rect r, Color color, const LinearGradient* gradient,
+                       float opacity, float borderWidth, CornerRadii rounding);
     void AddConvexFill(const Vec2* pts, int n, Color c);
     void AddConvexFillGradient(const Vec2* pts, int n, const LinearGradient& gradient,
                                Rect bounds, float opacity);

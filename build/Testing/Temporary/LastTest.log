@@ -1,3 +1,18 @@
-Start testing: Nov 16 01:39 Arabic Standard Time
+Start testing: Nov 16 04:58 Arabic Standard Time
 ----------------------------------------------------------
-End testing: Nov 16 01:39 Arabic Standard Time
+1/1 Testing: FluidUIStyleDrawTests
+1/1 Test: FluidUIStyleDrawTests
+Command: "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/tests/FluidUIStyleDrawTests.exe"
+Directory: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI
+"FluidUIStyleDrawTests" start time: Nov 16 04:58 Arabic Standard Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.17 sec
+----------------------------------------------------------
+Test Passed.
+"FluidUIStyleDrawTests" end time: Nov 16 04:58 Arabic Standard Time
+"FluidUIStyleDrawTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 16 04:58 Arabic Standard Time

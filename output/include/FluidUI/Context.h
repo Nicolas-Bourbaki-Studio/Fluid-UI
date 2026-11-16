@@ -181,6 +181,8 @@ public:
     // Styling / IDs
     void PushClass(std::string_view cls);
     void PopClass();
+    void PushStyleID(std::string_view id);
+    void PopStyleID();
     void PushID(std::string_view id);
     void PopID();
     bool WantsMouse() const { return wantsMouse_; }
@@ -315,6 +317,7 @@ private:
     void NormalizeTabGroupIdentity(WidgetId groupId);
     void JoinTab(WidgetId id, WidgetId target);
     Rect Place(Vec2 size, float spacing);
+    Rect PlaceStyled(Vec2 size, const ComputedStyle& style);
     void DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
                          float opacity, CornerRadii rounding = {});
     void DrawBox(Rect r, const ComputedStyle& s);
@@ -340,6 +343,7 @@ private:
                            const std::vector<ConsoleTextType>& lineTypes, Vec2 size);
     Rect BeginMenuPopup(WidgetId id, Rect anchor, size_t depth);
     void DrawTextCentered(Rect r, std::string_view text, const ComputedStyle& s);
+    void DrawTextAligned(Rect r, std::string_view text, const ComputedStyle& s);
 
     StyleSheet style_;
     DrawList draw_;
@@ -365,6 +369,7 @@ private:
 
     std::vector<WidgetId> idStack_;
     std::vector<std::string> classStack_;
+    std::vector<std::string> styleIdStack_;
     std::vector<Rect> interactionClips_;
     std::unordered_map<WidgetId, WindowState> windows_;
     std::array<std::vector<WidgetId>, 10> dockedWindows_;

@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include <windows.h>
+#include <commdlg.h>
 #include <wincodec.h>
 #include <d2d1_1.h>
 #include <d2d1_3.h>
@@ -7,7 +8,9 @@
 #include <d3d11.h>
 #include <dxgi1_2.h>
 #include <GLFW/glfw3.h>
-#include "../src/FluidUI/FluidUI.h"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <FluidUI/FluidUI.h>
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "../third_party/stb_truetype.h"
 
@@ -77,6 +80,30 @@ static void OnKey(GLFWwindow*, int key, int, int action, int mods) {
     if (key == GLFW_KEY_A && (mods & GLFW_MOD_CONTROL)) gSelectAllPressed = true;
     if (key == GLFW_KEY_C && (mods & GLFW_MOD_CONTROL)) gCopyPressed = true;
     if (key == GLFW_KEY_V && (mods & GLFW_MOD_CONTROL)) gPastePressed = true;
+}
+
+static bool SelectCssFile(HWND owner, std::filesystem::path& path, std::string& error) {
+    std::vector<wchar_t> filename(32768, L'\0');
+    const wchar_t filter[] =
+        L"CSS files (*.css)\0*.css\0All files (*.*)\0*.*\0\0";
+    OPENFILENAMEW dialog{};
+    dialog.lStructSize = sizeof(dialog);
+    dialog.hwndOwner = owner;
+    dialog.lpstrFilter = filter;
+    dialog.lpstrFile = filename.data();
+    dialog.nMaxFile = static_cast<DWORD>(filename.size());
+    dialog.lpstrDefExt = L"css";
+    dialog.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                   OFN_NOCHANGEDIR;
+    if (GetOpenFileNameW(&dialog)) {
+        path = std::filesystem::path(filename.data());
+        error.clear();
+        return true;
+    }
+    const DWORD dialogError = CommDlgExtendedError();
+    error = dialogError == 0 ? std::string{}
+        : "CSS file picker failed with error " + std::to_string(dialogError);
+    return false;
 }
 
 static void RenderGL(const DrawList& dl, int fbW, int fbH) {
@@ -644,7 +671,7 @@ int main(int argc, char** argv) {
     std::string cssError;
     const std::filesystem::path themePath =
         std::filesystem::path(FLUIDUI_EXAMPLE_SOURCE_DIR) / "theme.css";
-    if (!ui.Style().LoadCSSFile(themePath.string(), &cssError)) {
+    if (!ui.Style().LoadCSSFile(themePath, &cssError)) {
         std::fprintf(stderr, "%s\n", cssError.c_str());
         glfwDestroyWindow(win);
         glfwTerminate();
@@ -691,18 +718,56 @@ int main(int argc, char** argv) {
         glfwTerminate();
         return 1;
     }
-    ui.Style().RegisterImage("../src/Icons/FolderIcn.svg",
-                             static_cast<GPUImageId>(folderIconTexture),
-                             {static_cast<float>(folderIconWidth),
-                              static_cast<float>(folderIconHeight)});
-    ui.Style().RegisterImage("../src/Icons/EmptyIcn.png",
-                             static_cast<GPUImageId>(emptyIconTexture),
-                             {static_cast<float>(emptyIconWidth),
-                              static_cast<float>(emptyIconHeight)});
-    ui.Style().RegisterImage("../src/Images/Pr.png",
-                             static_cast<GPUImageId>(productImageTexture),
-                             {static_cast<float>(productImageWidth),
-                              static_cast<float>(productImageHeight)});
+    const auto registerThemeImages = [&](StyleSheet& style) {
+        style.RegisterImage(iconImageSource, static_cast<GPUImageId>(iconTexture),
+                            {static_cast<float>(iconImageWidth),
+                             static_cast<float>(iconImageHeight)});
+        style.RegisterImage("../src/Icons/FolderIcn.svg",
+                            static_cast<GPUImageId>(folderIconTexture),
+                            {static_cast<float>(folderIconWidth),
+                             static_cast<float>(folderIconHeight)});
+        style.RegisterImage("../src/Icons/EmptyIcn.png",
+                            static_cast<GPUImageId>(emptyIconTexture),
+                            {static_cast<float>(emptyIconWidth),
+                             static_cast<float>(emptyIconHeight)});
+        style.RegisterImage("../src/Images/Pr.png",
+                            static_cast<GPUImageId>(productImageTexture),
+                            {static_cast<float>(productImageWidth),
+                             static_cast<float>(productImageHeight)});
+    };
+    registerThemeImages(ui.Style());
+    std::filesystem::path activeThemePath = themePath;
+    std::filesystem::file_time_type activeThemeWriteTime{};
+    std::error_code themeTimestampError;
+    activeThemeWriteTime =
+        std::filesystem::last_write_time(activeThemePath, themeTimestampError);
+    bool hasThemeWriteTime = !themeTimestampError;
+    std::error_code themeWatchError = themeTimestampError;
+    bool autoReloadTheme = true;
+    std::string themeStatus = themeTimestampError
+        ? "CSS loaded, but automatic reload is unavailable: " +
+              themeTimestampError.message()
+        : "Loaded " + activeThemePath.string();
+    const auto loadTheme = [&](const std::filesystem::path& path) {
+        StyleSheet candidate = StyleSheet::Dark();
+        std::string error;
+        if (!candidate.LoadCSSFile(path, &error)) {
+            themeStatus = "Could not load CSS: " + error;
+            return false;
+        }
+        registerThemeImages(candidate);
+        ui.Style() = std::move(candidate);
+        activeThemePath = path;
+        std::error_code timestampError;
+        activeThemeWriteTime = std::filesystem::last_write_time(path, timestampError);
+        hasThemeWriteTime = !timestampError;
+        themeWatchError = timestampError;
+        themeStatus = "Loaded " + activeThemePath.string();
+        if (timestampError)
+            themeStatus += "; automatic reload unavailable: " +
+                           timestampError.message();
+        return true;
+    };
     DemoFontAtlas fontAtlas;
     std::string fontError;
     const std::filesystem::path fontPath =
@@ -773,10 +838,29 @@ int main(int argc, char** argv) {
     constexpr std::string_view managerWindow = "Window manager##manager";
     constexpr std::string_view settingsWindow = "Settings##settings";
     constexpr std::string_view advancedWindow = "Advanced controls##advanced";
+    constexpr std::string_view themeWindow = "Theme settings##theme-settings";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
         glfwPollEvents();
+        if (autoReloadTheme) {
+            std::error_code timestampError;
+            const auto writeTime =
+                std::filesystem::last_write_time(activeThemePath, timestampError);
+            if (timestampError) {
+                if (themeWatchError != timestampError) {
+                    themeStatus = "Automatic CSS reload failed: " +
+                                  timestampError.message();
+                    themeWatchError = timestampError;
+                }
+                hasThemeWriteTime = false;
+            } else if (!hasThemeWriteTime || writeTime != activeThemeWriteTime) {
+                activeThemeWriteTime = writeTime;
+                hasThemeWriteTime = true;
+                themeWatchError.clear();
+                loadTheme(activeThemePath);
+            }
+        }
         int w, h; glfwGetFramebufferSize(win, &w, &h);
         double mx, my; glfwGetCursorPos(win, &mx, &my);
         const double now = glfwGetTime();
@@ -841,6 +925,13 @@ int main(int argc, char** argv) {
                     else
                         std::fprintf(stdout, "Loaded window layout from '%s'\n",
                                      layoutPath.string().c_str());
+                }
+                if (ui.BeginMenu("Theme")) {
+                    if (ui.MenuItem("Theme settings..."))
+                        ui.SetWindowOpen(themeWindow, true);
+                    if (ui.MenuItem("Reload CSS"))
+                        loadTheme(activeThemePath);
+                    ui.EndMenu();
                 }
                 ui.EndMenu();
             }
@@ -1100,6 +1191,24 @@ int main(int argc, char** argv) {
             ui.ClippedList(100, [&](int row) {
                 ui.Text("Virtual row " + std::to_string(row));
             }, 24.f);
+            ui.EndWindow();
+        }
+
+        if (ui.BeginWindow(themeWindow, {560, 90, 520, 250})) {
+            ui.Text("Active stylesheet##ThemeTextTest");
+            ui.TextWrapped(activeThemePath.string());
+            if (ui.Button("Load CSS...")) {
+                std::filesystem::path selectedPath;
+                std::string dialogError;
+                if (SelectCssFile(glfwGetWin32Window(win), selectedPath, dialogError))
+                    loadTheme(selectedPath);
+                else if (!dialogError.empty())
+                    themeStatus = dialogError;
+            }
+            ui.SameLine();
+            if (ui.Button("Reload CSS")) loadTheme(activeThemePath);
+            ui.Toggle("Auto Reload", &autoReloadTheme);
+            ui.TextWrapped(themeStatus);
             ui.EndWindow();
         }
 

@@ -2,6 +2,7 @@
 #include "Export.h"
 #include "Types.h"
 
+#include <filesystem>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -14,7 +15,8 @@ namespace fluid {
 enum class Prop : uint8_t {
     Background, BackgroundReset, Foreground, Accent, BorderColor, ShadowColor,
     Outline, OutlineStyle, OutlineColor, OutlineColorGradient,
-    BorderWidth, Rounding, FontSize, Spacing, ShadowBlur, ShadowEnabled, Opacity,
+    BorderWidth, Rounding, FontSize, Width, Height, Alignment, JustifySelf, AlignSelf,
+    TextAlign, VerticalAlign, Spacing, ShadowBlur, ShadowEnabled, Opacity,
     OutlineWidth, Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
     BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
@@ -22,6 +24,9 @@ enum class Prop : uint8_t {
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
+enum class HorizontalAlignment : uint8_t { Auto, Start, Center, End };
+enum class VerticalAlignment : uint8_t { Auto, Start, Center, End };
+enum class TextAlignment : uint8_t { Start, Center, End };
 
 enum StateFlags : uint8_t {
     State_None     = 0,
@@ -46,6 +51,16 @@ struct ComputedStyle {
     float rounding    = 4.f;
     CornerRadii cornerRadii{4.f};
     float fontSize    = 16.f;
+    float width = -1.f;
+    float height = -1.f;
+    bool widthPercent = false;
+    bool heightPercent = false;
+    HorizontalAlignment justifySelf = HorizontalAlignment::Auto;
+    VerticalAlignment alignSelf = VerticalAlignment::Auto;
+    TextAlignment textAlign = TextAlignment::Start;
+    VerticalAlignment textVerticalAlign = VerticalAlignment::Start;
+    bool textAlignSet = false;
+    bool textVerticalAlignSet = false;
     float spacing     = 6.f;
     float shadowBlur  = 0.f;
     bool shadowEnabled = true;
@@ -69,14 +84,21 @@ struct ComputedStyle {
 FLUID_API ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t);
 
 struct StyleValue { float v[4] = {0, 0, 0, 0}; };
-struct StyleDecl  { Prop prop; StyleValue value; std::string text; };
+struct StyleDecl  {
+    Prop prop;
+    StyleValue value;
+    std::string text;
+    bool important = false;
+};
 
 struct StyleRule {
     std::string widget;      // empty = any
+    std::string id;
     std::vector<std::string> classes;
     uint8_t stateMask = 0;   // all bits must be present in the current state
     std::vector<StyleDecl> decls;
     bool builtIn = false;
+    bool fromCSS = false;
 };
 
 class FLUID_API StyleSheet {
@@ -96,6 +118,8 @@ public:
         RuleBuilder& Outline(bool v)          { return Num(Prop::OutlineStyle, v ? 1.f : 0.f); }
         RuleBuilder& Rounding(float v)        { return Num(Prop::Rounding, v); }
         RuleBuilder& FontSize(float v)        { return Num(Prop::FontSize, v); }
+        RuleBuilder& Width(float v)           { return Num(Prop::Width, v); }
+        RuleBuilder& Height(float v)          { return Num(Prop::Height, v); }
         RuleBuilder& Spacing(float v)         { return Num(Prop::Spacing, v); }
         RuleBuilder& ShadowBlur(float v)      { return Num(Prop::ShadowBlur, v); }
         RuleBuilder& ShadowEnabled(bool v)    { return Num(Prop::ShadowEnabled, v ? 1.f : 0.f); }
@@ -133,8 +157,9 @@ public:
         RuleBuilder& Padding(Edges e) {
             return Set(Prop::Padding, {{e.top, e.right, e.bottom, e.left}});
         }
-        RuleBuilder& Set(Prop p, StyleValue v, std::string text = {}) {
-            sheet_->SetProp(index_, p, v, std::move(text));
+        RuleBuilder& Set(Prop p, StyleValue v, std::string text = {},
+                         bool important = false) {
+            sheet_->SetProp(index_, p, v, std::move(text), important);
             return *this;
         }
 
@@ -145,21 +170,23 @@ public:
         size_t index_;
     };
 
-    // Selector grammar: [widget|*][.class...][:state[:state...]]
-    // e.g. "button", "button.primary", "button.primary.large:hover", "*", ".danger:active"
+    // Selector grammar: [widget|*][.class...][#id][:state[:state...]]
+    // e.g. "button.primary#confirm:hover", "*", ".danger:active"
     // States: hover, active, checked, disabled
     RuleBuilder Rule(std::string_view selector);
 
     // Cascade: lower specificity first, later rules win ties.
     ComputedStyle Resolve(std::string_view widget,
                           const std::vector<std::string>& classes,
-                          uint8_t state) const;
+                          uint8_t state, std::string_view id = {}) const;
 
-    void SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string text = {});
+    void SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string text = {},
+                 bool important = false);
     void RegisterImage(std::string_view source, GPUImageId image, Vec2 size);
     void Clear();
     bool LoadCSS(std::string_view css, std::string* error = nullptr);
     bool LoadCSSFile(const std::string& path, std::string* error = nullptr);
+    bool LoadCSSFile(const std::filesystem::path& path, std::string* error = nullptr);
     uint32_t Version() const { return version_; }
 
     static StyleSheet Dark(); // built-in theme

@@ -3,7 +3,7 @@ set(CMAKE_HOST_SYSTEM_NAME "Windows")
 set(CMAKE_HOST_SYSTEM_VERSION "10.0.19045")
 set(CMAKE_HOST_SYSTEM_PROCESSOR "AMD64")
 
-set(_CMAKE_INPUT_TOOLCHAIN_FILE [==[build/conan_toolchain.cmake]==])
+set(_CMAKE_INPUT_TOOLCHAIN_FILE [==[conan_toolchain.cmake]==])
 set(_CMAKE_SYSTEM_TOOLCHAIN_FILE "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build/conan_toolchain.cmake")
 include("${_CMAKE_SYSTEM_TOOLCHAIN_FILE}")
 

@@ -8,6 +8,14 @@
 
 ## Fluid UI is a lightweight, highly customizable UI library for C++ applications, designed to make building beautiful, native interfaces simple and intuitive.
 
+## Project layout and build
+
+Public headers live in `include/FluidUI`, with implementation files in `src/`. The demo and
+its theme are in `examples/`, third-party dependencies are in `third_party/`, and Windows
+build/install scripts are in `scripts/`. `build/` and `output/` are generated directories.
+Run `scripts/build.bat` to build and refresh the runnable package in `output/bin`; the root
+`bl.bat` remains as a compatibility entry point.
+
 ## Components
 
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
@@ -15,7 +23,8 @@ popup dropdown menus, progress bars, selectable console output and input, file-b
 tile containers, text and image labels, image buttons, collapsible containers, containers,
 horizontal/vertical lists, tabbed containers, hover hints, timed notifications, and
 class-styleable empty widgets.
-Text/icon labels can be combined as needed.
+Text/icon labels can be combined as needed. `InteractiveImage` has its own
+`interactive-image` style selector, separate from `image-button`.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
 The Windows GLFW example loads PNG and JPEG with WIC and SVG with Direct2D (Windows 10 or
@@ -156,9 +165,11 @@ to the text.
 ## CSS-like themes and classes
 
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
-Selectors support widget names, multiple stacked classes, grouped selectors, and widget
-states (`hover`, `active`, `checked`, `disabled`). User rules override the built-in dark
-theme defaults; selector specificity still determines precedence between user rules. Global
+Selectors support widget names, multiple classes, one ID, grouped selectors, and widget
+states (`hover`, `active`, `checked`, `disabled`), for example `button.primary#confirm:hover`.
+Use `PushClass`/`PopClass` and `PushStyleID`/`PopStyleID` to apply class and ID selectors to
+elements created in those scopes. User rules override the built-in dark theme defaults;
+selector specificity still determines precedence between user rules. Global
 custom properties can be declared
 in `:root`, retained across successive `LoadCSS` calls, and referenced with `var(--name)`
 (including a fallback). Colors support 3/4/6/8
@@ -167,12 +178,19 @@ numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius` and its `border-radius-top-left`,
 `border-radius-top-right`, `border-radius-bottom-left`, and `border-radius-bottom-right`
-corner overrides, `font-size`, `gap`, `shadow-blur`, `shadow-enabled` (`true` or `false`),
+corner overrides, `font-size`, `width` and `height` (`auto`, pixels, or percentages of the available content
+region), `align` (`left`, `center`, `right`, `top`, `middle`, or `bottom`),
+`justify-self`, `align-self`, `text-align`, `vertical-align`, `gap`, `shadow-blur`,
+`shadow-enabled` (`true` or `false`),
 `outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
 `outline-color`, `outline-width`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
 `padding`. Outlines and shadows are available to box-drawn components and can be set
-using widget selectors or global rules. Background images are supported with
+using widget selectors or global rules. CSS comments, zero values, and unsupported
+properties/selectors are safely ignored or parsed without aborting the stylesheet; malformed
+comments or rule blocks fail the load without partially changing the active stylesheet.
+Each successful CSS load replaces the previous CSS rules, so removed declarations no longer
+remain in effect. Background images are supported with
 `background-image: url("...")`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
@@ -180,14 +198,21 @@ using widget selectors or global rules. Background images are supported with
 support `linear-gradient(...)` and `gradient(...)` syntax, including angles or
 `to right`-style directions,
 multiple color stops, and percentage stops. Gradients are accepted anywhere a color is
-accepted (backgrounds, foreground/text, accent, borders, and shadows), with explicit
-`text-gradient`, `accent-gradient`, `border-color-gradient`, and `shadow-color-gradient`
-aliases available. Unsupported
+accepted (backgrounds, foreground/text, accent, borders, outlines, and shadows), including
+the `border` and `outline` shorthands. Solid borders and outlines draw only their rings,
+so they do not cover the component background. Explicit `background-gradient`,
+`text-gradient`, `accent-gradient`, `border-color-gradient`, `outline-color-gradient`,
+and `shadow-color-gradient` aliases are also available. Unsupported
 declarations are ignored so themes can include properties not implemented by Fluid UI.
-Unsupported selectors and invalid values for supported properties report an error, and
-failed stylesheet loads do not partially modify the active theme.
+`!important` is supported for regular declarations and follows the normal specificity order
+among important declarations.
+The selector grammar intentionally covers simple selectors rather than combinators, nested
+selectors, or media queries. Invalid declarations are ignored.
 Window styles also support `window-can-dock` and `window-child-dock`, each accepting
 `true` or `false`.
+In the GLFW demo, use `Layout > Theme > Theme settings` to select a CSS file, reload the
+active file, or toggle automatic reload. Invalid CSS leaves the last successfully loaded
+theme active and reports the error in the theme window.
 
 ```css
 button.primary {
@@ -198,6 +223,15 @@ button.primary {
 
 button.primary:hover {
     background: #4A6CF7;
+}
+
+button#confirm {
+    width: 180px;
+    text-align: center;
+}
+
+interactive-image:hover {
+    background: #304762;
 }
 
 empty-widget.brand {

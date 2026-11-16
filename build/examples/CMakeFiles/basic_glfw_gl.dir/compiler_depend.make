@@ -3,13 +3,14 @@
 
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/examples/main.cpp \
   C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Backend.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/DrawList.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Export.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h \
-  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Types.h \
+  C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3native.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Backend.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Context.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/DrawList.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Export.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/FluidUI.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Style.h \
+  C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Types.h \
   C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h \
   C:/msys64/ucrt64/include/GL/gl.h \
   C:/msys64/ucrt64/include/_bsd_types.h \
@@ -554,13 +555,23 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Docu
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/xtestintrin.h
 
 
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Backend.h:
-
 C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/examples/main.cpp:
 
 C:/msys64/ucrt64/include/handleapi.h:
 
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/FluidUI.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
+
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/DrawList.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/new:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bf16intrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512cdintrin.h:
+
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Export.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/locale:
 
@@ -570,57 +581,47 @@ C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512vp2intersectvlintrin.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/array:
+C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3native.h:
 
-C:/msys64/ucrt64/include/securitybaseapi.h:
+C:/msys64/ucrt64/include/cguid.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/ia32intrin.h:
+C:/msys64/ucrt64/include/corecrt_wconio.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/std_function.h:
+C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_dir.h:
 
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h:
+C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/alloc_traits.h:
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Backend.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/ranges_algobase.h:
+C:/msys64/ucrt64/include/c++/16.2.0/stdexcept:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx10_2satcvtintrin.h:
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/immintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/f16cintrin.h:
+C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.tcc:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/align.h:
+C:/msys64/ucrt64/include/_timeval.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mwaitxintrin.h:
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Context.h:
 
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h:
+C:/msys64/ucrt64/include/sysinfoapi.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/refwrap.h:
+C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.h:
 
-C:/msys64/ucrt64/include/winsvc.h:
+C:/msys64/ucrt64/include/process.h:
 
-C:/msys64/ucrt64/include/_mingw_off_t.h:
+C:/msys64/ucrt64/include/corecrt_wprocess.h:
 
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/DrawList.h:
+C:/msys64/ucrt64/include/_mingw.h:
 
-C:/msys64/ucrt64/include/bemapiset.h:
+C:/msys64/ucrt64/include/imm.h:
 
-C:/msys64/ucrt64/include/utilapiset.h:
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Style.h:
 
-C:/msys64/ucrt64/include/_bsd_types.h:
+C:/msys64/ucrt64/include/pthread_signal.h:
 
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Export.h:
+C:/msys64/ucrt64/include/winscard.h:
 
-C:/msys64/ucrt64/include/sys/timeb.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/functional_hash.h:
-
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/std_abs.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_defines.h:
-
-C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Types.h:
+C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Types.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_ios.h:
 
@@ -636,15 +637,11 @@ C:/msys64/ucrt64/include/c++/16.2.0/bit:
 
 C:/msys64/ucrt64/include/GL/gl.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.h:
+C:/msys64/ucrt64/include/bemapiset.h:
 
-C:/msys64/ucrt64/include/process.h:
+C:/msys64/ucrt64/include/utilapiset.h:
 
-C:/msys64/ucrt64/include/corecrt_wprocess.h:
-
-C:/msys64/ucrt64/include/_mingw.h:
-
-C:/msys64/ucrt64/include/imm.h:
+C:/msys64/ucrt64/include/_bsd_types.h:
 
 C:/msys64/ucrt64/include/_mingw_locale.h:
 
@@ -657,6 +654,12 @@ C:/msys64/ucrt64/include/c++/16.2.0/concepts:
 C:/msys64/ucrt64/include/mmiscapi2.h:
 
 C:/msys64/ucrt64/include/_mingw_mac.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/refwrap.h:
+
+C:/msys64/ucrt64/include/winsvc.h:
+
+C:/msys64/ucrt64/include/_mingw_off_t.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/fstream.tcc:
 
@@ -673,12 +676,6 @@ C:/msys64/ucrt64/include/c++/16.2.0/bits/charconv.h:
 C:/msys64/ucrt64/include/_mingw_stdarg.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/unordered_map:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/immintrin.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.tcc:
-
-C:/msys64/ucrt64/include/_timeval.h:
 
 C:/msys64/ucrt64/include/sys/stat.h:
 
@@ -714,11 +711,27 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avxneconvertintrin.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/algorithm:
 
+C:/msys64/ucrt64/include/c++/16.2.0/array:
+
+C:/msys64/ucrt64/include/securitybaseapi.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/ia32intrin.h:
+
 C:/msys64/ucrt64/include/c++/16.2.0/bits/char_traits.h:
 
 C:/msys64/ucrt64/include/objidlbase.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/backward/binders.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/alloc_traits.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/ranges_algobase.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx10_2satcvtintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/f16cintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/align.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/allocated_ptr.h:
 
@@ -770,13 +783,7 @@ C:/msys64/ucrt64/include/corecrt_stdio_config.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/erase_if.h:
 
-C:/msys64/ucrt64/include/cguid.h:
-
-C:/msys64/ucrt64/include/corecrt_wconio.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_dir.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h:
+C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_defines.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_fwd.h:
 
@@ -787,6 +794,10 @@ C:/msys64/ucrt64/include/c++/16.2.0/bits/localefwd.h:
 C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_path.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/functexcept.h:
+
+C:/msys64/ucrt64/include/sys/timeb.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/functional_hash.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/hashtable_policy.h:
 
@@ -917,6 +928,10 @@ C:/msys64/ucrt64/include/c++/16.2.0/bits/specfun.h:
 C:/msys64/ucrt64/include/ddeml.h:
 
 C:/msys64/ucrt64/include/c++/16.2.0/bits/sstream.tcc:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/std_abs.h:
+
+C:/msys64/ucrt64/include/c++/16.2.0/bits/std_function.h:
 
 C:/msys64/ucrt64/include/d3d10effect.h:
 
@@ -1118,12 +1133,6 @@ C:/msys64/ucrt64/include/c++/16.2.0/iterator:
 
 C:/msys64/ucrt64/include/c++/16.2.0/math.h:
 
-C:/msys64/ucrt64/include/c++/16.2.0/new:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512bf16intrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/avx512cdintrin.h:
-
 C:/msys64/ucrt64/include/c++/16.2.0/numbers:
 
 C:/msys64/ucrt64/include/c++/16.2.0/ostream:
@@ -1147,8 +1156,6 @@ C:/msys64/ucrt64/include/c++/16.2.0/ratio:
 C:/msys64/ucrt64/include/c++/16.2.0/sstream:
 
 C:/msys64/ucrt64/include/winuser.h:
-
-C:/msys64/ucrt64/include/c++/16.2.0/stdexcept:
 
 C:/msys64/ucrt64/include/c++/16.2.0/stdlib.h:
 
@@ -1442,10 +1449,6 @@ C:/msys64/ucrt64/include/wincon.h:
 
 C:/msys64/ucrt64/include/pthread_compat.h:
 
-C:/msys64/ucrt64/include/pthread_signal.h:
-
-C:/msys64/ucrt64/include/winscard.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/gfniintrin.h:
 
 C:/msys64/ucrt64/include/pthread_unistd.h:
@@ -1489,8 +1492,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/amxint8intrin.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/vaesintrin.h:
 
 C:/msys64/ucrt64/include/sys/types.h:
-
-C:/msys64/ucrt64/include/sysinfoapi.h:
 
 C:/msys64/ucrt64/include/threadpoolapiset.h:
 
@@ -1607,6 +1608,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/sm3intrin.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mm_malloc.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/movdirintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/mwaitxintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/pconfigintrin.h:
 
