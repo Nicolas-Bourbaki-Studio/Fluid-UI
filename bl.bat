@@ -1,3 +1,3 @@
 @echo off
-cmake --build build --clean-first --parallel 12
+call "%~dp0scripts\build.bat" %*
 exit /b %errorlevel%

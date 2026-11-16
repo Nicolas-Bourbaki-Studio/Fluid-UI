@@ -1,4 +1,4 @@
-#include "FluidUI/Style.h"
+#include <FluidUI/Style.h>
 
 #include <algorithm>
 #include <bit>
@@ -27,13 +27,63 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.rounding    = Lerp(a.rounding,    b.rounding,    t);
     o.cornerRadii = Lerp(a.cornerRadii, b.cornerRadii, t);
     o.fontSize    = Lerp(a.fontSize,    b.fontSize,    t);
+    const bool interpolateWidth = a.width >= 0.f && b.width >= 0.f &&
+                                  a.widthPercent == b.widthPercent;
+    o.width = interpolateWidth ? Lerp(a.width, b.width, t)
+                               : (t < 0.5f ? a.width : b.width);
+    o.widthPercent = t < 0.5f ? a.widthPercent : b.widthPercent;
+    const bool interpolateHeight = a.height >= 0.f && b.height >= 0.f &&
+                                   a.heightPercent == b.heightPercent;
+    o.height = interpolateHeight ? Lerp(a.height, b.height, t)
+                                 : (t < 0.5f ? a.height : b.height);
+    o.heightPercent = t < 0.5f ? a.heightPercent : b.heightPercent;
+    o.position = t < 0.5f ? a.position : b.position;
+    auto lerpOffset = [t](float from, float to, bool fromSet, bool toSet,
+                          bool fromPercent, bool toPercent) {
+        return fromSet && toSet && fromPercent == toPercent
+            ? Lerp(from, to, t) : (t < 0.5f ? from : to);
+    };
+    o.top = lerpOffset(a.top, b.top, a.topSet, b.topSet, a.topPercent, b.topPercent);
+    o.right = lerpOffset(a.right, b.right, a.rightSet, b.rightSet,
+                         a.rightPercent, b.rightPercent);
+    o.bottom = lerpOffset(a.bottom, b.bottom, a.bottomSet, b.bottomSet,
+                          a.bottomPercent, b.bottomPercent);
+    o.left = lerpOffset(a.left, b.left, a.leftSet, b.leftSet,
+                        a.leftPercent, b.leftPercent);
+    o.topSet = t < 0.5f ? a.topSet : b.topSet;
+    o.rightSet = t < 0.5f ? a.rightSet : b.rightSet;
+    o.bottomSet = t < 0.5f ? a.bottomSet : b.bottomSet;
+    o.leftSet = t < 0.5f ? a.leftSet : b.leftSet;
+    o.topPercent = t < 0.5f ? a.topPercent : b.topPercent;
+    o.rightPercent = t < 0.5f ? a.rightPercent : b.rightPercent;
+    o.bottomPercent = t < 0.5f ? a.bottomPercent : b.bottomPercent;
+    o.leftPercent = t < 0.5f ? a.leftPercent : b.leftPercent;
+    o.rotation = Lerp(a.rotation, b.rotation, t);
+    o.translate = {
+        a.translateXPercent == b.translateXPercent
+            ? Lerp(a.translate.x, b.translate.x, t)
+            : (t < 0.5f ? a.translate.x : b.translate.x),
+        a.translateYPercent == b.translateYPercent
+            ? Lerp(a.translate.y, b.translate.y, t)
+            : (t < 0.5f ? a.translate.y : b.translate.y)
+    };
+    o.translateXPercent = t < 0.5f ? a.translateXPercent : b.translateXPercent;
+    o.translateYPercent = t < 0.5f ? a.translateYPercent : b.translateYPercent;
+    o.justifySelf = t < 0.5f ? a.justifySelf : b.justifySelf;
+    o.alignSelf = t < 0.5f ? a.alignSelf : b.alignSelf;
+    o.textAlign = t < 0.5f ? a.textAlign : b.textAlign;
+    o.textVerticalAlign = t < 0.5f ? a.textVerticalAlign : b.textVerticalAlign;
+    o.textAlignSet = t < 0.5f ? a.textAlignSet : b.textAlignSet;
+    o.textVerticalAlignSet = t < 0.5f ? a.textVerticalAlignSet : b.textVerticalAlignSet;
     o.spacing     = Lerp(a.spacing,     b.spacing,     t);
     o.shadowBlur  = Lerp(a.shadowBlur,  b.shadowBlur,  t);
     o.shadowEnabled = t < 0.5f ? a.shadowEnabled : b.shadowEnabled;
     o.windowCanDock = t < 0.5f ? a.windowCanDock : b.windowCanDock;
     o.windowChildDock = t < 0.5f ? a.windowChildDock : b.windowChildDock;
+    o.scrollbarWidth = t < 0.5f ? a.scrollbarWidth : b.scrollbarWidth;
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
+    o.transitionEasing = t < 0.5f ? a.transitionEasing : b.transitionEasing;
     o.padding     = Lerp(a.padding,     b.padding,     t);
     o.backgroundImage = t < 0.5f ? a.backgroundImage : b.backgroundImage;
     o.backgroundImageSize = {
@@ -56,6 +106,23 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
 
 namespace {
 
+std::string Lowercase(std::string_view value) {
+    std::string result(value);
+    std::transform(result.begin(), result.end(), result.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+    return result;
+}
+
+bool EqualsIgnoreCase(std::string_view left, std::string_view right) {
+    if (left.size() != right.size()) return false;
+    for (size_t i = 0; i < left.size(); ++i) {
+        if (std::tolower(static_cast<unsigned char>(left[i])) !=
+            std::tolower(static_cast<unsigned char>(right[i])))
+            return false;
+    }
+    return true;
+}
+
 uint8_t StateFromName(std::string_view n) {
     if (n == "hover")    return State_Hovered;
     if (n == "active")   return State_Active;
@@ -64,32 +131,35 @@ uint8_t StateFromName(std::string_view n) {
     return 0;
 }
 
-void ParseSelector(std::string_view s, std::string& widget,
-                   std::vector<std::string>& classes, uint8_t& mask) {
-    if (s == ":root" || s == "*:root") {
-        widget.clear();
-        classes.clear();
-        mask = 0;
+void ParseSelector(std::string_view selector, std::string& widget,
+                   std::string& id, std::vector<std::string>& classes,
+                   uint8_t& mask) {
+    widget.clear();
+    id.clear();
+    classes.clear();
+    mask = 0;
+    if (selector == ":root" || selector == "*:root") {
         return;
     }
-    const size_t colon = s.find(':');
-    std::string_view head = s.substr(0, colon);
-    std::string_view states = (colon == std::string_view::npos) ? std::string_view{} : s.substr(colon + 1);
-
-    const size_t dot = head.find('.');
-    widget = std::string(head.substr(0, dot));
-    if (widget == "*") widget.clear();
-    classes.clear();
-    if (dot != std::string_view::npos) {
-        std::string_view remaining = head.substr(dot + 1);
-        while (!remaining.empty()) {
-            const size_t next = remaining.find('.');
-            classes.emplace_back(remaining.substr(0, next));
-            remaining = next == std::string_view::npos ? std::string_view{} : remaining.substr(next + 1);
-        }
+    const size_t colon = selector.find(':');
+    const std::string_view head = selector.substr(0, colon);
+    std::string_view states = colon == std::string_view::npos
+        ? std::string_view{} : selector.substr(colon + 1);
+    size_t position = 0;
+    while (position < head.size() && head[position] != '.' && head[position] != '#') {
+        ++position;
     }
-
-    mask = 0;
+    const std::string_view type = head.substr(0, position);
+    if (type != "*") widget.assign(type);
+    while (position < head.size()) {
+        const char marker = head[position++];
+        const size_t start = position;
+        while (position < head.size() && head[position] != '.' && head[position] != '#')
+            ++position;
+        const std::string_view name = head.substr(start, position - start);
+        if (marker == '#') id.assign(name);
+        else if (marker == '.') classes.emplace_back(name);
+    }
     while (!states.empty()) {
         const size_t c = states.find(':');
         mask |= StateFromName(states.substr(0, c));
@@ -103,12 +173,9 @@ bool ValidSelector(std::string_view selector) {
     for (char ch : selector)
         if (std::isspace(static_cast<unsigned char>(ch))) return false;
     const size_t colon = selector.find(':');
-    std::string_view head = selector.substr(0, colon);
+    const std::string_view head = selector.substr(0, colon);
     std::string_view states = colon == std::string_view::npos
         ? std::string_view{} : selector.substr(colon + 1);
-    const size_t dot = head.find('.');
-    std::string_view widget = head.substr(0, dot);
-    if (widget == "*") widget = {};
     auto validName = [](std::string_view name) {
         if (name.empty()) return false;
         for (char ch : name) {
@@ -117,16 +184,25 @@ bool ValidSelector(std::string_view selector) {
         }
         return true;
     };
-    if (!widget.empty() && !validName(widget)) return false;
-    if (dot != std::string_view::npos) {
-        std::string_view classes = head.substr(dot + 1);
-        while (!classes.empty()) {
-            const size_t next = classes.find('.');
-            if (!validName(classes.substr(0, next))) return false;
-            if (next == std::string_view::npos) break;
-            classes.remove_prefix(next + 1);
+    size_t position = 0;
+    while (position < head.size() && head[position] != '.' && head[position] != '#')
+        ++position;
+    const std::string_view type = head.substr(0, position);
+    if (!type.empty() && type != "*" && !validName(type)) return false;
+    bool hasId = false;
+    while (position < head.size()) {
+        const char marker = head[position++];
+        const size_t start = position;
+        while (position < head.size() && head[position] != '.' && head[position] != '#')
+            ++position;
+        if (!validName(head.substr(start, position - start))) return false;
+        if (marker == '#') {
+            if (hasId) return false;
+            hasId = true;
         }
     }
+    if (type == "*" && head.size() > 1 && head[1] != '.' && head[1] != '#')
+        return false;
     while (!states.empty()) {
         const size_t next = states.find(':');
         const std::string_view state = states.substr(0, next);
@@ -152,9 +228,17 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "border-radius-top-left" || name == "border-radius-top-right" ||
         name == "border-radius-bottom-left" || name == "border-radius-bottom-right" ||
         name == "font-size" || name == "gap" || name == "spacing" ||
+        name == "width" || name == "height" || name == "align" ||
+        name == "position" || name == "top" || name == "right" ||
+        name == "bottom" || name == "left" ||
+        name == "rotation" || name == "rotate" || name == "translate" ||
+        name == "alignment" || name == "align-self" || name == "justify-self" ||
+        name == "text-align" || name == "vertical-align" ||
         name == "shadow-blur" || name == "shadow-enabled" ||
-        name == "opacity" || name == "transition-speed" ||
+        name == "opacity" || name == "transition-speed" || name == "transition" ||
+        name == "transition-duration" ||
         name == "window-can-dock" || name == "window-child-dock" ||
+        name == "scrollbar-width" ||
         name == "padding" || name == "border" || name == "background-image" ||
         name == "text-gradient" || name == "color-gradient" ||
         name == "foreground-gradient" ||
@@ -230,13 +314,82 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::RoundingBottomRight: s.cornerRadii.bottomRight = v[0]; break;
         case Prop::RoundingBottomLeft:  s.cornerRadii.bottomLeft = v[0]; break;
         case Prop::FontSize:        s.fontSize = v[0]; break;
+        case Prop::Width:
+            s.width = v[0];
+            s.widthPercent = v[1] != 0.f;
+            break;
+        case Prop::Height:
+            s.height = v[0];
+            s.heightPercent = v[1] != 0.f;
+            break;
+        case Prop::Position:
+            s.position = static_cast<PositionType>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::PositionCoordinates: {
+            const uint8_t flags = static_cast<uint8_t>(v[3]);
+            s.position = PositionType::Absolute;
+            s.left = v[0];
+            s.top = v[1];
+            s.leftSet = s.topSet = true;
+            s.leftPercent = (flags & 1u) != 0;
+            s.topPercent = (flags & 2u) != 0;
+            break;
+        }
+        case Prop::OffsetTop:
+            s.top = v[0]; s.topSet = v[1] != 0.f; s.topPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetRight:
+            s.right = v[0]; s.rightSet = v[1] != 0.f; s.rightPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetBottom:
+            s.bottom = v[0]; s.bottomSet = v[1] != 0.f; s.bottomPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetLeft:
+            s.left = v[0]; s.leftSet = v[1] != 0.f; s.leftPercent = v[2] != 0.f;
+            break;
+        case Prop::Rotation: s.rotation = v[0]; break;
+        case Prop::Translate:
+            s.translate = {v[0], v[1]};
+            s.translateXPercent = v[2] != 0.f;
+            s.translateYPercent = v[3] != 0.f;
+            break;
+        case Prop::Alignment:
+            s.justifySelf = static_cast<HorizontalAlignment>(static_cast<uint8_t>(v[0]));
+            s.alignSelf = static_cast<VerticalAlignment>(static_cast<uint8_t>(v[1]));
+            break;
+        case Prop::JustifySelf:
+            s.justifySelf = static_cast<HorizontalAlignment>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::AlignSelf:
+            s.alignSelf = static_cast<VerticalAlignment>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::TextAlign:
+            s.textAlign = static_cast<TextAlignment>(static_cast<uint8_t>(v[0]));
+            s.textAlignSet = true;
+            break;
+        case Prop::VerticalAlign:
+            s.textVerticalAlign = static_cast<VerticalAlignment>(static_cast<uint8_t>(v[0]));
+            s.textVerticalAlignSet = true;
+            break;
         case Prop::Spacing:         s.spacing = v[0]; break;
         case Prop::ShadowBlur:      s.shadowBlur = v[0]; break;
         case Prop::ShadowEnabled:   s.shadowEnabled = v[0] != 0.f; break;
         case Prop::WindowCanDock:   s.windowCanDock = v[0] != 0.f; break;
         case Prop::WindowChildDock: s.windowChildDock = v[0] != 0.f; break;
-        case Prop::Opacity:         s.opacity = v[0]; break;
-        case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
+        case Prop::ScrollbarWidth:
+            s.scrollbarWidth = static_cast<ScrollbarWidth>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::Opacity:         s.opacity = std::clamp(v[0], 0.f, 1.f); break;
+        case Prop::TransitionSpeed:
+            s.transitionSpeed = v[0];
+            if (d.text == "ease") s.transitionEasing = TransitionEasing::Ease;
+            else if (d.text == "ease-in") s.transitionEasing = TransitionEasing::EaseIn;
+            else if (d.text == "ease-out") s.transitionEasing = TransitionEasing::EaseOut;
+            else if (d.text == "ease-in-out")
+                s.transitionEasing = TransitionEasing::EaseInOut;
+            else if (d.text == "linear" || d.text == "none")
+                s.transitionEasing = TransitionEasing::Linear;
+            break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
         case Prop::BackgroundSize:
             s.backgroundFit = static_cast<BackgroundFit>(static_cast<uint8_t>(v[0]));
@@ -290,7 +443,7 @@ std::string NormalizeImageSource(std::string_view source) {
 
 bool ParseNumber(std::string_view text, float& value) {
     text = Trim(text);
-    if (text.size() >= 2 && text.substr(text.size() - 2) == "px")
+    if (text.size() >= 2 && EqualsIgnoreCase(text.substr(text.size() - 2), "px"))
         text = Trim(text.substr(0, text.size() - 2));
     std::string owned(text);
     char* end = nullptr;
@@ -298,20 +451,125 @@ bool ParseNumber(std::string_view text, float& value) {
     return end != owned.c_str() && *end == '\0' && std::isfinite(value);
 }
 
+bool ParseDimension(std::string_view text, float& value, bool& percent) {
+    text = Trim(text);
+    if (EqualsIgnoreCase(text, "auto")) {
+        value = -1.f;
+        percent = false;
+        return true;
+    }
+    percent = !text.empty() && text.back() == '%';
+    if (percent) text.remove_suffix(1);
+    if (!ParseNumber(text, value) || value < 0.f) return false;
+    if (percent) value /= 100.f;
+    return true;
+}
+
+bool ParseOffset(std::string_view text, float& value, bool& set, bool& percent) {
+    text = Trim(text);
+    if (EqualsIgnoreCase(text, "auto")) {
+        value = 0.f;
+        set = false;
+        percent = false;
+        return true;
+    }
+    percent = !text.empty() && text.back() == '%';
+    if (percent) text.remove_suffix(1);
+    if (!ParseNumber(text, value)) return false;
+    if (percent) value /= 100.f;
+    set = true;
+    return true;
+}
+
+bool ParseAngle(std::string_view text, float& degrees) {
+    text = Trim(text);
+    if (text.size() >= 3 && EqualsIgnoreCase(text.substr(text.size() - 3), "deg"))
+        text = Trim(text.substr(0, text.size() - 3));
+    else if (text.size() >= 2 &&
+             EqualsIgnoreCase(text.substr(text.size() - 2), "px"))
+        return false;
+    return ParseNumber(text, degrees);
+}
+
+bool ParseTransition(std::string_view value, float& speed,
+                     TransitionEasing& easing) {
+    value = Trim(value);
+    if (value == "none") {
+        speed = 10000.f;
+        easing = TransitionEasing::Linear;
+        return true;
+    }
+    bool hasDuration = false;
+    bool hasEasing = false;
+    while (!value.empty()) {
+        const size_t split = value.find_first_of(" \t\r\n,");
+        std::string_view token = Trim(value.substr(0, split));
+        value = split == std::string_view::npos ? std::string_view{}
+                                                  : Trim(value.substr(split + 1));
+        if (!hasEasing) {
+            if (token == "ease") {
+                easing = TransitionEasing::Ease;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-in") {
+                easing = TransitionEasing::EaseIn;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-out") {
+                easing = TransitionEasing::EaseOut;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-in-out") {
+                easing = TransitionEasing::EaseInOut;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "linear") {
+                easing = TransitionEasing::Linear;
+                hasEasing = true;
+                continue;
+            }
+        }
+        float duration = 0.f;
+        float multiplier = 1.f;
+        if (token.size() >= 2 &&
+            EqualsIgnoreCase(token.substr(token.size() - 2), "ms")) {
+            token.remove_suffix(2);
+            multiplier = 0.001f;
+        } else if (!token.empty() &&
+                   (token.back() == 's' || token.back() == 'S')) {
+            token.remove_suffix(1);
+        } else if (token != "0") {
+            continue;
+        }
+        if (!ParseNumber(token, duration) || duration < 0.f) return false;
+        duration *= multiplier;
+        if (!hasDuration) {
+            speed = duration > 0.f ? 1.f / duration : 10000.f;
+            hasDuration = true;
+        }
+    }
+    return hasDuration;
+}
+
 bool ParseColor(std::string_view text, Color& color) {
     text = Trim(text);
-    if (text == "transparent") { color = {0.f, 0.f, 0.f, 0.f}; return true; }
-    if (text == "black") { color = Color::FromHex(0x000000FF); return true; }
-    if (text == "white") { color = Color::FromHex(0xFFFFFFFF); return true; }
-    if (text == "red") { color = Color::FromHex(0xFF0000FF); return true; }
-    if (text == "green") { color = Color::FromHex(0x008000FF); return true; }
-    if (text == "blue") { color = Color::FromHex(0x0000FFFF); return true; }
-    if (text == "yellow") { color = Color::FromHex(0xFFFF00FF); return true; }
-    if (text == "orange") { color = Color::FromHex(0xFFA500FF); return true; }
-    if (text == "purple") { color = Color::FromHex(0x800080FF); return true; }
-    if (text == "gray" || text == "grey") { color = Color::FromHex(0x808080FF); return true; }
-    if (text.starts_with("rgb(") || text.starts_with("rgba(")) {
-        const bool hasAlpha = text.starts_with("rgba(");
+    const std::string lower = Lowercase(text);
+    if (lower == "transparent") { color = {0.f, 0.f, 0.f, 0.f}; return true; }
+    if (lower == "black") { color = Color::FromHex(0x000000FF); return true; }
+    if (lower == "white") { color = Color::FromHex(0xFFFFFFFF); return true; }
+    if (lower == "red") { color = Color::FromHex(0xFF0000FF); return true; }
+    if (lower == "green") { color = Color::FromHex(0x008000FF); return true; }
+    if (lower == "blue") { color = Color::FromHex(0x0000FFFF); return true; }
+    if (lower == "yellow") { color = Color::FromHex(0xFFFF00FF); return true; }
+    if (lower == "orange") { color = Color::FromHex(0xFFA500FF); return true; }
+    if (lower == "purple") { color = Color::FromHex(0x800080FF); return true; }
+    if (lower == "gray" || lower == "grey") { color = Color::FromHex(0x808080FF); return true; }
+    if (lower.starts_with("rgb(") || lower.starts_with("rgba(")) {
+        const bool hasAlpha = lower.starts_with("rgba(");
         const size_t open = text.find('('), close = text.rfind(')');
         if (close != text.size() - 1 || close <= open + 1) return false;
         std::string_view parts = text.substr(open + 1, close - open - 1);
@@ -339,8 +597,8 @@ bool ParseColor(std::string_view text, Color& color) {
                  std::clamp(channels[2], 0.f, 1.f), std::clamp(channels[3], 0.f, 1.f)};
         return true;
     }
-    if (text.starts_with("hsl(") || text.starts_with("hsla(")) {
-        const bool hasAlpha = text.starts_with("hsla(");
+    if (lower.starts_with("hsl(") || lower.starts_with("hsla(")) {
+        const bool hasAlpha = lower.starts_with("hsla(");
         const size_t count = hasAlpha ? 4u : 3u;
         const size_t open = text.find('(');
         if (text.back() != ')' || open == std::string_view::npos) return false;
@@ -409,9 +667,10 @@ bool ParseColor(std::string_view text, Color& color) {
 
 bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
     text = Trim(text);
+    const std::string lower = Lowercase(text);
     size_t prefixLength = 0;
-    if (text.starts_with("linear-gradient(")) prefixLength = 16;
-    else if (text.starts_with("gradient(")) prefixLength = 9;
+    if (lower.starts_with("linear-gradient(")) prefixLength = 16;
+    else if (lower.starts_with("gradient(")) prefixLength = 9;
     else return false;
     if (text.size() <= prefixLength || text.back() != ')') return false;
     std::string_view body = Trim(text.substr(prefixLength, text.size() - prefixLength - 1));
@@ -431,8 +690,9 @@ bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
 
     LinearGradient parsed;
     auto angle = [](std::string_view token, float& degrees) {
-        if (token.starts_with("to ")) {
-            const std::string_view direction = token.substr(3);
+        const std::string lowerToken = Lowercase(token);
+        if (lowerToken.starts_with("to ")) {
+            const std::string_view direction = std::string_view(lowerToken).substr(3);
             if (direction == "top") degrees = 0.f;
             else if (direction == "right") degrees = 90.f;
             else if (direction == "bottom") degrees = 180.f;
@@ -444,7 +704,7 @@ bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
             else return false;
             return true;
         }
-        if (!token.ends_with("deg")) return false;
+        if (!lowerToken.ends_with("deg")) return false;
         token.remove_suffix(3);
         return ParseNumber(token, degrees);
     };
@@ -517,12 +777,18 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     };
     auto number = [&](Prop p) {
         float v = 0.f;
-        if (!ParseNumber(value, v)) return false;
+        if (!ParseNumber(value, v) || v < 0.f) return false;
+        if (p == Prop::Opacity) v = std::clamp(v, 0.f, 1.f);
         out.prop = p;
         out.value = {{v, 0.f, 0.f, 0.f}};
         return true;
     };
     if (name == "background" || name == "background-color") {
+        if (name == "background" && value == "none") {
+            out.prop = Prop::BackgroundReset;
+            out.value = {{0.f, 0.f, 0.f, 0.f}};
+            return true;
+        }
         return colorOrGradient(name == "background" ? Prop::BackgroundReset : Prop::Background,
                                Prop::BackgroundGradient);
     }
@@ -561,6 +827,151 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     if (name == "border-radius-bottom-right") return number(Prop::RoundingBottomRight);
     if (name == "border-radius-bottom-left") return number(Prop::RoundingBottomLeft);
     if (name == "font-size") return number(Prop::FontSize);
+    if (name == "width" || name == "height") {
+        float dimension = -1.f;
+        bool percent = false;
+        if (!ParseDimension(value, dimension, percent)) return false;
+        out.prop = name == "width" ? Prop::Width : Prop::Height;
+        out.value = {{dimension, percent ? 1.f : 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "position") {
+        if (value.size() >= 2 && value.front() == '(' && value.back() == ')') {
+            std::string_view coordinates = Trim(value.substr(1, value.size() - 2));
+            const size_t comma = coordinates.find(',');
+            if (comma == std::string_view::npos ||
+                coordinates.find(',', comma + 1) != std::string_view::npos)
+                return false;
+            float x = 0.f, y = 0.f;
+            bool xSet = false, ySet = false, xPercent = false, yPercent = false;
+            if (!ParseOffset(coordinates.substr(0, comma), x, xSet, xPercent) ||
+                !ParseOffset(coordinates.substr(comma + 1), y, ySet, yPercent) ||
+                !xSet || !ySet)
+                return false;
+            out.prop = Prop::PositionCoordinates;
+            out.value = {{x, y, 0.f,
+                          static_cast<float>((xPercent ? 1 : 0) |
+                                             (yPercent ? 2 : 0))}};
+            return true;
+        }
+        PositionType position;
+        if (value == "static") position = PositionType::Static;
+        else if (value == "relative") position = PositionType::Relative;
+        else if (value == "absolute") position = PositionType::Absolute;
+        else if (value == "fixed") position = PositionType::Fixed;
+        else return false;
+        out.prop = Prop::Position;
+        out.value = {{static_cast<float>(position), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "rotation" || name == "rotate") {
+        float degrees = 0.f;
+        if (!ParseAngle(value, degrees)) return false;
+        out.prop = Prop::Rotation;
+        out.value = {{degrees, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "translate") {
+        if (value.starts_with("translate(") && value.back() == ')')
+            value = Trim(value.substr(10, value.size() - 11));
+        std::string_view xToken, yToken;
+        const size_t comma = value.find(',');
+        if (comma != std::string_view::npos) {
+            if (value.find(',', comma + 1) != std::string_view::npos) return false;
+            xToken = Trim(value.substr(0, comma));
+            yToken = Trim(value.substr(comma + 1));
+        } else {
+            const size_t split = value.find_first_of(" \t\r\n");
+            xToken = Trim(value.substr(0, split));
+            yToken = split == std::string_view::npos
+                ? std::string_view{"0px"} : Trim(value.substr(split + 1));
+            if (yToken.find_first_of(" \t\r\n") != std::string_view::npos) return false;
+        }
+        float x = 0.f, y = 0.f;
+        bool xSet = false, ySet = false, xPercent = false, yPercent = false;
+        if (!ParseOffset(xToken, x, xSet, xPercent) ||
+            !ParseOffset(yToken, y, ySet, yPercent) || !xSet || !ySet)
+            return false;
+        out.prop = Prop::Translate;
+        out.value = {{x, y, xPercent ? 1.f : 0.f, yPercent ? 1.f : 0.f}};
+        return true;
+    }
+    if (name == "top" || name == "right" || name == "bottom" || name == "left") {
+        float offset = 0.f;
+        bool set = false, percent = false;
+        if (!ParseOffset(value, offset, set, percent)) return false;
+        out.prop = name == "top" ? Prop::OffsetTop
+            : name == "right" ? Prop::OffsetRight
+            : name == "bottom" ? Prop::OffsetBottom : Prop::OffsetLeft;
+        out.value = {{offset, set ? 1.f : 0.f, percent ? 1.f : 0.f, 0.f}};
+        return true;
+    }
+    if (name == "align" || name == "alignment") {
+        HorizontalAlignment horizontal = HorizontalAlignment::Auto;
+        VerticalAlignment vertical = VerticalAlignment::Auto;
+        if (value == "left" || value == "start") horizontal = HorizontalAlignment::Start;
+        else if (value == "right" || value == "end") horizontal = HorizontalAlignment::End;
+        else if (value == "center") {
+            horizontal = HorizontalAlignment::Center;
+            vertical = VerticalAlignment::Center;
+        } else if (value == "top") vertical = VerticalAlignment::Start;
+        else if (value == "middle") vertical = VerticalAlignment::Center;
+        else if (value == "bottom") vertical = VerticalAlignment::End;
+        else if (value != "auto") return false;
+        out.prop = Prop::Alignment;
+        out.value = {{static_cast<float>(horizontal), static_cast<float>(vertical), 0.f, 0.f}};
+        return true;
+    }
+    if (name == "justify-self") {
+        HorizontalAlignment alignment;
+        if (value == "start" || value == "left" || value == "stretch")
+            alignment = HorizontalAlignment::Start;
+        else if (value == "center") alignment = HorizontalAlignment::Center;
+        else if (value == "end" || value == "right")
+            alignment = HorizontalAlignment::End;
+        else if (value == "auto") alignment = HorizontalAlignment::Auto;
+        else return false;
+        out.prop = Prop::JustifySelf;
+        out.value = {{static_cast<float>(alignment), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "align-self") {
+        VerticalAlignment alignment;
+        if (value == "start" || value == "top" || value == "stretch")
+            alignment = VerticalAlignment::Start;
+        else if (value == "center" || value == "middle")
+            alignment = VerticalAlignment::Center;
+        else if (value == "end" || value == "bottom")
+            alignment = VerticalAlignment::End;
+        else if (value == "auto") alignment = VerticalAlignment::Auto;
+        else return false;
+        out.prop = Prop::AlignSelf;
+        out.value = {{static_cast<float>(alignment), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "text-align") {
+        TextAlignment alignment;
+        if (value == "left" || value == "start") alignment = TextAlignment::Start;
+        else if (value == "center") alignment = TextAlignment::Center;
+        else if (value == "right" || value == "end") alignment = TextAlignment::End;
+        else return false;
+        out.prop = Prop::TextAlign;
+        out.value = {{static_cast<float>(alignment), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "vertical-align") {
+        VerticalAlignment alignment;
+        if (value == "top" || value == "text-top" || value == "baseline")
+            alignment = VerticalAlignment::Start;
+        else if (value == "middle" || value == "center")
+            alignment = VerticalAlignment::Center;
+        else if (value == "bottom" || value == "text-bottom")
+            alignment = VerticalAlignment::End;
+        else return false;
+        out.prop = Prop::VerticalAlign;
+        out.value = {{static_cast<float>(alignment), 0.f, 0.f, 0.f}};
+        return true;
+    }
     if (name == "gap" || name == "spacing") return number(Prop::Spacing);
     if (name == "shadow-blur") return number(Prop::ShadowBlur);
     if (name == "shadow-enabled") {
@@ -575,8 +986,25 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
         return true;
     }
+    if (name == "scrollbar-width") {
+        ScrollbarWidth width;
+        if (value == "auto") width = ScrollbarWidth::Auto;
+        else if (value == "thin") width = ScrollbarWidth::Thin;
+        else if (value == "none") width = ScrollbarWidth::None;
+        else return false;
+        out.prop = Prop::ScrollbarWidth;
+        out.value = {{static_cast<float>(width), 0.f, 0.f, 0.f}};
+        return true;
+    }
     if (name == "outline") {
         if (value == "none") {
+            out.prop = Prop::Outline;
+            out.value = {{0.f, 0.f, 0.f, 0.f}};
+            out.text = "none";
+            return true;
+        }
+        float zero = 0.f;
+        if (ParseNumber(value, zero) && zero == 0.f) {
             out.prop = Prop::Outline;
             out.value = {{0.f, 0.f, 0.f, 0.f}};
             out.text = "none";
@@ -624,6 +1052,23 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     }
     if (name == "opacity") return number(Prop::Opacity);
     if (name == "transition-speed") return number(Prop::TransitionSpeed);
+    if (name == "transition" || name == "transition-duration") {
+        float speed = 0.f;
+        TransitionEasing easing = TransitionEasing::Linear;
+        if (!ParseTransition(value, speed, easing)) return false;
+        out.prop = Prop::TransitionSpeed;
+        out.value = {{speed, 0.f, 0.f, 0.f}};
+        if (name == "transition") {
+            switch (easing) {
+                case TransitionEasing::Linear: out.text = "linear"; break;
+                case TransitionEasing::Ease: out.text = "ease"; break;
+                case TransitionEasing::EaseIn: out.text = "ease-in"; break;
+                case TransitionEasing::EaseOut: out.text = "ease-out"; break;
+                case TransitionEasing::EaseInOut: out.text = "ease-in-out"; break;
+            }
+        }
+        return true;
+    }
     if (name == "padding") {
         float values[4]{};
         size_t count = 0;
@@ -823,28 +1268,143 @@ bool ResolveVariables(std::string_view source,
     return ResolveVariables(source, variables, resolving, resolved);
 }
 
-void CollectVariables(std::string_view source,
-                      std::unordered_map<std::string, std::string>& variables) {
+using CssBlock = std::pair<std::string_view, std::string_view>;
+
+bool StripComments(std::string_view source, std::string& output) {
+    output.clear();
+    char quote = 0;
+    bool escaped = false;
+    for (size_t i = 0; i < source.size(); ++i) {
+        const char ch = source[i];
+        if (quote != 0) {
+            output.push_back(ch);
+            if (escaped) escaped = false;
+            else if (ch == '\\') escaped = true;
+            else if (ch == quote) quote = 0;
+            continue;
+        }
+        if (ch == '"' || ch == '\'') {
+            quote = ch;
+            output.push_back(ch);
+            continue;
+        }
+        if (ch == '/' && i + 1 < source.size() && source[i + 1] == '*') {
+            const size_t end = source.find("*/", i + 2);
+            if (end == std::string_view::npos) return false;
+            output.push_back(' ');
+            i = end + 1;
+            continue;
+        }
+        output.push_back(ch);
+    }
+    return true;
+}
+
+size_t FindTopLevel(std::string_view source, char delimiter) {
+    char quote = 0;
+    bool escaped = false;
+    int parentheses = 0;
+    int brackets = 0;
+    for (size_t i = 0; i < source.size(); ++i) {
+        const char ch = source[i];
+        if (quote != 0) {
+            if (escaped) escaped = false;
+            else if (ch == '\\') escaped = true;
+            else if (ch == quote) quote = 0;
+            continue;
+        }
+        if (ch == '"' || ch == '\'') quote = ch;
+        else if (ch == '\\' && i + 1 < source.size()) ++i;
+        else if (ch == '(') ++parentheses;
+        else if (ch == ')' && parentheses > 0) --parentheses;
+        else if (ch == '[') ++brackets;
+        else if (ch == ']' && brackets > 0) --brackets;
+        else if (ch == delimiter && parentheses == 0 && brackets == 0) return i;
+    }
+    return std::string_view::npos;
+}
+
+size_t FindMatchingBrace(std::string_view source, size_t open) {
+    char quote = 0;
+    bool escaped = false;
+    int parentheses = 0;
+    int brackets = 0;
+    int nested = 0;
+    for (size_t i = open + 1; i < source.size(); ++i) {
+        const char ch = source[i];
+        if (quote != 0) {
+            if (escaped) escaped = false;
+            else if (ch == '\\') escaped = true;
+            else if (ch == quote) quote = 0;
+            continue;
+        }
+        if (ch == '"' || ch == '\'') quote = ch;
+        else if (ch == '\\' && i + 1 < source.size()) ++i;
+        else if (ch == '(') ++parentheses;
+        else if (ch == ')' && parentheses > 0) --parentheses;
+        else if (ch == '[') ++brackets;
+        else if (ch == ']' && brackets > 0) --brackets;
+        else if (parentheses == 0 && brackets == 0 && ch == '{') ++nested;
+        else if (parentheses == 0 && brackets == 0 && ch == '}') {
+            if (nested == 0) return i;
+            --nested;
+        }
+    }
+    return std::string_view::npos;
+}
+
+bool ParseCssBlocks(std::string_view source, std::vector<CssBlock>& blocks) {
+    blocks.clear();
     while (!(source = Trim(source)).empty()) {
-        const size_t open = source.find('{');
-        if (open == std::string_view::npos) break;
-        const size_t close = source.find('}', open + 1);
-        if (close == std::string_view::npos) break;
-        std::string_view declarations = source.substr(open + 1, close - open - 1);
-        std::string_view selectorList = Trim(source.substr(0, open));
+        if (source.front() == '@') {
+            const size_t open = FindTopLevel(source, '{');
+            const size_t semicolon = FindTopLevel(source, ';');
+            if (semicolon != std::string_view::npos &&
+                (open == std::string_view::npos || semicolon < open)) {
+                source.remove_prefix(semicolon + 1);
+                continue;
+            }
+            if (open == std::string_view::npos) return false;
+            const size_t close = FindMatchingBrace(source, open);
+            if (close == std::string_view::npos) return false;
+            source.remove_prefix(close + 1);
+            continue;
+        }
+
+        const size_t open = FindTopLevel(source, '{');
+        if (open == std::string_view::npos) return false;
+        const size_t close = FindMatchingBrace(source, open);
+        if (close == std::string_view::npos) return false;
+        blocks.emplace_back(Trim(source.substr(0, open)),
+                            source.substr(open + 1, close - open - 1));
+        source.remove_prefix(close + 1);
+    }
+    return true;
+}
+
+std::vector<std::string_view> SplitSelectors(std::string_view selectors) {
+    std::vector<std::string_view> result;
+    while (!(selectors = Trim(selectors)).empty()) {
+        const size_t comma = FindTopLevel(selectors, ',');
+        result.push_back(Trim(selectors.substr(0, comma)));
+        if (comma == std::string_view::npos) break;
+        selectors.remove_prefix(comma + 1);
+    }
+    return result;
+}
+
+void CollectVariables(const std::vector<CssBlock>& blocks,
+                      std::unordered_map<std::string, std::string>& variables) {
+    for (const CssBlock& block : blocks) {
         bool global = false;
-        while (!selectorList.empty()) {
-            const size_t comma = selectorList.find(',');
-            const std::string_view selector = Trim(selectorList.substr(0, comma));
+        for (std::string_view selector : SplitSelectors(block.first))
             global = global || selector == ":root" || selector == "*:root" ||
                      selector == "*";
-            if (comma == std::string_view::npos) break;
-            selectorList.remove_prefix(comma + 1);
-        }
+        std::string_view declarations = block.second;
         while (!Trim(declarations).empty()) {
-            const size_t semi = declarations.find(';');
+            const size_t semi = FindTopLevel(declarations, ';');
             const std::string_view declaration = Trim(declarations.substr(0, semi));
-            const size_t colon = declaration.find(':');
+            const size_t colon = FindTopLevel(declaration, ':');
             if (global && colon != std::string_view::npos) {
                 const std::string_view name = Trim(declaration.substr(0, colon));
                 if (name.starts_with("--")) {
@@ -854,7 +1414,6 @@ void CollectVariables(std::string_view source,
             if (semi == std::string_view::npos) break;
             declarations.remove_prefix(semi + 1);
         }
-        source.remove_prefix(close + 1);
     }
 }
 
@@ -862,22 +1421,25 @@ void CollectVariables(std::string_view source,
 
 StyleSheet::RuleBuilder StyleSheet::Rule(std::string_view selector) {
     StyleRule r;
-    ParseSelector(selector, r.widget, r.classes, r.stateMask);
+    ParseSelector(selector, r.widget, r.id, r.classes, r.stateMask);
     rules_.push_back(std::move(r));
     cache_.clear();
     ++version_;
     return RuleBuilder(this, rules_.size() - 1);
 }
 
-void StyleSheet::SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string text) {
+void StyleSheet::SetProp(size_t ruleIndex, Prop p, StyleValue v, std::string text,
+                         bool important) {
     if (ruleIndex >= rules_.size()) return;
     auto& decls = rules_[ruleIndex].decls;
     auto it = std::find_if(decls.begin(), decls.end(), [&](const StyleDecl& d) { return d.prop == p; });
     if (it != decls.end()) {
+        if (it->important && !important) return;
         it->value = v;
         it->text = std::move(text);
+        it->important = important;
     } else {
-        decls.push_back({p, v, std::move(text)});
+        decls.push_back({p, v, std::move(text), important});
     }
     cache_.clear();
     ++version_;
@@ -894,60 +1456,74 @@ void StyleSheet::RegisterImage(std::string_view source, GPUImageId image, Vec2 s
     ++version_;
 }
 
-void StyleSheet::Clear() { rules_.clear(); cache_.clear(); ++version_; }
+void StyleSheet::Clear() {
+    rules_.clear();
+    variables_.clear();
+    cache_.clear();
+    ++version_;
+}
 
 bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
-    std::string source(css);
-    for (size_t start = 0; (start = source.find("/*", start)) != std::string::npos;) {
-        const size_t end = source.find("*/", start + 2);
-        if (end == std::string::npos) {
-            if (error) *error = "Unterminated CSS comment";
-            return false;
-        }
-        source.erase(start, end + 2 - start);
+    std::string source;
+    if (!StripComments(css, source)) {
+        if (error) *error = "Unterminated CSS comment";
+        return false;
     }
-
-    std::unordered_map<std::string, std::string> variables;
-    CollectVariables(source, variables);
+    std::vector<CssBlock> blocks;
+    if (!ParseCssBlocks(source, blocks)) {
+        if (error) *error = "Malformed CSS rule";
+        return false;
+    }
+    std::unordered_map<std::string, std::string> variables = variables_;
+    CollectVariables(blocks, variables);
     StyleSheet candidate = *this;
-    std::string_view rest(source);
-    while (!(rest = Trim(rest)).empty()) {
-        const size_t open = rest.find('{');
-        if (open == std::string_view::npos) {
-            if (error) *error = "Expected '{' after CSS selector";
-            return false;
-        }
-        const std::string_view selectors = Trim(rest.substr(0, open));
-        const size_t close = rest.find('}', open + 1);
-        if (selectors.empty() || close == std::string_view::npos) {
-            if (error) *error = "Invalid CSS rule";
-            return false;
-        }
-        std::string_view body = rest.substr(open + 1, close - open - 1);
+    candidate.rules_.erase(
+        std::remove_if(candidate.rules_.begin(), candidate.rules_.end(),
+                       [](const StyleRule& rule) { return rule.fromCSS; }),
+        candidate.rules_.end());
+    candidate.cache_.clear();
+    ++candidate.version_;
+    for (const CssBlock& block : blocks) {
         std::vector<StyleDecl> declarations;
+        std::string_view body = block.second;
         while (!Trim(body).empty()) {
-            const size_t semi = body.find(';');
+            const size_t semi = FindTopLevel(body, ';');
             const std::string_view decl = Trim(body.substr(0, semi));
-            if (!decl.empty()) {
-                const size_t colon = decl.find(':');
-                const std::string_view name = colon == std::string_view::npos
-                    ? std::string_view{} : Trim(decl.substr(0, colon));
-                const bool supported = IsSupportedDeclaration(name);
-                std::string value;
-                if (colon == std::string_view::npos ||
-                    (!name.starts_with("--") && supported &&
-                     !ResolveVariables(decl.substr(colon + 1), variables, value))) {
-                    if (error) *error = "Invalid CSS variable in declaration: " + std::string(decl);
-                    return false;
+            const size_t colon = FindTopLevel(decl, ':');
+            if (!decl.empty() && colon != std::string_view::npos) {
+                std::string name(Trim(decl.substr(0, colon)));
+                if (!name.starts_with("--")) {
+                    std::transform(name.begin(), name.end(), name.begin(),
+                        [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
                 }
-                if (!name.starts_with("--") && supported) {
+                const std::string_view property = name;
+                const bool supported = IsSupportedDeclaration(property);
+                std::string value;
+                bool important = false;
+                const bool customProperty = name.starts_with("--");
+                if (!customProperty && supported &&
+                    ResolveVariables(decl.substr(colon + 1), variables, value)) {
+                    const size_t bang = value.rfind('!');
+                    if (bang != std::string::npos &&
+                        EqualsIgnoreCase(Trim(value.substr(bang)), "!important")) {
+                        important = true;
+                        value = std::string(Trim(std::string_view(value).substr(0, bang)));
+                    }
                     std::vector<StyleDecl> parsed;
-                    if (name == "border") {
+                    if (property == "border") {
                         std::string_view parts = Trim(value);
                         bool valid = true, foundWidth = false, foundColor = false;
-                        while (!parts.empty()) {
-                            const size_t split = parts.find_first_of(" \t\r\n");
-                            const std::string_view token = Trim(parts.substr(0, split));
+                        while (!(parts = Trim(parts)).empty()) {
+                            size_t split = 0;
+                            int depth = 0;
+                            for (; split < parts.size(); ++split) {
+                                if (parts[split] == '(') ++depth;
+                                else if (parts[split] == ')') --depth;
+                                else if (depth == 0 &&
+                                         std::isspace(static_cast<unsigned char>(parts[split])))
+                                    break;
+                            }
+                            const std::string_view token = parts.substr(0, split);
                             if (token == "solid") {
                             } else if (token == "none") {
                                 parsed.push_back({Prop::BorderWidth, StyleValue{{0.f, 0.f, 0.f, 0.f}}});
@@ -956,62 +1532,66 @@ bool StyleSheet::LoadCSS(std::string_view css, std::string* error) {
                                 parsed.push_back({Prop::BorderColor,
                                                   StyleValue{{color.r, color.g, color.b, color.a}}});
                                 foundColor = true;
+                            } else if (LinearGradient gradient;
+                                       ParseLinearGradient(token, gradient)) {
+                                parsed.push_back({Prop::BorderColorGradient, {}, std::string(token)});
+                                foundColor = true;
                             } else {
                                 float width = 0.f;
-                                if (!ParseNumber(token, width)) { valid = false; break; }
+                                if (!ParseNumber(token, width) || width < 0.f) {
+                                    valid = false;
+                                    break;
+                                }
                                 parsed.push_back({Prop::BorderWidth, StyleValue{{width, 0.f, 0.f, 0.f}}});
                                 foundWidth = true;
                             }
-                            if (split == std::string_view::npos) break;
-                            parts.remove_prefix(split + 1);
+                            parts = split == parts.size() ? std::string_view{}
+                                                          : parts.substr(split + 1);
                         }
                         if (!valid || (!foundWidth && !foundColor)) parsed.clear();
                     } else {
                         StyleDecl parsedValue{};
-                        if (ParseDeclaration(name, value, parsedValue))
+                        if (ParseDeclaration(property, value, parsedValue))
                             parsed.push_back(std::move(parsedValue));
                     }
-                    if (parsed.empty()) {
-                        if (error) *error = "Invalid or unsupported CSS declaration: " + std::string(decl);
-                        return false;
-                    }
+                    for (StyleDecl& parsedDeclaration : parsed)
+                        parsedDeclaration.important = important;
                     declarations.insert(declarations.end(), parsed.begin(), parsed.end());
                 }
             }
             if (semi == std::string_view::npos) break;
             body.remove_prefix(semi + 1);
         }
-        std::string_view remainingSelectors = selectors;
-        while (!remainingSelectors.empty()) {
-            const size_t comma = remainingSelectors.find(',');
-            const std::string_view selector = Trim(remainingSelectors.substr(0, comma));
-            if (!ValidSelector(selector)) {
-                if (error) *error = "Invalid or unsupported CSS selector: " + std::string(selector);
-                return false;
-            }
+        if (declarations.empty()) continue;
+        for (const std::string_view selector : SplitSelectors(block.first)) {
+            if (!ValidSelector(selector)) continue;
             auto rule = candidate.Rule(selector);
             for (const auto& declaration : declarations)
-                rule.Set(declaration.prop, declaration.value, declaration.text);
-            if (comma == std::string_view::npos) break;
-            remainingSelectors.remove_prefix(comma + 1);
+                rule.Set(declaration.prop, declaration.value, declaration.text,
+                         declaration.important);
+            candidate.rules_.back().fromCSS = true;
         }
-        rest.remove_prefix(close + 1);
     }
+    candidate.variables_ = std::move(variables);
     *this = std::move(candidate);
     if (error) error->clear();
     return true;
 }
 
 bool StyleSheet::LoadCSSFile(const std::string& path, std::string* error) {
+    return LoadCSSFile(std::filesystem::path(path), error);
+}
+
+bool StyleSheet::LoadCSSFile(const std::filesystem::path& path, std::string* error) {
     std::ifstream file(path, std::ios::binary);
     if (!file) {
-        if (error) *error = "Could not open stylesheet: " + path;
+        if (error) *error = "Could not open stylesheet: " + path.string();
         return false;
     }
     std::ostringstream contents;
     contents << file.rdbuf();
     if (file.bad()) {
-        if (error) *error = "Could not read stylesheet: " + path;
+        if (error) *error = "Could not read stylesheet: " + path.string();
         return false;
     }
     return LoadCSS(contents.str(), error);
@@ -1019,45 +1599,54 @@ bool StyleSheet::LoadCSSFile(const std::string& path, std::string* error) {
 
 ComputedStyle StyleSheet::Resolve(std::string_view widget,
                                   const std::vector<std::string>& classes,
-                                  uint8_t state) const {
+                                  uint8_t state, std::string_view id) const {
     uint32_t key = HashStr(widget);
     for (const auto& c : classes) key = HashStr(c, key ^ 0x9E3779B9u);
+    key = HashStr(id, key ^ 0x85EBCA6Bu);
     key = key * 31u + state;
     if (auto it = cache_.find(key); it != cache_.end()) return it->second;
 
     std::vector<std::pair<int, const StyleRule*>> hits;
     for (const StyleRule& r : rules_) {
         if (!r.widget.empty() && r.widget != widget) continue;
+        if (!r.id.empty() && r.id != id) continue;
         if (!std::all_of(r.classes.begin(), r.classes.end(), [&](const std::string& cls) {
                 return std::find(classes.begin(), classes.end(), cls) != classes.end();
             })) continue;
         if ((r.stateMask & ~static_cast<unsigned>(state)) != 0) continue;
-        const int spec = (r.widget.empty() ? 0 : 1) + static_cast<int>(r.classes.size()) * 2
-                       + 4 * std::popcount(static_cast<unsigned>(r.stateMask));
+        const int spec = (!r.id.empty() ? 100 : 0) +
+                         static_cast<int>(r.classes.size()) * 10 +
+                         10 * std::popcount(static_cast<unsigned>(r.stateMask)) +
+                         (r.widget.empty() ? 0 : 1);
         hits.emplace_back(spec, &r);
     }
-    std::stable_sort(hits.begin(), hits.end(),
-                     [](const auto& a, const auto& b) { return a.first < b.first; });
+    std::stable_sort(hits.begin(), hits.end(), [](const auto& a, const auto& b) {
+        if (a.second->builtIn != b.second->builtIn) return a.second->builtIn;
+        return a.first < b.first;
+    });
 
     ComputedStyle out;
-    for (const auto& h : hits) {
-        for (const StyleDecl& d : h.second->decls) {
-            if (d.prop == Prop::BackgroundImage) {
-                if (d.text.empty()) {
-                    out.backgroundImage = 0;
-                    out.backgroundImageSize = {};
-                } else {
-                    const auto image = images_.find(NormalizeImageSource(d.text));
-                    if (image != images_.end()) {
-                        out.backgroundImage = image->second.id;
-                        out.backgroundImageSize = image->second.size;
-                    } else {
+    for (bool important : {false, true}) {
+        for (const auto& h : hits) {
+            for (const StyleDecl& d : h.second->decls) {
+                if (d.important != important) continue;
+                if (d.prop == Prop::BackgroundImage) {
+                    if (d.text.empty()) {
                         out.backgroundImage = 0;
                         out.backgroundImageSize = {};
+                    } else {
+                        const auto image = images_.find(NormalizeImageSource(d.text));
+                        if (image != images_.end()) {
+                            out.backgroundImage = image->second.id;
+                            out.backgroundImageSize = image->second.size;
+                        } else {
+                            out.backgroundImage = 0;
+                            out.backgroundImageSize = {};
+                        }
                     }
+                } else {
+                    Apply(out, d);
                 }
-            } else {
-                Apply(out, d);
             }
         }
     }
@@ -1127,16 +1716,23 @@ StyleSheet StyleSheet::Dark() {
         .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
     s.Rule("input-text:active").BorderColor(C::FromHex(0x5A91F7FF));
     s.Rule("selectable").Foreground(C::FromHex(0xDCE6F5FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
         .Padding(Edges(5, 8));
     s.Rule("selectable:hover").Background(C::FromHex(0x253449FF));
     s.Rule("selectable:checked").Background(C::FromHex(0x2F5E9AFF));
     s.Rule("tree-node").Foreground(C::FromHex(0xDCE6F5FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
         .Padding(Edges(4, 8));
     s.Rule("tree-node:hover").Background(C::FromHex(0x253449FF));
     s.Rule("collapsing-header").Background(C::FromHex(0x1B2839FF))
-        .Foreground(C::FromHex(0xF1F5FCFF)).Padding(Edges(6, 8));
+        .Foreground(C::FromHex(0xF1F5FCFF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
+        .Padding(Edges(6, 8));
     s.Rule("collapsing-header:hover").Background(C::FromHex(0x253449FF));
     s.Rule("separator").Foreground(C::FromHex(0x526783FF)).BorderWidth(1);
+    s.Rule("separator-text").Foreground(C::FromHex(0xAEBBD0FF))
+        .BorderColor(C::FromHex(0x526783FF)).BorderWidth(1)
+        .Padding(Edges(3, 8)).Spacing(8);
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
     s.Rule("dock-splitter").Background(C::FromHex(0x8999B0AA)).Rounding(2);
@@ -1221,9 +1817,14 @@ StyleSheet StyleSheet::Dark() {
         .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
         .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
     s.Rule("image-button:hover").Background(C::FromHex(0x304762FF));
+    s.Rule("interactive-image")
+        .Background(C::FromHex(0x223147FF)).BorderColor(C::FromHex(0x3D526FFF))
+        .BorderWidth(1).Rounding(8).Padding(Edges(8, 12));
+    s.Rule("interactive-image:hover").Background(C::FromHex(0x304762FF));
     s.Rule("text-label").Spacing(7);
     s.Rule("image-label").Spacing(7);
 
+    for (StyleRule& rule : s.rules_) rule.builtIn = true;
     return s;
 }
 

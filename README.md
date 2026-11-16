@@ -8,6 +8,14 @@
 
 ## Fluid UI is a lightweight, highly customizable UI library for C++ applications, designed to make building beautiful, native interfaces simple and intuitive.
 
+## Project layout and build
+
+Public headers live in `include/FluidUI`, with implementation files in `src/`. The demo and
+its theme are in `examples/`, third-party dependencies are in `third_party/`, and Windows
+build/install scripts are in `scripts/`. `build/` and `output/` are generated directories.
+Run `scripts/build.bat` to build and refresh the runnable package in `output/bin`; the root
+`bl.bat` remains as a compatibility entry point.
+
 ## Components
 
 `fluid::Context` includes buttons, checkboxes, toggles, radio buttons, float/value sliders,
@@ -15,7 +23,8 @@ popup dropdown menus, progress bars, selectable console output and input, file-b
 tile containers, text and image labels, image buttons, collapsible containers, containers,
 horizontal/vertical lists, tabbed containers, hover hints, timed notifications, and
 class-styleable empty widgets.
-Text/icon labels can be combined as needed.
+Text/icon labels can be combined as needed. `InteractiveImage` has its own
+`interactive-image` style selector, separate from `image-button`.
 Images accept caller-owned `GPUImageId` handles from any rendering API; Fluid UI does not
 load, create, or destroy those image resources.
 The Windows GLFW example loads PNG and JPEG with WIC and SVG with Direct2D (Windows 10 or
@@ -152,24 +161,55 @@ in the adjacent docked panel's layer, so floating windows can cover them. The GL
 rounded geometry with multisampling and higher-resolution corner tessellation, and uses linear
 filtering for images; multisampling is kept off for textured draws so it does not add antialiasing
 to the text.
+Pass `WindowFlags::NoScrollbar` to `BeginWindow` (or as the third argument to `Begin`) to hide a
+window's scrollbar and reclaim its gutter; mouse-wheel scrolling remains available.
 
 ## CSS-like themes and classes
 
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
-Selectors support widget names, multiple stacked classes, grouped selectors, and widget
-states (`hover`, `active`, `checked`, `disabled`). Global custom properties can be declared
-in `:root` and referenced with `var(--name)` (including a fallback). Colors support 3/4/6/8
+Selectors support widget names, multiple classes, one ID, grouped selectors, and widget
+states (`hover`, `active`, `checked`, `disabled`), for example `button.primary#confirm:hover`.
+Use `PushClass`/`PopClass` to apply classes, and either `PushStyleID`/`PopStyleID` or a
+`Visible label##id` label to apply an ID selector. The `##id` suffix is hidden and identifies
+the widget. User rules override the built-in dark theme defaults;
+selector specificity still determines precedence between user rules. Global
+custom properties can be declared
+in `:root`, retained across successive `LoadCSS` calls, and referenced with `var(--name)`
+(including a fallback). Colors support 3/4/6/8
 digit hex, common named colors, `rgb()`/`rgba()`, `hsl()`/`hsla()`, and `transparent`;
 numeric values may include `px`.
 Supported properties are `background`, `color`/`foreground`, `accent`, `border-color`,
 `shadow-color`, `border-width`, `border-radius` and its `border-radius-top-left`,
 `border-radius-top-right`, `border-radius-bottom-left`, and `border-radius-bottom-right`
-corner overrides, `font-size`, `gap`, `shadow-blur`, `shadow-enabled` (`true` or `false`),
+corner overrides, `font-size`, `width` and `height` (`auto`, pixels, or percentages of the available content
+region), `align` (`left`, `center`, `right`, `top`, `middle`, or `bottom`),
+`justify-self`, `align-self`, `text-align`, `vertical-align`, `gap`, `shadow-blur`,
+`shadow-enabled` (`true` or `false`), and `scrollbar-width` (`auto`, `thin`, or `none`).
+`position` supports `static`, `relative`, `absolute`, and `fixed`, with `top`, `right`,
+`bottom`, and `left` offsets in pixels or percentages. Absolute offsets are relative to the
+current content region (the display for top-level windows); fixed offsets are relative to the
+display. Docked windows keep their dock-managed positions. Positioned elements are
+removed from normal layout flow for `absolute` and `fixed`; relative offsets preserve their
+original layout space. The custom `position: (x, y)` form places an element absolutely
+within its containing region, for example `position: (24px, 10%)`.
+`rotation` (or `rotate`) accepts degrees, and `translate` accepts pixel or percentage pairs,
+such as `translate: 8px -4px` or `translate: translate(10%, 0px)`.
+`transition` accepts CSS-like durations and easing names (for example
+`transition: all 200ms ease`); `transition-speed` remains available for direct speed values.
+`selectable`, `tree-node`, and `collapsing-header` accept the same border, radius, and
+per-corner declarations as other box widgets.
+`scrollbar-width: none` hides scrollbar controls without reserving their space; scrolling
+through the content remains available. The `width` property on `window-scrollbar` and
+`container-scrollbar` sets the track thickness and matching content gutter; pixel and
+percentage widths are supported.
 `outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
-`outline-color`, `outline-width`,
-`opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
+`outline-color`, `outline-width`, `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
 `padding`. Outlines and shadows are available to box-drawn components and can be set
-using widget selectors or global rules. Background images are supported with
+using widget selectors or global rules. CSS comments, zero values, and unsupported
+properties/selectors are safely ignored or parsed without aborting the stylesheet; malformed
+comments or rule blocks fail the load without partially changing the active stylesheet.
+Each successful CSS load replaces the previous CSS rules, so removed declarations no longer
+remain in effect. Background images are supported with
 `background-image: url("...")`,
 `background-size` (`stretch`, `cover`, or `contain`), and keyword/percentage
 `background-position`. Image URLs resolve to caller-owned GPU resources registered with
@@ -177,14 +217,21 @@ using widget selectors or global rules. Background images are supported with
 support `linear-gradient(...)` and `gradient(...)` syntax, including angles or
 `to right`-style directions,
 multiple color stops, and percentage stops. Gradients are accepted anywhere a color is
-accepted (backgrounds, foreground/text, accent, borders, and shadows), with explicit
-`text-gradient`, `accent-gradient`, `border-color-gradient`, and `shadow-color-gradient`
-aliases available. Unsupported
+accepted (backgrounds, foreground/text, accent, borders, outlines, and shadows), including
+the `border` and `outline` shorthands. Solid borders and outlines draw only their rings,
+so they do not cover the component background. Explicit `background-gradient`,
+`text-gradient`, `accent-gradient`, `border-color-gradient`, `outline-color-gradient`,
+and `shadow-color-gradient` aliases are also available. Unsupported
 declarations are ignored so themes can include properties not implemented by Fluid UI.
-Unsupported selectors and invalid values for supported properties report an error, and
-failed stylesheet loads do not partially modify the active theme.
+`!important` is supported for regular declarations and follows the normal specificity order
+among important declarations.
+The selector grammar intentionally covers simple selectors rather than combinators, nested
+selectors, or media queries. Invalid declarations are ignored.
 Window styles also support `window-can-dock` and `window-child-dock`, each accepting
 `true` or `false`.
+In the GLFW demo, use `Layout > Theme > Theme settings` to select a CSS file, reload the
+active file, or toggle automatic reload. Invalid CSS leaves the last successfully loaded
+theme active and reports the error in the theme window.
 
 ```css
 button.primary {
@@ -195,6 +242,15 @@ button.primary {
 
 button.primary:hover {
     background: #4A6CF7;
+}
+
+button#confirm {
+    width: 180px;
+    text-align: center;
+}
+
+interactive-image:hover {
+    background: #304762;
 }
 
 empty-widget.brand {
@@ -248,6 +304,10 @@ both an empty widget and an image widget near the top of the component window. T
 source must match the `url(...)` value in CSS. The demo also shows gradients on backgrounds,
 text, borders, and accent colors.
 
+`Separator()` remains the standard horizontal rule. `HorizontalSeparator()` is its explicit
+counterpart, and `HorizontalSeparatorText("Section")` draws a centered label between two
+horizontal rules; both can be styled with `separator` and `separator-text`.
+
 The `examples` target includes `theme.css` and a GLFW demo covering the controls, container
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible
 content.
@@ -294,6 +354,7 @@ the group intact; double-click a docked title bar to undock it. Docked window co
 square, and the dock compass takes precedence over windows behind it. Drop a floating
 window on the compass center to add it to the center dock tab group. The layout
 adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
+Window groups are limited to four members; attempts to add another window show a notification.
 CSS `window-can-dock: false` prevents a window from being docked, and
 `window-child-dock: false` prevents other windows from being grouped into it; both properties
 apply to `window` styles and default to `true`.

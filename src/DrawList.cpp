@@ -1,4 +1,4 @@
-#include "FluidUI/DrawList.h"
+#include <FluidUI/DrawList.h>
 
 #include <algorithm>
 #include <cmath>
@@ -23,8 +23,7 @@ CornerRadii ExpandRadii(CornerRadii radii, float amount) {
             std::max(0.f, radii.bottomLeft + amount)};
 }
 
-void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
-    out.clear();
+CornerRadii NormalizeRadii(Rect r, CornerRadii radii) {
     radii.topLeft = std::max(0.f, radii.topLeft);
     radii.topRight = std::max(0.f, radii.topRight);
     radii.bottomRight = std::max(0.f, radii.bottomRight);
@@ -41,6 +40,16 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
     radii.topRight *= scale;
     radii.bottomRight *= scale;
     radii.bottomLeft *= scale;
+    return radii;
+}
+
+int ArcSegments(float radius) {
+    return static_cast<int>(std::clamp(radius * 0.6f + 3.f, 4.f, 64.f));
+}
+
+void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
+    out.clear();
+    radii = NormalizeRadii(r, radii);
 
     if (radii.topLeft < 0.5f && radii.topRight < 0.5f &&
         radii.bottomRight < 0.5f && radii.bottomLeft < 0.5f) {
@@ -52,8 +61,7 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
             out.push_back(squareCorner);
             return;
         }
-        const int seg = static_cast<int>(std::clamp(radius * 0.6f + 3.f, 4.f, 64.f));
-        Arc(out, center, radius, start, end, seg);
+        Arc(out, center, radius, start, end, ArcSegments(radius));
     };
     addArc({r.x + r.w - radii.topRight, r.y + radii.topRight}, radii.topRight,
            -kPi * 0.5f, 0.f, {r.x + r.w, r.y});
@@ -63,6 +71,61 @@ void BuildRoundedRect(std::vector<Vec2>& out, Rect r, CornerRadii radii) {
            kPi * 0.5f, kPi, {r.x, r.y + r.h});
     addArc({r.x + radii.topLeft, r.y + radii.topLeft}, radii.topLeft,
            kPi, kPi * 1.5f, {r.x, r.y});
+}
+
+void BuildRoundedRectRing(std::vector<Vec2>& outer, std::vector<Vec2>& inner,
+                          Rect r, CornerRadii radii, float borderWidth) {
+    outer.clear();
+    inner.clear();
+    radii = NormalizeRadii(r, radii);
+    const Rect innerRect{r.x + borderWidth, r.y + borderWidth,
+                         r.w - borderWidth * 2.f, r.h - borderWidth * 2.f};
+    const CornerRadii innerRadii = ExpandRadii(radii, -borderWidth);
+
+    auto addArc = [&](Vec2 outerCenter, float outerRadius, Vec2 innerCenter,
+                      float innerRadius, float start, float end,
+                      Vec2 outerCorner, Vec2 innerCorner) {
+        if (outerRadius < 0.5f) {
+            outer.push_back(outerCorner);
+            inner.push_back(innerCorner);
+            return;
+        }
+        const int segments = ArcSegments(outerRadius);
+        for (int i = 0; i <= segments; ++i) {
+            const float angle = start + (end - start) *
+                (static_cast<float>(i) / static_cast<float>(segments));
+            const float x = std::cos(angle);
+            const float y = std::sin(angle);
+            outer.push_back({outerCenter.x + x * outerRadius,
+                             outerCenter.y + y * outerRadius});
+            inner.push_back({innerCenter.x + x * innerRadius,
+                             innerCenter.y + y * innerRadius});
+        }
+    };
+
+    addArc({r.x + r.w - radii.topRight, r.y + radii.topRight}, radii.topRight,
+           {innerRect.x + innerRect.w - innerRadii.topRight,
+            innerRect.y + innerRadii.topRight}, innerRadii.topRight,
+           -kPi * 0.5f, 0.f, {r.x + r.w, r.y},
+           {innerRect.x + innerRect.w, innerRect.y});
+    addArc({r.x + r.w - radii.bottomRight, r.y + r.h - radii.bottomRight},
+           radii.bottomRight,
+           {innerRect.x + innerRect.w - innerRadii.bottomRight,
+            innerRect.y + innerRect.h - innerRadii.bottomRight},
+           innerRadii.bottomRight, 0.f, kPi * 0.5f,
+           {r.x + r.w, r.y + r.h},
+           {innerRect.x + innerRect.w, innerRect.y + innerRect.h});
+    addArc({r.x + radii.bottomLeft, r.y + r.h - radii.bottomLeft},
+           radii.bottomLeft,
+           {innerRect.x + innerRadii.bottomLeft,
+            innerRect.y + innerRect.h - innerRadii.bottomLeft},
+           innerRadii.bottomLeft, kPi * 0.5f, kPi,
+           {r.x, r.y + r.h}, {innerRect.x, innerRect.y + innerRect.h});
+    addArc({r.x + radii.topLeft, r.y + radii.topLeft}, radii.topLeft,
+           {innerRect.x + innerRadii.topLeft,
+            innerRect.y + innerRadii.topLeft},
+           innerRadii.topLeft, kPi, kPi * 1.5f,
+           {r.x, r.y}, {innerRect.x, innerRect.y});
 }
 
 Color SampleGradient(const LinearGradient& gradient, Vec2 point, Rect bounds) {
@@ -95,6 +158,9 @@ Color SampleGradient(const LinearGradient& gradient, Vec2 point, Rect bounds) {
 
 void DrawList::Clear() {
     vtx_.clear(); idx_.clear(); cmds_.clear(); clipStack_.clear();
+    rotationCenter_ = {};
+    rotationCos_ = 1.f;
+    rotationSin_ = 0.f;
     breakCommand_ = false;
 }
 
@@ -108,6 +174,22 @@ void DrawList::PushClipRect(Rect r) {
 
 void DrawList::PopClipRect() {
     if (!clipStack_.empty()) clipStack_.pop_back();
+}
+
+void DrawList::SetRotation(Rect bounds, float degrees) {
+    constexpr float radiansPerDegree = 3.14159265358979f / 180.f;
+    const float radians = degrees * radiansPerDegree;
+    rotationCenter_ = {bounds.x + bounds.w * 0.5f, bounds.y + bounds.h * 0.5f};
+    rotationCos_ = std::cos(radians);
+    rotationSin_ = std::sin(radians);
+}
+
+void DrawList::AddVertex(Vec2 position, Vec2 uv, uint32_t color) {
+    const float x = position.x - rotationCenter_.x;
+    const float y = position.y - rotationCenter_.y;
+    const Vec2 rotated{rotationCenter_.x + x * rotationCos_ - y * rotationSin_,
+                       rotationCenter_.y + x * rotationSin_ + y * rotationCos_};
+    vtx_.push_back({rotated, uv, color});
 }
 
 DrawList::Layer DrawList::BeginLayer() {
@@ -244,7 +326,7 @@ void DrawList::AddConvexFill(const Vec2* p, int n, Color c) {
     PrepareCmd(0);
     const uint32_t col = c.ToU32();
     const uint32_t base = static_cast<uint32_t>(vtx_.size());
-    for (int i = 0; i < n; ++i) vtx_.push_back({p[i], {0.f, 0.f}, col});
+    for (int i = 0; i < n; ++i) AddVertex(p[i], {}, col);
     for (int i = 1; i < n - 1; ++i) {
         idx_.push_back(base);
         idx_.push_back(base + i);
@@ -301,19 +383,7 @@ void DrawList::AddBorderGradient(Rect r, const LinearGradient& gradient, float o
 
 void DrawList::AddBorderGradient(Rect r, const LinearGradient& gradient, float opacity,
                                  float borderWidth, CornerRadii rounding) {
-    if (borderWidth <= 0.f || gradient.Empty()) return;
-    const float horizontalInset = std::min(borderWidth, r.w * 0.5f);
-    const float verticalInset = std::min(borderWidth, r.h * 0.5f);
-    AddRectFilledGradient({r.x, r.y, r.w, borderWidth}, gradient, opacity,
-                          {rounding.topLeft, rounding.topRight, 0.f, 0.f});
-    AddRectFilledGradient({r.x, r.y + r.h - borderWidth, r.w, borderWidth},
-                          gradient, opacity,
-                          {0.f, 0.f, rounding.bottomRight, rounding.bottomLeft});
-    const float sideHeight = std::max(0.f, r.h - 2.f * borderWidth);
-    AddRectFilledGradient({r.x, r.y + borderWidth, horizontalInset, sideHeight},
-                          gradient, opacity);
-    AddRectFilledGradient({r.x + r.w - horizontalInset, r.y + borderWidth,
-                           horizontalInset, sideHeight}, gradient, opacity);
+    AddBorderRing(r, {}, &gradient, opacity, borderWidth, rounding);
 }
 
 void DrawList::AddConvexFillGradient(const Vec2* points, int count,
@@ -325,7 +395,7 @@ void DrawList::AddConvexFillGradient(const Vec2* points, int count,
     for (int i = 0; i < count; ++i) {
         Color color = SampleGradient(gradient, points[i], bounds);
         color.a *= opacity;
-        vtx_.push_back({points[i], {0.f, 0.f}, color.ToU32()});
+        AddVertex(points[i], {}, color.ToU32());
     }
     for (int i = 1; i < count - 1; ++i) {
         idx_.push_back(base);
@@ -347,6 +417,47 @@ void DrawList::AddBox(Rect r, Color bg, Color border, float bw, CornerRadii roun
     } else {
         AddRectFilled(r, bg, rounding);
     }
+}
+
+void DrawList::AddBorder(Rect r, Color color, float borderWidth, float rounding) {
+    AddBorder(r, color, borderWidth, CornerRadii(rounding));
+}
+
+void DrawList::AddBorder(Rect r, Color color, float borderWidth, CornerRadii rounding) {
+    AddBorderRing(r, color, nullptr, 1.f, borderWidth, rounding);
+}
+
+void DrawList::AddBorderRing(Rect r, Color color, const LinearGradient* gradient,
+                             float opacity, float borderWidth, CornerRadii rounding) {
+    if (borderWidth <= 0.f || r.w <= 0.f || r.h <= 0.f ||
+        (gradient ? gradient->Empty() : color.a <= 0.f))
+        return;
+
+    borderWidth = std::min(borderWidth, std::min(r.w, r.h) * 0.5f);
+    std::vector<Vec2> outer;
+    std::vector<Vec2> inner;
+    BuildRoundedRectRing(outer, inner, r, rounding, borderWidth);
+    if (outer.size() != inner.size() || outer.size() < 3) return;
+
+    PrepareCmd(0);
+    const uint32_t base = static_cast<uint32_t>(vtx_.size());
+    auto addVertex = [&](Vec2 position) {
+        Color vertexColor = gradient ? SampleGradient(*gradient, position, r) : color;
+        if (gradient) vertexColor.a *= opacity;
+        AddVertex(position, {}, vertexColor.ToU32());
+    };
+    for (Vec2 position : outer) addVertex(position);
+    for (Vec2 position : inner) addVertex(position);
+
+    const uint32_t count = static_cast<uint32_t>(outer.size());
+    for (uint32_t i = 0; i < count; ++i) {
+        const uint32_t next = (i + 1) % count;
+        const uint32_t innerIndex = base + count + i;
+        const uint32_t nextInnerIndex = base + count + next;
+        idx_.insert(idx_.end(), {base + i, base + next, nextInnerIndex,
+                                 base + i, nextInnerIndex, innerIndex});
+    }
+    FinishPrimitive();
 }
 
 void DrawList::AddShadow(Rect r, Color c, float blur, float rounding) {
@@ -384,10 +495,10 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
     PrepareCmd(imageId);
     const uint32_t col = c.ToU32();
     const uint32_t base = static_cast<uint32_t>(vtx_.size());
-    vtx_.push_back({{r.x,       r.y},       {uv.x,        uv.y},        col});
-    vtx_.push_back({{r.x + r.w, r.y},       {uv.x + uv.w, uv.y},        col});
-    vtx_.push_back({{r.x + r.w, r.y + r.h}, {uv.x + uv.w, uv.y + uv.h}, col});
-    vtx_.push_back({{r.x,       r.y + r.h}, {uv.x,        uv.y + uv.h}, col});
+    AddVertex({r.x, r.y}, {uv.x, uv.y}, col);
+    AddVertex({r.x + r.w, r.y}, {uv.x + uv.w, uv.y}, col);
+    AddVertex({r.x + r.w, r.y + r.h}, {uv.x + uv.w, uv.y + uv.h}, col);
+    AddVertex({r.x, r.y + r.h}, {uv.x, uv.y + uv.h}, col);
     const uint32_t i[6] = {0, 1, 2, 0, 2, 3};
     for (uint32_t k : i) idx_.push_back(base + k);
 
@@ -404,7 +515,7 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
             Vertex outer = vtx_[base + static_cast<uint32_t>(corner)];
             outer.pos = outerPositions[corner];
             outer.col &= 0x00FFFFFFu;
-            vtx_.push_back(outer);
+            AddVertex(outer.pos, outer.uv, outer.col);
         }
         for (uint32_t edge = 0; edge < 4; ++edge) {
             const uint32_t next = (edge + 1) % 4;

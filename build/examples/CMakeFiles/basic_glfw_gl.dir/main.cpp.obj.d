@@ -270,11 +270,12 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.2.0/include/stdint.h \
  C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/GL/gl.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/FluidUI.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Backend.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/DrawList.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Export.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Types.h \
+ C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/include/GLFW/glfw3native.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/FluidUI.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Backend.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/DrawList.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Export.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Types.h \
  C:/msys64/ucrt64/include/c++/16.2.0/algorithm \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_algobase.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/cpp_type_traits.h \
@@ -394,40 +395,17 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/cerrno \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/charconv.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/basic_string.tcc \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Context.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/FluidUI/Style.h \
- C:/msys64/ucrt64/include/c++/16.2.0/utility \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/intcmp.h \
- C:/msys64/ucrt64/include/c++/16.2.0/optional \
- C:/msys64/ucrt64/include/c++/16.2.0/exception \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/nested_exception.h \
- C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h \
- C:/msys64/ucrt64/include/c++/16.2.0/math.h \
- C:/msys64/ucrt64/include/c++/16.2.0/cmath \
- C:/msys64/ucrt64/include/math.h \
- C:/msys64/ucrt64/include/c++/16.2.0/bits/specfun.h \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/gamma.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/special_function_util.h \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/bessel_function.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/beta_function.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/ell_integral.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/exp_integral.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/hypergeometric.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/legendre_function.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/modified_bessel_func.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_hermite.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_laguerre.tcc \
- C:/msys64/ucrt64/include/c++/16.2.0/tr1/riemann_zeta.tcc \
- C:/msys64/ucrt64/include/assert.h \
- C:/msys64/ucrt64/include/c++/16.2.0/cstring \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Context.h \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/include/FluidUI/Style.h \
  C:/msys64/ucrt64/include/c++/16.2.0/filesystem \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_fwd.h \
  C:/msys64/ucrt64/include/c++/16.2.0/system_error \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/error_constants.h \
  C:/msys64/ucrt64/include/c++/16.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/16.2.0/exception \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/stdexcept_except.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/chrono.h \
  C:/msys64/ucrt64/include/c++/16.2.0/ratio \
@@ -488,6 +466,29 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/align.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_dir.h \
  C:/msys64/ucrt64/include/c++/16.2.0/bits/fs_ops.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/utility \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/stl_relops.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/intcmp.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/optional \
+ C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/third_party/stb_truetype.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/math.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/cmath \
+ C:/msys64/ucrt64/include/math.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/bits/specfun.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/gamma.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/special_function_util.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/bessel_function.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/beta_function.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/ell_integral.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/exp_integral.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/hypergeometric.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/legendre_function.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/modified_bessel_func.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_hermite.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/poly_laguerre.tcc \
+ C:/msys64/ucrt64/include/c++/16.2.0/tr1/riemann_zeta.tcc \
+ C:/msys64/ucrt64/include/assert.h \
+ C:/msys64/ucrt64/include/c++/16.2.0/cstring \
  C:/msys64/ucrt64/include/c++/16.2.0/fstream \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/basic_file.h \
  C:/msys64/ucrt64/include/c++/16.2.0/x86_64-w64-mingw32/bits/c++io.h \

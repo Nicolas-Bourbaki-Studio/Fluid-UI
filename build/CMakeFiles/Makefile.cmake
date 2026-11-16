@@ -16,9 +16,13 @@ set(CMAKE_MAKEFILE_DEPENDS
   "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeRCInformation.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeSystemSpecificInformation.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/CMakeSystemSpecificInitialize.cmake"
+  "C:/Program Files/CMake/share/cmake-4.5/Modules/CTest.cmake"
+  "C:/Program Files/CMake/share/cmake-4.5/Modules/CTestTargets.cmake"
+  "C:/Program Files/CMake/share/cmake-4.5/Modules/CTestUseLaunchers.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Compiler/GNU-CXX.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Compiler/GNU.cmake"
+  "C:/Program Files/CMake/share/cmake-4.5/Modules/DartConfiguration.tcl.in"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Internal/CMakeCXXLinkerInformation.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Internal/CMakeCommonLinkerInformation.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Linker/GNU-CXX.cmake"
@@ -33,6 +37,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Platform/Windows-windres.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Platform/Windows.cmake"
   "C:/Program Files/CMake/share/cmake-4.5/Modules/Platform/WindowsPaths.cmake"
+  "C:/Program Files/CMake/share/cmake-4.5/Templates/CTestScript.cmake.in"
   "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/CMakeLists.txt"
   "CMakeFiles/4.5.0/CMakeCXXCompiler.cmake"
   "CMakeFiles/4.5.0/CMakeRCCompiler.cmake"
@@ -51,6 +56,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "opengl_systemTargets.cmake"
   "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/examples/CMakeLists.txt"
   "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/src/CMakeLists.txt"
+  "C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/tests/CMakeLists.txt"
   )
 
 # The corresponding makefile is:
@@ -61,13 +67,45 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
+  "DartConfiguration.tcl"
+  "CMakeFiles/CTestScript.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "src/CMakeFiles/CMakeDirectoryInformation.cmake"
   "examples/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "tests/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/Experimental.dir/DependInfo.cmake"
+  "CMakeFiles/Nightly.dir/DependInfo.cmake"
+  "CMakeFiles/Continuous.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyMemoryCheck.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyStart.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyUpdate.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyConfigure.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyBuild.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyTest.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyCoverage.dir/DependInfo.cmake"
+  "CMakeFiles/NightlyMemCheck.dir/DependInfo.cmake"
+  "CMakeFiles/NightlySubmit.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalStart.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalUpdate.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalConfigure.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalBuild.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalTest.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalCoverage.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalMemCheck.dir/DependInfo.cmake"
+  "CMakeFiles/ExperimentalSubmit.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousStart.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousUpdate.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousConfigure.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousBuild.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousTest.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousCoverage.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousMemCheck.dir/DependInfo.cmake"
+  "CMakeFiles/ContinuousSubmit.dir/DependInfo.cmake"
   "src/CMakeFiles/FluidUI.dir/DependInfo.cmake"
   "examples/CMakeFiles/basic_glfw_gl.dir/DependInfo.cmake"
+  "tests/CMakeFiles/FluidUIStyleDrawTests.dir/DependInfo.cmake"
   )
