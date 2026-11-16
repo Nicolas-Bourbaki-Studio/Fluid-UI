@@ -101,6 +101,19 @@ int main() {
     Require(idOnly.background.r > 0.9f && idOnly.background.g > 0.9f &&
             idOnly.background.b < 0.1f);
 
+    fluid::StyleSheet scrollbarStyles;
+    Require(scrollbarStyles.LoadCSS(
+        "window { scrollbar-width: none; }"
+        "container { scrollbar-width: thin; }"
+        "console-output { scrollbar-width: auto; }",
+        &error));
+    Require(scrollbarStyles.Resolve("window", {}, fluid::State_None).scrollbarWidth ==
+            fluid::ScrollbarWidth::None);
+    Require(scrollbarStyles.Resolve("container", {}, fluid::State_None).scrollbarWidth ==
+            fluid::ScrollbarWidth::Thin);
+    Require(scrollbarStyles.Resolve("console-output", {}, fluid::State_None).scrollbarWidth ==
+            fluid::ScrollbarWidth::Auto);
+
     fluid::StyleSheet important;
     Require(important.LoadCSS(
         "button { color: blue !important; }"
@@ -134,6 +147,47 @@ int main() {
     Require(captureText.emitted.front() == "Active stylesheet");
     Require(captureText.colors.front().r > 0.9f &&
             captureText.colors.front().g < 0.1f);
+
+    fluid::Context windowUi;
+    Require(windowUi.Style().LoadCSS("window { padding: 0; }", &error));
+    auto measureWindowContentWidth = [&](fluid::WindowFlags flags) {
+        fluid::InputState frame;
+        frame.displaySize = {400.f, 300.f};
+        windowUi.NewFrame(frame);
+        Require(windowUi.BeginWindow("Scrollable##window-id",
+                                     {20.f, 20.f, 200.f, 100.f}, flags));
+        const float width = windowUi.GetContentRegionAvail().x;
+        for (int i = 0; i < 12; ++i) windowUi.Text("Overflow line");
+        windowUi.EndWindow();
+        windowUi.EndFrame();
+        return width;
+    };
+    measureWindowContentWidth(fluid::WindowFlags::None);
+    const float windowWithScrollbar =
+        measureWindowContentWidth(fluid::WindowFlags::None);
+    const float windowWithoutScrollbar =
+        measureWindowContentWidth(fluid::WindowFlags::NoScrollbar);
+    Require(windowWithoutScrollbar > windowWithScrollbar + 6.f);
+
+    fluid::Context containerUi;
+    Require(containerUi.Style().LoadCSS("container { padding: 0; }", &error));
+    auto measureContainerContentWidth = [&]() {
+        fluid::InputState frame;
+        frame.displaySize = {400.f, 300.f};
+        containerUi.NewFrame(frame);
+        Require(containerUi.BeginContainer("Scrollable##container-id", {100.f, 80.f}));
+        const float width = containerUi.GetContentRegionAvail().x;
+        for (int i = 0; i < 12; ++i) containerUi.Text("Overflow line");
+        containerUi.EndContainer();
+        containerUi.EndFrame();
+        return width;
+    };
+    measureContainerContentWidth();
+    const float containerWithScrollbar = measureContainerContentWidth();
+    Require(containerUi.Style().LoadCSS(
+        "container { padding: 0; scrollbar-width: none; }", &error));
+    const float containerWithoutScrollbar = measureContainerContentWidth();
+    Require(containerWithoutScrollbar > containerWithScrollbar + 6.f);
 
     fluid::StyleSheet reload;
     Require(reload.LoadCSS("button { background: red; color: white; }", &error));

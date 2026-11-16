@@ -14,6 +14,20 @@
 
 namespace fluid {
 
+enum class WindowFlags : uint8_t {
+    None = 0,
+    NoScrollbar = 1u << 0
+};
+
+constexpr WindowFlags operator|(WindowFlags left, WindowFlags right) {
+    return static_cast<WindowFlags>(static_cast<uint8_t>(left) |
+                                    static_cast<uint8_t>(right));
+}
+
+constexpr bool HasWindowFlag(WindowFlags flags, WindowFlags flag) {
+    return (static_cast<uint8_t>(flags) & static_cast<uint8_t>(flag)) != 0;
+}
+
 class FLUID_API Context {
 public:
     Context();
@@ -30,9 +44,11 @@ public:
     const DrawList& EndFrame();
 
     // Containers
-    bool Begin(std::string_view title, bool* open = nullptr);
+    bool Begin(std::string_view title, bool* open = nullptr,
+               WindowFlags flags = WindowFlags::None);
     void End();
-    bool BeginWindow(std::string_view title, Rect initial);
+    bool BeginWindow(std::string_view title, Rect initial,
+                     WindowFlags flags = WindowFlags::None);
     void EndWindow();
     void SetWindowOpen(std::string_view title, bool open);
     bool SaveLayout(const std::string& path, std::string* error = nullptr) const;
@@ -203,6 +219,7 @@ private:
         Vec2 pos, size, dragOff, dockDragStartPos, resizeStart, startSize, resizeStartPos;
         Vec2 dockRestoreSize, lastTitleClickPos;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f;
+        float scrollbarWidth = 7.f;
         float dockSpan = 1.f, titleHeight = 0.f;
         WidgetId tabGroup = 0;
         double lastTitleClickTime = -1.0;
@@ -271,6 +288,7 @@ private:
         Rect frame, baseContent;
         float contentRight = 0.f, contentBottom = 0.f;
         float scrollX = 0.f, scrollY = 0.f;
+        float scrollbarSize = 0.f;
     };
     struct ScrollableContainerRect {
         Rect rect;

@@ -48,6 +48,7 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.shadowEnabled = t < 0.5f ? a.shadowEnabled : b.shadowEnabled;
     o.windowCanDock = t < 0.5f ? a.windowCanDock : b.windowCanDock;
     o.windowChildDock = t < 0.5f ? a.windowChildDock : b.windowChildDock;
+    o.scrollbarWidth = t < 0.5f ? a.scrollbarWidth : b.scrollbarWidth;
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
     o.padding     = Lerp(a.padding,     b.padding,     t);
@@ -200,6 +201,7 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "shadow-blur" || name == "shadow-enabled" ||
         name == "opacity" || name == "transition-speed" ||
         name == "window-can-dock" || name == "window-child-dock" ||
+        name == "scrollbar-width" ||
         name == "padding" || name == "border" || name == "background-image" ||
         name == "text-gradient" || name == "color-gradient" ||
         name == "foreground-gradient" ||
@@ -306,6 +308,9 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::ShadowEnabled:   s.shadowEnabled = v[0] != 0.f; break;
         case Prop::WindowCanDock:   s.windowCanDock = v[0] != 0.f; break;
         case Prop::WindowChildDock: s.windowChildDock = v[0] != 0.f; break;
+        case Prop::ScrollbarWidth:
+            s.scrollbarWidth = static_cast<ScrollbarWidth>(static_cast<uint8_t>(v[0]));
+            break;
         case Prop::Opacity:         s.opacity = std::clamp(v[0], 0.f, 1.f); break;
         case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
@@ -741,6 +746,16 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         if (value != "true" && value != "false") return false;
         out.prop = name == "window-can-dock" ? Prop::WindowCanDock : Prop::WindowChildDock;
         out.value = {{value == "true" ? 1.f : 0.f, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "scrollbar-width") {
+        ScrollbarWidth width;
+        if (value == "auto") width = ScrollbarWidth::Auto;
+        else if (value == "thin") width = ScrollbarWidth::Thin;
+        else if (value == "none") width = ScrollbarWidth::None;
+        else return false;
+        out.prop = Prop::ScrollbarWidth;
+        out.value = {{static_cast<float>(width), 0.f, 0.f, 0.f}};
         return true;
     }
     if (name == "outline") {

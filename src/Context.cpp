@@ -88,6 +88,15 @@ constexpr float kDockTargetGap = 4.f;
 constexpr float kDockCompassSize = 104.f;
 constexpr float kContainerScrollbarSize = 8.f;
 
+float ScrollbarSize(ScrollbarWidth width, float defaultSize) {
+    switch (width) {
+        case ScrollbarWidth::Thin: return std::max(1.f, defaultSize * 0.5f);
+        case ScrollbarWidth::None: return 0.f;
+        case ScrollbarWidth::Auto: return defaultSize;
+    }
+    return defaultSize;
+}
+
 struct ContainerViewport {
     Rect rect;
     bool horizontal = false;
@@ -95,14 +104,15 @@ struct ContainerViewport {
 };
 
 ContainerViewport CalculateContainerViewport(Rect content, float contentWidth,
-                                             float contentHeight) {
+                                             float contentHeight,
+                                             float scrollbarSize = kContainerScrollbarSize) {
     bool horizontal = contentWidth > content.w;
     bool vertical = contentHeight > content.h;
     for (int i = 0; i < 3; ++i) {
         const float width = std::max(0.f, content.w -
-            (vertical ? kContainerScrollbarSize : 0.f));
+            (vertical ? scrollbarSize : 0.f));
         const float height = std::max(0.f, content.h -
-            (horizontal ? kContainerScrollbarSize : 0.f));
+            (horizontal ? scrollbarSize : 0.f));
         const bool nextHorizontal = contentWidth > width;
         const bool nextVertical = contentHeight > height;
         if (nextHorizontal == horizontal && nextVertical == vertical) break;
@@ -111,8 +121,8 @@ ContainerViewport CalculateContainerViewport(Rect content, float contentWidth,
     }
     return {
         {content.x, content.y,
-         std::max(0.f, content.w - (vertical ? kContainerScrollbarSize : 0.f)),
-         std::max(0.f, content.h - (horizontal ? kContainerScrollbarSize : 0.f))},
+         std::max(0.f, content.w - (vertical ? scrollbarSize : 0.f)),
+         std::max(0.f, content.h - (horizontal ? scrollbarSize : 0.f))},
         horizontal,
         vertical
     };
@@ -1471,7 +1481,7 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
     return true;
 }
 
-bool Context::Begin(std::string_view title, bool* open) {
+bool Context::Begin(std::string_view title, bool* open, WindowFlags flags) {
     const WidgetId id = GetID(title);
     if (open) {
         if (!*open) {
@@ -1490,7 +1500,7 @@ bool Context::Begin(std::string_view title, bool* open) {
     const Rect initial{std::max(0.f, (in_.displaySize.x - width) * 0.5f),
                        std::max(menuBarHeight_, (in_.displaySize.y - height) * 0.5f),
                        width, height};
-    const bool visible = BeginWindow(title, initial);
+    const bool visible = BeginWindow(title, initial, flags);
     if (!visible && open) *open = false;
     return visible;
 }
@@ -2070,7 +2080,7 @@ void Context::LayoutDockedWindows() {
     }
 }
 
-bool Context::BeginWindow(std::string_view title, Rect initial) {
+bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flags) {
     windowHovered_ = false;
     LayoutDockedWindows();
     const WidgetId id = GetID(title);
@@ -2484,10 +2494,18 @@ bool Context::BeginWindow(std::string_view title, Rect initial) {
     idStack_.push_back(id);
     currentWindowId_ = id;
 
-    const float scrollBarWidth = 12.f;
+    const float scrollBarWidth = HasWindowFlag(flags, WindowFlags::NoScrollbar)
+        ? 0.f : ScrollbarSize(ws.scrollbarWidth, 7.f);
+    const float contentHeight = std::max(
+        0.f, frame.h - contentTop - ws.padding.Vertical());
+    const bool reserveScrollbar = scrollBarWidth > 0.f &&
+        w.contentHeight > contentHeight;
+    const float scrollbarGutter = reserveScrollbar ? scrollBarWidth + 5.f : 0.f;
+    w.scrollbarWidth = scrollBarWidth;
+    if (scrollBarWidth == 0.f) w.scrolling = false;
     content_ = {frame.x + ws.padding.left,
                 frame.y + contentTop + ws.padding.top,
-                frame.w - ws.padding.Horizontal() - scrollBarWidth,
+                std::max(0.f, frame.w - ws.padding.Horizontal() - scrollbarGutter),
                 frame.h - contentTop - ws.padding.Vertical()};
     windowViewport_ = content_;
     const bool overScrollableConsole = std::any_of(
@@ -2536,9 +2554,9 @@ void Context::EndWindow() {
             scrollToBottom_ = false;
         }
         window.scrollY = std::clamp(window.scrollY, 0.f, maxScroll);
-        if (maxScroll > 0.f) {
+        if (maxScroll > 0.f && window.scrollbarWidth > 0.f) {
             const ComputedStyle trackStyle = Resolve("window-scrollbar", 0);
-            const float trackWidth = 7.f;
+            const float trackWidth = window.scrollbarWidth;
             const Rect track{windowViewport_.x + windowViewport_.w + 2.f, windowViewport_.y,
                              trackWidth, windowViewport_.h};
             DrawStyledColor(track, trackStyle.background, trackStyle.backgroundGradient,
@@ -2652,8 +2670,10 @@ bool Context::BeginContainerImpl(Vec2 size, bool horizontal,
     const Rect baseContent{frame.x + style.padding.left, frame.y + style.padding.top,
                            std::max(0.f, frame.w - style.padding.Horizontal()),
                            std::max(0.f, frame.h - style.padding.Vertical())};
+    const float scrollbarSize = ScrollbarSize(style.scrollbarWidth,
+                                              kContainerScrollbarSize);
     const ContainerViewport previousViewport = CalculateContainerViewport(
-        baseContent, scroll.contentWidth, scroll.contentHeight);
+        baseContent, scroll.contentWidth, scroll.contentHeight, scrollbarSize);
     scroll.scrollX = std::clamp(scroll.scrollX, 0.f,
         std::max(0.f, scroll.contentWidth - previousViewport.rect.w));
     scroll.scrollY = std::clamp(scroll.scrollY, 0.f,
@@ -2667,6 +2687,7 @@ bool Context::BeginContainerImpl(Vec2 size, bool horizontal,
     container.contentBottom = baseContent.y;
     container.scrollX = scroll.scrollX;
     container.scrollY = scroll.scrollY;
+    container.scrollbarSize = scrollbarSize;
     containerStack_.push_back(container);
     DrawBox(frame, style);
     draw_.PushClipRect(frame);
@@ -2707,7 +2728,8 @@ void Context::EndContainer() {
     scroll.contentWidth = std::max(0.f, container.contentRight - container.baseContent.x);
     scroll.contentHeight = std::max(0.f, container.contentBottom - container.baseContent.y);
     const ContainerViewport viewport = CalculateContainerViewport(
-        container.baseContent, scroll.contentWidth, scroll.contentHeight);
+        container.baseContent, scroll.contentWidth, scroll.contentHeight,
+        container.scrollbarSize);
     const float maxScrollX = std::max(0.f, scroll.contentWidth - viewport.rect.w);
     const float maxScrollY = std::max(0.f, scroll.contentHeight - viewport.rect.h);
     scroll.scrollX = std::clamp(scroll.scrollX, 0.f, maxScrollX);
@@ -2716,13 +2738,14 @@ void Context::EndContainer() {
         scrollableContainerRects_.push_back({container.frame, currentWindowId_});
 
     if (viewport.vertical) {
-        const float trackWidth = std::min(kContainerScrollbarSize,
+        const float trackWidth = std::min(container.scrollbarSize,
                                           container.baseContent.w);
         const Rect track{viewport.rect.x + viewport.rect.w, viewport.rect.y,
                          trackWidth, viewport.rect.h};
         const ComputedStyle style = Resolve("container-scrollbar", 0);
-        DrawStyledColor(track, style.background, style.backgroundGradient,
-                        style.opacity, trackWidth * 0.5f);
+        if (trackWidth > 0.f)
+            DrawStyledColor(track, style.background, style.backgroundGradient,
+                            style.opacity, trackWidth * 0.5f);
         if (container.frame.Contains(in_.mousePos) && in_.mouseWheel != 0.f) {
             const float lineHeight = Resolve("text", 0).fontSize;
             scroll.scrollY = std::clamp(scroll.scrollY -
@@ -2740,7 +2763,8 @@ void Context::EndContainer() {
         const Rect lastItemRect = lastItemRect_;
         const bool lastItemPressed = lastItemPressed_;
         const bool lastItemHovered = lastItemHovered_;
-        const Interaction interaction = Behavior(scrollId, track);
+        const Interaction interaction = trackWidth > 0.f
+            ? Behavior(scrollId, track) : Interaction{};
         lastItemId_ = lastItemId;
         lastItemRect_ = lastItemRect;
         lastItemPressed_ = lastItemPressed;
@@ -2759,20 +2783,22 @@ void Context::EndContainer() {
         } else if (scroll.scrollingY && !in_.mouseDown[0]) {
             scroll.scrollingY = false;
         }
-        DrawStyledColor(thumb, style.accent, style.accentGradient,
-                        style.opacity, trackWidth * 0.5f);
+        if (trackWidth > 0.f)
+            DrawStyledColor(thumb, style.accent, style.accentGradient,
+                            style.opacity, trackWidth * 0.5f);
     } else {
         scroll.scrollingY = false;
     }
 
     if (viewport.horizontal) {
-        const float trackHeight = std::min(kContainerScrollbarSize,
+        const float trackHeight = std::min(container.scrollbarSize,
                                            container.baseContent.h);
         const Rect track{viewport.rect.x, viewport.rect.y + viewport.rect.h,
                          viewport.rect.w, trackHeight};
         const ComputedStyle style = Resolve("container-scrollbar", 0);
-        DrawStyledColor(track, style.background, style.backgroundGradient,
-                        style.opacity, trackHeight * 0.5f);
+        if (trackHeight > 0.f)
+            DrawStyledColor(track, style.background, style.backgroundGradient,
+                            style.opacity, trackHeight * 0.5f);
         const float thumbWidth = std::min(track.w, std::max(24.f,
             track.w * track.w / std::max(scroll.contentWidth, 1.f)));
         const float travel = std::max(0.f, track.w - thumbWidth);
@@ -2784,7 +2810,8 @@ void Context::EndContainer() {
         const Rect lastItemRect = lastItemRect_;
         const bool lastItemPressed = lastItemPressed_;
         const bool lastItemHovered = lastItemHovered_;
-        const Interaction interaction = Behavior(scrollId, track);
+        const Interaction interaction = trackHeight > 0.f
+            ? Behavior(scrollId, track) : Interaction{};
         lastItemId_ = lastItemId;
         lastItemRect_ = lastItemRect;
         lastItemPressed_ = lastItemPressed;
@@ -2803,8 +2830,9 @@ void Context::EndContainer() {
         } else if (scroll.scrollingX && !in_.mouseDown[0]) {
             scroll.scrollingX = false;
         }
-        DrawStyledColor(thumb, style.accent, style.accentGradient,
-                        style.opacity, trackHeight * 0.5f);
+        if (trackHeight > 0.f)
+            DrawStyledColor(thumb, style.accent, style.accentGradient,
+                            style.opacity, trackHeight * 0.5f);
     } else {
         scroll.scrollingX = false;
     }
@@ -4249,9 +4277,11 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
     selection.anchor = std::min(selection.anchor, text.size());
     selection.focus = std::min(selection.focus, text.size());
 
-    const float trackWidth = hasOverflow ? 8.f : 0.f;
+    const float trackWidth = hasOverflow
+        ? ScrollbarSize(style.scrollbarWidth, 8.f) : 0.f;
+    const bool hasScrollbar = trackWidth > 0.f;
     const Rect textViewport{inner.x, inner.y,
-                            std::max(0.f, inner.w - (hasOverflow ? trackWidth + 4.f : 0.f)),
+                            std::max(0.f, inner.w - (hasScrollbar ? trackWidth + 4.f : 0.f)),
                             inner.h};
     const Rect track{inner.x + inner.w - trackWidth, inner.y, trackWidth, inner.h};
     const float thumbHeight = hasOverflow
@@ -4261,7 +4291,7 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
         (maxScroll > 0.f ? selection.scrollY / maxScroll : 0.f);
     const Rect thumb{track.x, thumbY, track.w, thumbHeight};
     const WidgetId scrollId = HashStr("##console-scrollbar", id);
-    const Interaction scroll = hasOverflow
+    const Interaction scroll = hasScrollbar
         ? Behavior(scrollId, thumb.Expanded(3.f)) : Interaction{};
     if (scroll.held) {
         if (!selection.scrolling) {
@@ -4276,7 +4306,7 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
     } else if (selection.scrolling && !in_.mouseDown[0]) {
         selection.scrolling = false;
     }
-    const bool onScrollbar = hasOverflow && track.Contains(in_.mousePos);
+    const bool onScrollbar = hasScrollbar && track.Contains(in_.mousePos);
     const Interaction interaction = !onScrollbar && !selection.scrolling
         ? Behavior(id, rect) : Interaction{};
     auto characterAt = [&](Vec2 position) {
@@ -4374,7 +4404,7 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
         ++lineIndex;
     }
     draw_.PopClipRect();
-    if (hasOverflow) {
+    if (hasScrollbar) {
         const ComputedStyle trackStyle = Resolve("window-scrollbar", 0);
         DrawStyledColor(track, trackStyle.background, trackStyle.backgroundGradient,
                         trackStyle.opacity, trackWidth * 0.5f);

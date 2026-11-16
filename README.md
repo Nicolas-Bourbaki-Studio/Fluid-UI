@@ -161,6 +161,8 @@ in the adjacent docked panel's layer, so floating windows can cover them. The GL
 rounded geometry with multisampling and higher-resolution corner tessellation, and uses linear
 filtering for images; multisampling is kept off for textured draws so it does not add antialiasing
 to the text.
+Pass `WindowFlags::NoScrollbar` to `BeginWindow` (or as the third argument to `Begin`) to hide a
+window's scrollbar and reclaim its gutter; mouse-wheel scrolling remains available.
 
 ## CSS-like themes and classes
 
@@ -182,7 +184,9 @@ Supported properties are `background`, `color`/`foreground`, `accent`, `border-c
 corner overrides, `font-size`, `width` and `height` (`auto`, pixels, or percentages of the available content
 region), `align` (`left`, `center`, `right`, `top`, `middle`, or `bottom`),
 `justify-self`, `align-self`, `text-align`, `vertical-align`, `gap`, `shadow-blur`,
-`shadow-enabled` (`true` or `false`),
+`shadow-enabled` (`true` or `false`), and `scrollbar-width` (`auto`, `thin`, or `none`).
+`scrollbar-width: none` hides scrollbar controls without reserving their space; scrolling
+through the content remains available.
 `outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
 `outline-color`, `outline-width`,
 `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value

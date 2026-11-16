@@ -1068,7 +1068,6 @@ int main(int argc, char** argv) {
             }
             ui.EndWindow();
         }
-
         if (ui.BeginWindow(tabsWindow, {548, 40, 550, 720})) {
             ui.Text("Configurable tab positions");
             if (ui.Button("Show window manager")) ui.SetWindowOpen(managerWindow, true);

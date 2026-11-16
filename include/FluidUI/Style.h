@@ -20,10 +20,12 @@ enum class Prop : uint8_t {
     OutlineWidth, Padding, TransitionSpeed, BackgroundImage, BackgroundSize, BackgroundPosition,
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
     BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
-    RoundingBottomRight, RoundingBottomLeft, WindowCanDock, WindowChildDock
+    RoundingBottomRight, RoundingBottomLeft, WindowCanDock, WindowChildDock,
+    ScrollbarWidth
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
+enum class ScrollbarWidth : uint8_t { Auto, Thin, None };
 enum class HorizontalAlignment : uint8_t { Auto, Start, Center, End };
 enum class VerticalAlignment : uint8_t { Auto, Start, Center, End };
 enum class TextAlignment : uint8_t { Start, Center, End };
@@ -66,6 +68,7 @@ struct ComputedStyle {
     bool shadowEnabled = true;
     bool windowCanDock = true;
     bool windowChildDock = true;
+    ScrollbarWidth scrollbarWidth = ScrollbarWidth::Auto;
     float opacity     = 1.f;
     float transitionSpeed = 14.f; // higher = snappier
     Edges padding {4.f, 8.f, 4.f, 8.f};
@@ -125,6 +128,9 @@ public:
         RuleBuilder& ShadowEnabled(bool v)    { return Num(Prop::ShadowEnabled, v ? 1.f : 0.f); }
         RuleBuilder& WindowCanDock(bool v)    { return Num(Prop::WindowCanDock, v ? 1.f : 0.f); }
         RuleBuilder& WindowChildDock(bool v)  { return Num(Prop::WindowChildDock, v ? 1.f : 0.f); }
+        RuleBuilder& Scrollbars(ScrollbarWidth v) {
+            return Num(Prop::ScrollbarWidth, static_cast<float>(v));
+        }
         RuleBuilder& Opacity(float v)         { return Num(Prop::Opacity, v); }
         RuleBuilder& TransitionSpeed(float v) { return Num(Prop::TransitionSpeed, v); }
         RuleBuilder& BackgroundImage(std::string source) {
