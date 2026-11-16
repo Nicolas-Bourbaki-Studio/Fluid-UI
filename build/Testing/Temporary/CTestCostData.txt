@@ -1,2 +1,2 @@
-FluidUIStyleDrawTests 4 0.041487
+FluidUIStyleDrawTests 7 0.0804204
 ---

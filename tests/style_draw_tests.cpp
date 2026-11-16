@@ -1,8 +1,11 @@
 #include <FluidUI/DrawList.h>
+#include <FluidUI/Context.h>
 #include <FluidUI/Style.h>
 
 #include <cmath>
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 namespace {
 
@@ -18,6 +21,22 @@ bool ContainsPosition(const fluid::DrawList& drawList, fluid::Vec2 expected) {
     }
     return false;
 }
+
+class CaptureText final : public fluid::ITextBackend {
+public:
+    fluid::Vec2 Measure(std::string_view text, float fontSize) override {
+        return {static_cast<float>(text.size()) * fontSize * 0.5f, fontSize};
+    }
+
+    void Emit(fluid::DrawList&, fluid::Vec2, std::string_view text,
+              float, fluid::Color color) override {
+        emitted.emplace_back(text);
+        colors.push_back(color);
+    }
+
+    std::vector<std::string> emitted;
+    std::vector<fluid::Color> colors;
+};
 
 } // namespace
 
@@ -101,6 +120,20 @@ int main() {
     const fluid::ComputedStyle variableStyle =
         variableStyles.Resolve("button", {}, fluid::State_None);
     Require(variableStyle.background.b > variableStyle.background.r);
+
+    fluid::Context context;
+    CaptureText captureText;
+    context.SetTextBackend(&captureText);
+    Require(context.Style().LoadCSS("#ThemeTextTest { color: #ff0000; }", &error));
+    fluid::InputState input;
+    input.displaySize = {400.f, 300.f};
+    context.NewFrame(input);
+    context.Text("Active stylesheet##ThemeTextTest");
+    context.EndFrame();
+    Require(captureText.emitted.size() == 1);
+    Require(captureText.emitted.front() == "Active stylesheet");
+    Require(captureText.colors.front().r > 0.9f &&
+            captureText.colors.front().g < 0.1f);
 
     fluid::StyleSheet reload;
     Require(reload.LoadCSS("button { background: red; color: white; }", &error));

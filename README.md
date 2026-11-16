@@ -167,8 +167,9 @@ to the text.
 Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-like file.
 Selectors support widget names, multiple classes, one ID, grouped selectors, and widget
 states (`hover`, `active`, `checked`, `disabled`), for example `button.primary#confirm:hover`.
-Use `PushClass`/`PopClass` and `PushStyleID`/`PopStyleID` to apply class and ID selectors to
-elements created in those scopes. User rules override the built-in dark theme defaults;
+Use `PushClass`/`PopClass` to apply classes, and either `PushStyleID`/`PopStyleID` or a
+`Visible label##id` label to apply an ID selector. The `##id` suffix is hidden and identifies
+the widget. User rules override the built-in dark theme defaults;
 selector specificity still determines precedence between user rules. Global
 custom properties can be declared
 in `:root`, retained across successive `LoadCSS` calls, and referenced with `var(--name)`

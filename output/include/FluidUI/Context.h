@@ -308,8 +308,12 @@ private:
 
     WidgetId GetID(std::string_view label) const;
     ComputedStyle Resolve(std::string_view widget, uint8_t state) const;
+    ComputedStyle ResolveLabel(std::string_view widget, uint8_t state,
+                               std::string_view label) const;
     ComputedStyle Animate(WidgetId id, std::string_view widget, uint8_t extraState,
                           bool hovered, bool held);
+    ComputedStyle AnimateLabel(WidgetId id, std::string_view widget, uint8_t extraState,
+                               bool hovered, bool held, std::string_view label);
     Interaction Behavior(WidgetId id, Rect r);
     bool IsFloatingWindowAt(Vec2 position) const;
     WidgetId WindowAt(Vec2 position, WidgetId exclude) const;
@@ -333,7 +337,8 @@ private:
     void LayoutDockedWindows();
     void BringLayerToFront(DrawList::Layer& layer);
     bool BeginContainerImpl(Vec2 size, bool horizontal,
-                            std::string_view widget = "container");
+                            std::string_view widget = "container",
+                            std::string_view label = {});
     bool BeginPopupImpl(std::string_view id, bool modal);
     void EndPopupImpl();
     void ClosePopupAndChildren(WidgetId id);
