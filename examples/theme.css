@@ -1,17 +1,17 @@
 :root {
     --ui-accent: rgb(31, 83, 255);
-    --ui-accent-muted: rgb(12, 50, 165);
+    --ui-accent-muted: rgb(22, 56, 168);
 
     --ui-window: #080808;
     --ui-sunken: linear-gradient(180deg, #080808 0%, #000000 100%);
     --ui-panel: #030303;
-    --ui-panel-hover: #101216;
-    --ui-panel-active: #161A20;
+    --ui-panel-hover: #0e0e0e;
+    --ui-panel-active: #0c0c0c;
     --ui-overlay: transparent;
 
     --ui-border: #22222277;
     --ui-border-hover: #242932;
-    --ui-window-border: linear-gradient(180deg, #080808 0%, #000000 100%);
+    --ui-window-border: linear-gradient(180deg, #070707 0%, #030303 100%);
 
     --ui-text: #E8E8E8;
     --ui-text-secondary: #777E89;
@@ -23,16 +23,16 @@
 
     --ui-radius: 8px;
     --ui-outline-width: 1px;
-    --ui-dock-splitter: rgba(255, 255, 255, 0.045);
+    --ui-dock-splitter: rgba(255, 255, 255, 0.116)
 }
 
 
 #ThemeTextTest{
     color: #2eee2e;
-    font-size: 8px;
+    font-size: 20px;
     gap: 6px;
     transition-speed: 20;
-    shadow-color: rgba(0, 0, 0, 0.521);
+    shadow-color: rgba(226, 20, 20, 0.521);
 }
 
 * {
@@ -60,7 +60,7 @@ window {
 }
 
 window-title {
-    background: linear-gradient(180deg, #141414 0%, #0C0C0C 100%);
+    background: linear-gradient(180deg, #111111 0%, #0C0C0C 100%);
     color: var(--ui-text);
     font-size: 15px;
     padding: 7px;
@@ -104,7 +104,7 @@ dock-tab:hover {
 }
 
 dock-tab:checked {
-    background: var(--ui-accent-muted);
+    background: var(--ui-panel-active);
     border-color: var(--ui-accent);
     color: var(--ui-text);
 }
@@ -309,7 +309,7 @@ button.danger:hover {
 }
 
 progress-bar {
-    background: var(--ui-sunken);
+    background: var(--ui-panel);
     accent: var(--ui-accent);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
@@ -317,7 +317,7 @@ progress-bar {
 }
 
 tile-container {
-    background: var(--ui-sunken);
+    background: var(--ui-panel);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
     padding: 6px;
@@ -346,7 +346,7 @@ console-output {
 }
 
 console-input {
-    background: var(--ui-sunken);
+    background: var(--ui-panel);
     color: var(--ui-text);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
@@ -363,7 +363,7 @@ popup {
 }
 
 input-text {
-    background: var(--ui-sunken);
+    background: var(--ui-panel);
     color: var(--ui-text);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
@@ -376,6 +376,8 @@ input-text:active {
 
 selectable,
 tree-node {
+    background: var(--ui-panel);
+    border: 0px solid var(--ui-border);
     color: var(--ui-text);
     padding: 5px 8px;
 }
@@ -486,7 +488,7 @@ container,
 collapsible-container,
 horizontal-list,
 vertical-list {
-    background: #0D0D0D;
+    background: var(--ui-panel);
     border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
