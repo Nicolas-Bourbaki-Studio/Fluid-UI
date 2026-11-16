@@ -185,11 +185,25 @@ corner overrides, `font-size`, `width` and `height` (`auto`, pixels, or percenta
 region), `align` (`left`, `center`, `right`, `top`, `middle`, or `bottom`),
 `justify-self`, `align-self`, `text-align`, `vertical-align`, `gap`, `shadow-blur`,
 `shadow-enabled` (`true` or `false`), and `scrollbar-width` (`auto`, `thin`, or `none`).
+`position` supports `static`, `relative`, `absolute`, and `fixed`, with `top`, `right`,
+`bottom`, and `left` offsets in pixels or percentages. Absolute offsets are relative to the
+current content region (the display for top-level windows); fixed offsets are relative to the
+display. Docked windows keep their dock-managed positions. Positioned elements are
+removed from normal layout flow for `absolute` and `fixed`; relative offsets preserve their
+original layout space. The custom `position: (x, y)` form places an element absolutely
+within its containing region, for example `position: (24px, 10%)`.
+`rotation` (or `rotate`) accepts degrees, and `translate` accepts pixel or percentage pairs,
+such as `translate: 8px -4px` or `translate: translate(10%, 0px)`.
+`transition` accepts CSS-like durations and easing names (for example
+`transition: all 200ms ease`); `transition-speed` remains available for direct speed values.
+`selectable`, `tree-node`, and `collapsing-header` accept the same border, radius, and
+per-corner declarations as other box widgets.
 `scrollbar-width: none` hides scrollbar controls without reserving their space; scrolling
-through the content remains available.
+through the content remains available. The `width` property on `window-scrollbar` and
+`container-scrollbar` sets the track thickness and matching content gutter; pixel and
+percentage widths are supported.
 `outline` (`none` or a width, `solid`, and color), `outline-style` (`none` or `solid`),
-`outline-color`, `outline-width`,
-`opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
+`outline-color`, `outline-width`, `opacity`, `transition-speed`, the `border` shorthand, and CSS-style one-to-four-value
 `padding`. Outlines and shadows are available to box-drawn components and can be set
 using widget selectors or global rules. CSS comments, zero values, and unsupported
 properties/selectors are safely ignored or parsed without aborting the stylesheet; malformed
@@ -290,6 +304,10 @@ both an empty widget and an image widget near the top of the component window. T
 source must match the `url(...)` value in CSS. The demo also shows gradients on backgrounds,
 text, borders, and accent colors.
 
+`Separator()` remains the standard horizontal rule. `HorizontalSeparator()` is its explicit
+counterpart, and `HorizontalSeparatorText("Section")` draws a centered label between two
+horizontal rules; both can be styled with `separator` and `separator-text`.
+
 The `examples` target includes `theme.css` and a GLFW demo covering the controls, container
 layouts, all tab positions, image widgets, dropdown variants, CSS classes, and collapsible
 content.
@@ -336,6 +354,7 @@ the group intact; double-click a docked title bar to undock it. Docked window co
 square, and the dock compass takes precedence over windows behind it. Drop a floating
 window on the compass center to add it to the center dock tab group. The layout
 adapts when the display changes size. Use `Context::DockWindows(false)` to disable docking.
+Window groups are limited to four members; attempts to add another window show a notification.
 CSS `window-can-dock: false` prevents a window from being docked, and
 `window-child-dock: false` prevents other windows from being grouped into it; both properties
 apply to `window` styles and default to `true`.

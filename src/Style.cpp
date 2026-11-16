@@ -37,6 +37,38 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.height = interpolateHeight ? Lerp(a.height, b.height, t)
                                  : (t < 0.5f ? a.height : b.height);
     o.heightPercent = t < 0.5f ? a.heightPercent : b.heightPercent;
+    o.position = t < 0.5f ? a.position : b.position;
+    auto lerpOffset = [t](float from, float to, bool fromSet, bool toSet,
+                          bool fromPercent, bool toPercent) {
+        return fromSet && toSet && fromPercent == toPercent
+            ? Lerp(from, to, t) : (t < 0.5f ? from : to);
+    };
+    o.top = lerpOffset(a.top, b.top, a.topSet, b.topSet, a.topPercent, b.topPercent);
+    o.right = lerpOffset(a.right, b.right, a.rightSet, b.rightSet,
+                         a.rightPercent, b.rightPercent);
+    o.bottom = lerpOffset(a.bottom, b.bottom, a.bottomSet, b.bottomSet,
+                          a.bottomPercent, b.bottomPercent);
+    o.left = lerpOffset(a.left, b.left, a.leftSet, b.leftSet,
+                        a.leftPercent, b.leftPercent);
+    o.topSet = t < 0.5f ? a.topSet : b.topSet;
+    o.rightSet = t < 0.5f ? a.rightSet : b.rightSet;
+    o.bottomSet = t < 0.5f ? a.bottomSet : b.bottomSet;
+    o.leftSet = t < 0.5f ? a.leftSet : b.leftSet;
+    o.topPercent = t < 0.5f ? a.topPercent : b.topPercent;
+    o.rightPercent = t < 0.5f ? a.rightPercent : b.rightPercent;
+    o.bottomPercent = t < 0.5f ? a.bottomPercent : b.bottomPercent;
+    o.leftPercent = t < 0.5f ? a.leftPercent : b.leftPercent;
+    o.rotation = Lerp(a.rotation, b.rotation, t);
+    o.translate = {
+        a.translateXPercent == b.translateXPercent
+            ? Lerp(a.translate.x, b.translate.x, t)
+            : (t < 0.5f ? a.translate.x : b.translate.x),
+        a.translateYPercent == b.translateYPercent
+            ? Lerp(a.translate.y, b.translate.y, t)
+            : (t < 0.5f ? a.translate.y : b.translate.y)
+    };
+    o.translateXPercent = t < 0.5f ? a.translateXPercent : b.translateXPercent;
+    o.translateYPercent = t < 0.5f ? a.translateYPercent : b.translateYPercent;
     o.justifySelf = t < 0.5f ? a.justifySelf : b.justifySelf;
     o.alignSelf = t < 0.5f ? a.alignSelf : b.alignSelf;
     o.textAlign = t < 0.5f ? a.textAlign : b.textAlign;
@@ -51,6 +83,7 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.scrollbarWidth = t < 0.5f ? a.scrollbarWidth : b.scrollbarWidth;
     o.opacity     = Lerp(a.opacity,     b.opacity,     t);
     o.transitionSpeed = a.transitionSpeed;
+    o.transitionEasing = t < 0.5f ? a.transitionEasing : b.transitionEasing;
     o.padding     = Lerp(a.padding,     b.padding,     t);
     o.backgroundImage = t < 0.5f ? a.backgroundImage : b.backgroundImage;
     o.backgroundImageSize = {
@@ -196,10 +229,14 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "border-radius-bottom-left" || name == "border-radius-bottom-right" ||
         name == "font-size" || name == "gap" || name == "spacing" ||
         name == "width" || name == "height" || name == "align" ||
+        name == "position" || name == "top" || name == "right" ||
+        name == "bottom" || name == "left" ||
+        name == "rotation" || name == "rotate" || name == "translate" ||
         name == "alignment" || name == "align-self" || name == "justify-self" ||
         name == "text-align" || name == "vertical-align" ||
         name == "shadow-blur" || name == "shadow-enabled" ||
-        name == "opacity" || name == "transition-speed" ||
+        name == "opacity" || name == "transition-speed" || name == "transition" ||
+        name == "transition-duration" ||
         name == "window-can-dock" || name == "window-child-dock" ||
         name == "scrollbar-width" ||
         name == "padding" || name == "border" || name == "background-image" ||
@@ -285,6 +322,37 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.height = v[0];
             s.heightPercent = v[1] != 0.f;
             break;
+        case Prop::Position:
+            s.position = static_cast<PositionType>(static_cast<uint8_t>(v[0]));
+            break;
+        case Prop::PositionCoordinates: {
+            const uint8_t flags = static_cast<uint8_t>(v[3]);
+            s.position = PositionType::Absolute;
+            s.left = v[0];
+            s.top = v[1];
+            s.leftSet = s.topSet = true;
+            s.leftPercent = (flags & 1u) != 0;
+            s.topPercent = (flags & 2u) != 0;
+            break;
+        }
+        case Prop::OffsetTop:
+            s.top = v[0]; s.topSet = v[1] != 0.f; s.topPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetRight:
+            s.right = v[0]; s.rightSet = v[1] != 0.f; s.rightPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetBottom:
+            s.bottom = v[0]; s.bottomSet = v[1] != 0.f; s.bottomPercent = v[2] != 0.f;
+            break;
+        case Prop::OffsetLeft:
+            s.left = v[0]; s.leftSet = v[1] != 0.f; s.leftPercent = v[2] != 0.f;
+            break;
+        case Prop::Rotation: s.rotation = v[0]; break;
+        case Prop::Translate:
+            s.translate = {v[0], v[1]};
+            s.translateXPercent = v[2] != 0.f;
+            s.translateYPercent = v[3] != 0.f;
+            break;
         case Prop::Alignment:
             s.justifySelf = static_cast<HorizontalAlignment>(static_cast<uint8_t>(v[0]));
             s.alignSelf = static_cast<VerticalAlignment>(static_cast<uint8_t>(v[1]));
@@ -312,7 +380,16 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
             s.scrollbarWidth = static_cast<ScrollbarWidth>(static_cast<uint8_t>(v[0]));
             break;
         case Prop::Opacity:         s.opacity = std::clamp(v[0], 0.f, 1.f); break;
-        case Prop::TransitionSpeed: s.transitionSpeed = v[0]; break;
+        case Prop::TransitionSpeed:
+            s.transitionSpeed = v[0];
+            if (d.text == "ease") s.transitionEasing = TransitionEasing::Ease;
+            else if (d.text == "ease-in") s.transitionEasing = TransitionEasing::EaseIn;
+            else if (d.text == "ease-out") s.transitionEasing = TransitionEasing::EaseOut;
+            else if (d.text == "ease-in-out")
+                s.transitionEasing = TransitionEasing::EaseInOut;
+            else if (d.text == "linear" || d.text == "none")
+                s.transitionEasing = TransitionEasing::Linear;
+            break;
         case Prop::Padding:         s.padding = Edges(v[0], v[1], v[2], v[3]); break;
         case Prop::BackgroundSize:
             s.backgroundFit = static_cast<BackgroundFit>(static_cast<uint8_t>(v[0]));
@@ -386,6 +463,96 @@ bool ParseDimension(std::string_view text, float& value, bool& percent) {
     if (!ParseNumber(text, value) || value < 0.f) return false;
     if (percent) value /= 100.f;
     return true;
+}
+
+bool ParseOffset(std::string_view text, float& value, bool& set, bool& percent) {
+    text = Trim(text);
+    if (EqualsIgnoreCase(text, "auto")) {
+        value = 0.f;
+        set = false;
+        percent = false;
+        return true;
+    }
+    percent = !text.empty() && text.back() == '%';
+    if (percent) text.remove_suffix(1);
+    if (!ParseNumber(text, value)) return false;
+    if (percent) value /= 100.f;
+    set = true;
+    return true;
+}
+
+bool ParseAngle(std::string_view text, float& degrees) {
+    text = Trim(text);
+    if (text.size() >= 3 && EqualsIgnoreCase(text.substr(text.size() - 3), "deg"))
+        text = Trim(text.substr(0, text.size() - 3));
+    else if (text.size() >= 2 &&
+             EqualsIgnoreCase(text.substr(text.size() - 2), "px"))
+        return false;
+    return ParseNumber(text, degrees);
+}
+
+bool ParseTransition(std::string_view value, float& speed,
+                     TransitionEasing& easing) {
+    value = Trim(value);
+    if (value == "none") {
+        speed = 10000.f;
+        easing = TransitionEasing::Linear;
+        return true;
+    }
+    bool hasDuration = false;
+    bool hasEasing = false;
+    while (!value.empty()) {
+        const size_t split = value.find_first_of(" \t\r\n,");
+        std::string_view token = Trim(value.substr(0, split));
+        value = split == std::string_view::npos ? std::string_view{}
+                                                  : Trim(value.substr(split + 1));
+        if (!hasEasing) {
+            if (token == "ease") {
+                easing = TransitionEasing::Ease;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-in") {
+                easing = TransitionEasing::EaseIn;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-out") {
+                easing = TransitionEasing::EaseOut;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "ease-in-out") {
+                easing = TransitionEasing::EaseInOut;
+                hasEasing = true;
+                continue;
+            }
+            if (token == "linear") {
+                easing = TransitionEasing::Linear;
+                hasEasing = true;
+                continue;
+            }
+        }
+        float duration = 0.f;
+        float multiplier = 1.f;
+        if (token.size() >= 2 &&
+            EqualsIgnoreCase(token.substr(token.size() - 2), "ms")) {
+            token.remove_suffix(2);
+            multiplier = 0.001f;
+        } else if (!token.empty() &&
+                   (token.back() == 's' || token.back() == 'S')) {
+            token.remove_suffix(1);
+        } else if (token != "0") {
+            continue;
+        }
+        if (!ParseNumber(token, duration) || duration < 0.f) return false;
+        duration *= multiplier;
+        if (!hasDuration) {
+            speed = duration > 0.f ? 1.f / duration : 10000.f;
+            hasDuration = true;
+        }
+    }
+    return hasDuration;
 }
 
 bool ParseColor(std::string_view text, Color& color) {
@@ -668,6 +835,77 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
         out.value = {{dimension, percent ? 1.f : 0.f, 0.f, 0.f}};
         return true;
     }
+    if (name == "position") {
+        if (value.size() >= 2 && value.front() == '(' && value.back() == ')') {
+            std::string_view coordinates = Trim(value.substr(1, value.size() - 2));
+            const size_t comma = coordinates.find(',');
+            if (comma == std::string_view::npos ||
+                coordinates.find(',', comma + 1) != std::string_view::npos)
+                return false;
+            float x = 0.f, y = 0.f;
+            bool xSet = false, ySet = false, xPercent = false, yPercent = false;
+            if (!ParseOffset(coordinates.substr(0, comma), x, xSet, xPercent) ||
+                !ParseOffset(coordinates.substr(comma + 1), y, ySet, yPercent) ||
+                !xSet || !ySet)
+                return false;
+            out.prop = Prop::PositionCoordinates;
+            out.value = {{x, y, 0.f,
+                          static_cast<float>((xPercent ? 1 : 0) |
+                                             (yPercent ? 2 : 0))}};
+            return true;
+        }
+        PositionType position;
+        if (value == "static") position = PositionType::Static;
+        else if (value == "relative") position = PositionType::Relative;
+        else if (value == "absolute") position = PositionType::Absolute;
+        else if (value == "fixed") position = PositionType::Fixed;
+        else return false;
+        out.prop = Prop::Position;
+        out.value = {{static_cast<float>(position), 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "rotation" || name == "rotate") {
+        float degrees = 0.f;
+        if (!ParseAngle(value, degrees)) return false;
+        out.prop = Prop::Rotation;
+        out.value = {{degrees, 0.f, 0.f, 0.f}};
+        return true;
+    }
+    if (name == "translate") {
+        if (value.starts_with("translate(") && value.back() == ')')
+            value = Trim(value.substr(10, value.size() - 11));
+        std::string_view xToken, yToken;
+        const size_t comma = value.find(',');
+        if (comma != std::string_view::npos) {
+            if (value.find(',', comma + 1) != std::string_view::npos) return false;
+            xToken = Trim(value.substr(0, comma));
+            yToken = Trim(value.substr(comma + 1));
+        } else {
+            const size_t split = value.find_first_of(" \t\r\n");
+            xToken = Trim(value.substr(0, split));
+            yToken = split == std::string_view::npos
+                ? std::string_view{"0px"} : Trim(value.substr(split + 1));
+            if (yToken.find_first_of(" \t\r\n") != std::string_view::npos) return false;
+        }
+        float x = 0.f, y = 0.f;
+        bool xSet = false, ySet = false, xPercent = false, yPercent = false;
+        if (!ParseOffset(xToken, x, xSet, xPercent) ||
+            !ParseOffset(yToken, y, ySet, yPercent) || !xSet || !ySet)
+            return false;
+        out.prop = Prop::Translate;
+        out.value = {{x, y, xPercent ? 1.f : 0.f, yPercent ? 1.f : 0.f}};
+        return true;
+    }
+    if (name == "top" || name == "right" || name == "bottom" || name == "left") {
+        float offset = 0.f;
+        bool set = false, percent = false;
+        if (!ParseOffset(value, offset, set, percent)) return false;
+        out.prop = name == "top" ? Prop::OffsetTop
+            : name == "right" ? Prop::OffsetRight
+            : name == "bottom" ? Prop::OffsetBottom : Prop::OffsetLeft;
+        out.value = {{offset, set ? 1.f : 0.f, percent ? 1.f : 0.f, 0.f}};
+        return true;
+    }
     if (name == "align" || name == "alignment") {
         HorizontalAlignment horizontal = HorizontalAlignment::Auto;
         VerticalAlignment vertical = VerticalAlignment::Auto;
@@ -814,6 +1052,23 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     }
     if (name == "opacity") return number(Prop::Opacity);
     if (name == "transition-speed") return number(Prop::TransitionSpeed);
+    if (name == "transition" || name == "transition-duration") {
+        float speed = 0.f;
+        TransitionEasing easing = TransitionEasing::Linear;
+        if (!ParseTransition(value, speed, easing)) return false;
+        out.prop = Prop::TransitionSpeed;
+        out.value = {{speed, 0.f, 0.f, 0.f}};
+        if (name == "transition") {
+            switch (easing) {
+                case TransitionEasing::Linear: out.text = "linear"; break;
+                case TransitionEasing::Ease: out.text = "ease"; break;
+                case TransitionEasing::EaseIn: out.text = "ease-in"; break;
+                case TransitionEasing::EaseOut: out.text = "ease-out"; break;
+                case TransitionEasing::EaseInOut: out.text = "ease-in-out"; break;
+            }
+        }
+        return true;
+    }
     if (name == "padding") {
         float values[4]{};
         size_t count = 0;
@@ -1461,16 +1716,23 @@ StyleSheet StyleSheet::Dark() {
         .BorderWidth(1).Rounding(5).Padding(Edges(6, 8));
     s.Rule("input-text:active").BorderColor(C::FromHex(0x5A91F7FF));
     s.Rule("selectable").Foreground(C::FromHex(0xDCE6F5FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
         .Padding(Edges(5, 8));
     s.Rule("selectable:hover").Background(C::FromHex(0x253449FF));
     s.Rule("selectable:checked").Background(C::FromHex(0x2F5E9AFF));
     s.Rule("tree-node").Foreground(C::FromHex(0xDCE6F5FF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
         .Padding(Edges(4, 8));
     s.Rule("tree-node:hover").Background(C::FromHex(0x253449FF));
     s.Rule("collapsing-header").Background(C::FromHex(0x1B2839FF))
-        .Foreground(C::FromHex(0xF1F5FCFF)).Padding(Edges(6, 8));
+        .Foreground(C::FromHex(0xF1F5FCFF))
+        .BorderColor(C::FromHex(0x3A4B64FF)).BorderWidth(1).Rounding(5)
+        .Padding(Edges(6, 8));
     s.Rule("collapsing-header:hover").Background(C::FromHex(0x253449FF));
     s.Rule("separator").Foreground(C::FromHex(0x526783FF)).BorderWidth(1);
+    s.Rule("separator-text").Foreground(C::FromHex(0xAEBBD0FF))
+        .BorderColor(C::FromHex(0x526783FF)).BorderWidth(1)
+        .Padding(Edges(3, 8)).Spacing(8);
     s.Rule("dock-preview").Background(C::FromHex(0x4D83F7FF)).Accent(C::FromHex(0x73A5FFFF))
         .Rounding(14);
     s.Rule("dock-splitter").Background(C::FromHex(0x8999B0AA)).Rounding(2);

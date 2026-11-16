@@ -25,6 +25,8 @@ std::string_view ExplicitLabelID(std::string_view s) {
     return p == std::string_view::npos ? std::string_view{} : s.substr(p + 2);
 }
 
+size_t NextCodepoint(std::string_view text, size_t offset);
+
 WidgetId HashLabel(std::string_view label, WidgetId seed) {
     const size_t separator = label.find("##");
     if (separator != std::string_view::npos) label.remove_prefix(separator + 2);
@@ -32,6 +34,21 @@ WidgetId HashLabel(std::string_view label, WidgetId seed) {
 }
 
 Color Fade(Color c, float opacity) { c.a *= opacity; return c; }
+
+float EaseProgress(float progress, TransitionEasing easing) {
+    progress = std::clamp(progress, 0.f, 1.f);
+    switch (easing) {
+        case TransitionEasing::Ease: return progress * progress * (3.f - 2.f * progress);
+        case TransitionEasing::EaseIn: return progress * progress;
+        case TransitionEasing::EaseOut: return 1.f - (1.f - progress) * (1.f - progress);
+        case TransitionEasing::EaseInOut:
+            return progress < 0.5f
+                ? 2.f * progress * progress
+                : 1.f - 2.f * (1.f - progress) * (1.f - progress);
+        case TransitionEasing::Linear: return progress;
+    }
+    return progress;
+}
 
 bool KeyDown(const InputState& input, size_t key) {
     return key < InputState::KeyCount && input.keysDown[key];
@@ -87,6 +104,7 @@ constexpr float kDockTargetSize = 28.f;
 constexpr float kDockTargetGap = 4.f;
 constexpr float kDockCompassSize = 104.f;
 constexpr float kContainerScrollbarSize = 8.f;
+constexpr size_t kMaxDockedChildren = 4;
 
 float ScrollbarSize(ScrollbarWidth width, float defaultSize) {
     switch (width) {
@@ -95,6 +113,21 @@ float ScrollbarSize(ScrollbarWidth width, float defaultSize) {
         case ScrollbarWidth::Auto: return defaultSize;
     }
     return defaultSize;
+}
+
+float ResolveScrollbarSize(ScrollbarWidth inheritedWidth,
+                           const ComputedStyle& scrollbarStyle,
+                           float defaultSize, float availableSize) {
+    if (inheritedWidth == ScrollbarWidth::None ||
+        scrollbarStyle.scrollbarWidth == ScrollbarWidth::None)
+        return 0.f;
+    float size = scrollbarStyle.width >= 0.f
+        ? (scrollbarStyle.widthPercent
+            ? availableSize * scrollbarStyle.width : scrollbarStyle.width)
+        : ScrollbarSize(scrollbarStyle.scrollbarWidth == ScrollbarWidth::Auto
+                            ? inheritedWidth : scrollbarStyle.scrollbarWidth,
+                        defaultSize);
+    return std::clamp(size, 0.f, std::max(0.f, availableSize));
 }
 
 struct ContainerViewport {
@@ -299,6 +332,7 @@ void Context::BringLayerToFront(DrawList::Layer& layer) {
 }
 
 const DrawList& Context::EndFrame() {
+    draw_.SetRotation({0.f, 0.f, in_.displaySize.x, in_.displaySize.y}, 0.f);
     if (const auto focused = windows_.find(focusedWindow_);
         focused != windows_.end() && focused->second.hasDrawLayer)
         BringLayerToFront(focused->second.drawLayer);
@@ -493,7 +527,8 @@ ComputedStyle Context::Animate(WidgetId id, std::string_view widget, uint8_t ext
     an.hover  += ((hovered || held ? 1.f : 0.f) - an.hover) * k;
     an.active += ((held ? 1.f : 0.f) - an.active) * k;
 
-    return Lerp(Lerp(n, h, an.hover), a, an.active);
+    return Lerp(Lerp(n, h, EaseProgress(an.hover, n.transitionEasing)),
+                a, EaseProgress(an.active, n.transitionEasing));
 }
 
 ComputedStyle Context::AnimateLabel(WidgetId id, std::string_view widget, uint8_t extra,
@@ -506,7 +541,8 @@ ComputedStyle Context::AnimateLabel(WidgetId id, std::string_view widget, uint8_
     const float k = std::min(1.f, in_.deltaTime * n.transitionSpeed);
     an.hover += ((hovered || held ? 1.f : 0.f) - an.hover) * k;
     an.active += ((held ? 1.f : 0.f) - an.active) * k;
-    return Lerp(Lerp(n, h, an.hover), a, an.active);
+    return Lerp(Lerp(n, h, EaseProgress(an.hover, n.transitionEasing)),
+                a, EaseProgress(an.active, n.transitionEasing));
 }
 
 Context::Interaction Context::Behavior(WidgetId id, Rect r) {
@@ -711,6 +747,10 @@ void Context::JoinTab(WidgetId id, WidgetId target) {
     if (targetDock == DockSide::Center) {
         auto& center = dockedWindows_[static_cast<size_t>(DockSide::Center)];
         if (std::find(center.begin(), center.end(), id) != center.end()) return;
+        if (center.size() >= kMaxDockedChildren) {
+            Notification("A window group cannot contain more than 4 windows");
+            return;
+        }
         if (dragged->second.dock == DockSide::None)
             dragged->second.dockRestoreSize = dragged->second.size;
         DetachTab(id);
@@ -726,6 +766,15 @@ void Context::JoinTab(WidgetId id, WidgetId target) {
     if (dragged->second.tabGroup != 0 &&
         dragged->second.tabGroup == targetWindow->second.tabGroup)
         return;
+
+    const auto targetGroup = targetWindow->second.tabGroup == 0
+        ? tabGroups_.end() : tabGroups_.find(targetWindow->second.tabGroup);
+    const size_t targetGroupSize = targetGroup == tabGroups_.end()
+        ? 1 : targetGroup->second.windows.size();
+    if (targetGroupSize >= kMaxDockedChildren) {
+        Notification("A window group cannot contain more than 4 windows");
+        return;
+    }
 
     const DockSide draggedDock = dragged->second.dock;
     const Vec2 restoreSize = dragged->second.size;
@@ -812,12 +861,49 @@ Rect Context::Place(Vec2 size, float spacing) {
 }
 
 Rect Context::PlaceStyled(Vec2 size, const ComputedStyle& style) {
+    const bool fixed = style.position == PositionType::Fixed;
+    const float referenceWidth = fixed ? in_.displaySize.x : content_.w;
+    const float referenceHeight = fixed ? in_.displaySize.y : content_.h;
+    auto applyTransform = [&](Rect rect) {
+        rect.x += style.translateXPercent ? rect.w * style.translate.x
+                                           : style.translate.x;
+        rect.y += style.translateYPercent ? rect.h * style.translate.y
+                                           : style.translate.y;
+        draw_.SetRotation(rect, style.rotation);
+        return rect;
+    };
     if (style.width >= 0.f)
-        size.x = style.widthPercent ? content_.w * style.width : style.width;
+        size.x = style.widthPercent ? referenceWidth * style.width : style.width;
     if (style.height >= 0.f)
-        size.y = style.heightPercent ? content_.h * style.height : style.height;
+        size.y = style.heightPercent ? referenceHeight * style.height : style.height;
 
     const Rect parent = content_;
+    if (style.position == PositionType::Absolute ||
+        style.position == PositionType::Fixed) {
+        if (nextItemWidth_) {
+            const float width = *nextItemWidth_;
+            const float right = content_.x + content_.w;
+            size.x = width >= 0.f
+                ? width
+                : std::max(0.f, right -
+                    (sameLine_ ? lastRight_ + style.spacing : content_.x) + width);
+            nextItemWidth_.reset();
+        }
+        const float originX = fixed ? 0.f : parent.x;
+        const float originY = fixed ? 0.f : parent.y;
+        const float extentX = fixed ? in_.displaySize.x : parent.w;
+        const float extentY = fixed ? in_.displaySize.y : parent.h;
+        const float left = style.leftPercent ? extentX * style.left : style.left;
+        const float right = style.rightPercent ? extentX * style.right : style.right;
+        const float top = style.topPercent ? extentY * style.top : style.top;
+        const float bottom = style.bottomPercent ? extentY * style.bottom : style.bottom;
+        const float x = style.leftSet ? originX + left
+            : style.rightSet ? originX + extentX - right - size.x : originX;
+        const float y = style.topSet ? originY + top
+            : style.bottomSet ? originY + extentY - bottom - size.y : originY;
+        return applyTransform({x, y, size.x, size.y});
+    }
+
     const bool horizontal = horizontalLayout_;
     const bool sameLine = sameLine_;
     Rect rect = Place(size, style.spacing);
@@ -850,7 +936,17 @@ Rect Context::PlaceStyled(Vec2 size, const ComputedStyle& style) {
         cursorX_ = rect.x + rect.w + style.spacing;
     }
     lastRight_ = rect.x + rect.w;
-    return rect;
+    if (style.position == PositionType::Relative) {
+        const float left = style.leftPercent ? parent.w * style.left : style.left;
+        const float right = style.rightPercent ? parent.w * style.right : style.right;
+        const float top = style.topPercent ? parent.h * style.top : style.top;
+        const float bottom = style.bottomPercent ? parent.h * style.bottom : style.bottom;
+        if (style.leftSet) rect.x += left;
+        else if (style.rightSet) rect.x -= right;
+        if (style.topSet) rect.y += top;
+        else if (style.bottomSet) rect.y -= bottom;
+    }
+    return applyTransform(rect);
 }
 
 void Context::DrawStyledColor(Rect r, Color color, const LinearGradient& gradient,
@@ -873,6 +969,7 @@ CornerRadii ExpandRadii(CornerRadii radii, float amount) {
 } // namespace
 
 void Context::DrawBox(Rect r, const ComputedStyle& s) {
+    draw_.SetRotation(r, s.rotation);
     if (s.shadowEnabled) {
         if (!s.shadowColorGradient.Empty())
             draw_.AddShadowGradient(r, s.shadowColorGradient, s.opacity,
@@ -910,17 +1007,18 @@ void Context::DrawOutline(Rect r, const ComputedStyle& s) {
 }
 
 void Context::EmitText(Vec2 pos, std::string_view text, const ComputedStyle& style) {
+    if (text.empty()) return;
+
+    const size_t vertexStart = draw_.Vertices().size();
     if (style.textGradient.Empty()) {
         text_->Emit(draw_, pos, text, style.fontSize, Fade(style.foreground, style.opacity));
-        return;
+    } else {
+        const Vec2 size = text_->Measure(text, style.fontSize);
+        text_->Emit(draw_, pos, text, style.fontSize, Color{1.f, 1.f, 1.f, 1.f});
+        draw_.ApplyLinearGradient(vertexStart, draw_.Vertices().size(),
+                                  {pos.x, pos.y, size.x, size.y},
+                                  style.textGradient, style.opacity);
     }
-
-    const Vec2 size = text_->Measure(text, style.fontSize);
-    const size_t vertexStart = draw_.Vertices().size();
-    text_->Emit(draw_, pos, text, style.fontSize, Color{1.f, 1.f, 1.f, 1.f});
-    draw_.ApplyLinearGradient(vertexStart, draw_.Vertices().size(),
-                              {pos.x, pos.y, size.x, size.y},
-                              style.textGradient, style.opacity);
 }
 
 void Context::DrawBackgroundImage(Rect r, const ComputedStyle& s) {
@@ -1099,6 +1197,10 @@ void Context::ClippedList(int count, const std::function<void(int)>& drawItem,
 }
 
 void Context::Separator() {
+    HorizontalSeparator();
+}
+
+void Context::HorizontalSeparator() {
     const ComputedStyle style = Resolve("separator", 0);
     const Rect rect = PlaceStyled({content_.w, std::max(1.f, style.borderWidth)}, style);
     const bool hasBorderColor = style.borderColor.a > 0.f ||
@@ -1107,6 +1209,37 @@ void Context::Separator() {
                     hasBorderColor ? style.borderColorGradient : style.textGradient,
                     style.opacity * (hasBorderColor ? 1.f : 0.25f));
     SetLastItem(GetID("##separator"), rect, {});
+}
+
+void Context::HorizontalSeparatorText(std::string_view text) {
+    const ComputedStyle style = ResolveLabel("separator-text", 0, text);
+    const std::string_view visible = DisplayLabel(text);
+    const Vec2 textSize = text_->Measure(visible, style.fontSize);
+    const float lineHeight = std::max(1.f, style.borderWidth);
+    const float height = std::max(textSize.y, lineHeight) + style.padding.Vertical();
+    const Rect rect = PlaceStyled({content_.w, height}, style);
+    const float centerY = rect.y + rect.h * 0.5f;
+    const float labelWidth = textSize.x + style.padding.Horizontal();
+    const float gap = style.spacing;
+    const float centerX = rect.x + rect.w * 0.5f;
+    const bool hasBorderColor = style.borderColor.a > 0.f ||
+                                !style.borderColorGradient.Empty();
+    const Color lineColor = hasBorderColor ? style.borderColor : style.foreground;
+    const LinearGradient& lineGradient = hasBorderColor
+        ? style.borderColorGradient : style.textGradient;
+    const float lineOpacity = style.opacity * (hasBorderColor ? 1.f : 0.25f);
+    const float leftWidth = std::max(0.f, centerX - (labelWidth * 0.5f) - gap - rect.x);
+    const float rightX = centerX + labelWidth * 0.5f + gap;
+    const float rightWidth = std::max(0.f, rect.x + rect.w - rightX);
+    if (leftWidth > 0.f)
+        DrawStyledColor({rect.x, centerY - lineHeight * 0.5f, leftWidth, lineHeight},
+                        lineColor, lineGradient, lineOpacity);
+    if (rightWidth > 0.f)
+        DrawStyledColor({rightX, centerY - lineHeight * 0.5f, rightWidth, lineHeight},
+                        lineColor, lineGradient, lineOpacity);
+    EmitText({centerX - textSize.x * 0.5f,
+              rect.y + (rect.h - textSize.y) * 0.5f}, visible, style);
+    SetLastItem(GetID(text), rect, {});
 }
 
 bool Context::IsItemHovered() const { return lastItemHovered_; }
@@ -1355,6 +1488,7 @@ bool Context::LoadLayout(const std::string& path, std::string* error) {
         const WidgetId id = static_cast<WidgetId>(rawId);
         window.init = true;
         window.open = open != 0;
+        window.styleBasePos = window.pos;
         window.dock = static_cast<DockSide>(dock);
         window.contentHeight = window.scrollY + window.size.y;
         if (!loadedWindows.emplace(id, window).second)
@@ -2090,6 +2224,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
     if (!w.init) {
         w.init = true;
         w.pos = {initial.x, initial.y};
+        w.styleBasePos = w.pos;
         w.size = {initial.w, initial.h};
         w.zOrder = ++nextWindowZ_;
     }
@@ -2097,6 +2232,16 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
     if (!windowPaddingStack_.empty()) ws.padding = windowPaddingStack_.back();
     const ComputedStyle ts = ResolveLabel("window-title", 0, title);
     if (w.dock == DockSide::None) {
+        w.pos = w.pos - w.styleTranslate;
+        w.styleTranslate = {};
+        if (w.stylePosition != ws.position) {
+            if (w.stylePosition != PositionType::Static &&
+                ws.position == PositionType::Static)
+                w.pos = w.styleBasePos;
+            else if (ws.position != PositionType::Static)
+                w.styleBasePos = w.pos;
+            w.stylePosition = ws.position;
+        }
         if (ws.width >= 0.f)
             w.size.x = std::max(0.f, ws.widthPercent
                 ? in_.displaySize.x * ws.width : ws.width);
@@ -2119,6 +2264,28 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
             else
                 w.pos.y = 0.f;
         }
+        if (ws.position != PositionType::Static) {
+            const bool relative = ws.position == PositionType::Relative;
+            const float originX = relative ? w.styleBasePos.x : 0.f;
+            const float originY = relative ? w.styleBasePos.y : 0.f;
+            const float left = ws.leftPercent ? in_.displaySize.x * ws.left : ws.left;
+            const float right = ws.rightPercent ? in_.displaySize.x * ws.right : ws.right;
+            const float top = ws.topPercent ? in_.displaySize.y * ws.top : ws.top;
+            const float bottom = ws.bottomPercent ? in_.displaySize.y * ws.bottom : ws.bottom;
+            w.pos.x = ws.leftSet ? originX + left
+                : ws.rightSet ? originX + in_.displaySize.x - right - w.size.x
+                : originX;
+            w.pos.y = ws.topSet ? originY + top
+                : ws.bottomSet ? originY + in_.displaySize.y - bottom - w.size.y
+                : originY;
+        }
+        w.styleTranslate = {
+            ws.translateXPercent ? w.size.x * ws.translate.x : ws.translate.x,
+            ws.translateYPercent ? w.size.y * ws.translate.y : ws.translate.y
+        };
+        w.pos = w.pos + w.styleTranslate;
+    } else {
+        w.styleTranslate = {};
     }
     w.canDock = ws.windowCanDock;
     w.canBeChildDock = ws.windowChildDock;
@@ -2413,6 +2580,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
         windowStyle.cornerRadii = {};
         titleStyle.cornerRadii = {};
     }
+    draw_.SetRotation(frame, ws.rotation);
     DrawBox(frame, windowStyle);
     DrawBox(bar, titleStyle);
     float contentTop = titleH;
@@ -2494,8 +2662,10 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
     idStack_.push_back(id);
     currentWindowId_ = id;
 
+    const ComputedStyle scrollbarStyle = Resolve("window-scrollbar", 0);
     const float scrollBarWidth = HasWindowFlag(flags, WindowFlags::NoScrollbar)
-        ? 0.f : ScrollbarSize(ws.scrollbarWidth, 7.f);
+        ? 0.f : ResolveScrollbarSize(ws.scrollbarWidth, scrollbarStyle, 7.f,
+                                     frame.w - ws.padding.Horizontal());
     const float contentHeight = std::max(
         0.f, frame.h - contentTop - ws.padding.Vertical());
     const bool reserveScrollbar = scrollBarWidth > 0.f &&
@@ -2542,6 +2712,7 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
 
 void Context::EndWindow() {
     while (!containerStack_.empty()) EndContainer();
+    draw_.SetRotation({0.f, 0.f, in_.displaySize.x, in_.displaySize.y}, 0.f);
     draw_.PopClipRect();
     if (!interactionClips_.empty()) interactionClips_.pop_back();
     if (currentWindowId_ != 0) {
@@ -2670,8 +2841,9 @@ bool Context::BeginContainerImpl(Vec2 size, bool horizontal,
     const Rect baseContent{frame.x + style.padding.left, frame.y + style.padding.top,
                            std::max(0.f, frame.w - style.padding.Horizontal()),
                            std::max(0.f, frame.h - style.padding.Vertical())};
-    const float scrollbarSize = ScrollbarSize(style.scrollbarWidth,
-                                              kContainerScrollbarSize);
+    const ComputedStyle scrollbarStyle = Resolve("container-scrollbar", 0);
+    const float scrollbarSize = ResolveScrollbarSize(
+        style.scrollbarWidth, scrollbarStyle, kContainerScrollbarSize, baseContent.w);
     const ContainerViewport previousViewport = CalculateContainerViewport(
         baseContent, scroll.contentWidth, scroll.contentHeight, scrollbarSize);
     scroll.scrollX = std::clamp(scroll.scrollX, 0.f,
@@ -2724,6 +2896,7 @@ void Context::EndContainer() {
     draw_.PopClipRect();
     if (!interactionClips_.empty()) interactionClips_.pop_back();
     ContainerState& container = containerStack_.back();
+    draw_.SetRotation(container.frame, 0.f);
     ContainerScrollState& scroll = containerScrollStates_[container.id];
     scroll.contentWidth = std::max(0.f, container.contentRight - container.baseContent.x);
     scroll.contentHeight = std::max(0.f, container.contentBottom - container.baseContent.y);
@@ -2861,11 +3034,11 @@ void Context::DrawTextCentered(Rect r, std::string_view text, const ComputedStyl
 }
 
 void Context::DrawTextAligned(Rect r, std::string_view text, const ComputedStyle& style) {
-    const Vec2 measured = text_->Measure(text, style.fontSize);
     const float left = r.x + style.padding.left;
     const float right = r.x + r.w - style.padding.right;
     const float top = r.y + style.padding.top;
     const float bottom = r.y + r.h - style.padding.bottom;
+    const Vec2 measured = text_->Measure(text, style.fontSize);
     float x = left;
     if (style.textAlign == TextAlignment::Center)
         x = left + (right - left - measured.x) * 0.5f;
@@ -4277,8 +4450,9 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
     selection.anchor = std::min(selection.anchor, text.size());
     selection.focus = std::min(selection.focus, text.size());
 
+    const ComputedStyle trackStyle = Resolve("window-scrollbar", 0);
     const float trackWidth = hasOverflow
-        ? ScrollbarSize(style.scrollbarWidth, 8.f) : 0.f;
+        ? ResolveScrollbarSize(style.scrollbarWidth, trackStyle, 8.f, inner.w) : 0.f;
     const bool hasScrollbar = trackWidth > 0.f;
     const Rect textViewport{inner.x, inner.y,
                             std::max(0.f, inner.w - (hasScrollbar ? trackWidth + 4.f : 0.f)),
@@ -4405,7 +4579,6 @@ void Context::ConsoleOutputImpl(std::string_view label, std::string_view text,
     }
     draw_.PopClipRect();
     if (hasScrollbar) {
-        const ComputedStyle trackStyle = Resolve("window-scrollbar", 0);
         DrawStyledColor(track, trackStyle.background, trackStyle.backgroundGradient,
                         trackStyle.opacity, trackWidth * 0.5f);
         DrawStyledColor({thumb.x, thumbY, thumb.w, thumb.h},

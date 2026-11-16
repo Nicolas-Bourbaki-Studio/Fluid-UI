@@ -158,6 +158,9 @@ Color SampleGradient(const LinearGradient& gradient, Vec2 point, Rect bounds) {
 
 void DrawList::Clear() {
     vtx_.clear(); idx_.clear(); cmds_.clear(); clipStack_.clear();
+    rotationCenter_ = {};
+    rotationCos_ = 1.f;
+    rotationSin_ = 0.f;
     breakCommand_ = false;
 }
 
@@ -171,6 +174,22 @@ void DrawList::PushClipRect(Rect r) {
 
 void DrawList::PopClipRect() {
     if (!clipStack_.empty()) clipStack_.pop_back();
+}
+
+void DrawList::SetRotation(Rect bounds, float degrees) {
+    constexpr float radiansPerDegree = 3.14159265358979f / 180.f;
+    const float radians = degrees * radiansPerDegree;
+    rotationCenter_ = {bounds.x + bounds.w * 0.5f, bounds.y + bounds.h * 0.5f};
+    rotationCos_ = std::cos(radians);
+    rotationSin_ = std::sin(radians);
+}
+
+void DrawList::AddVertex(Vec2 position, Vec2 uv, uint32_t color) {
+    const float x = position.x - rotationCenter_.x;
+    const float y = position.y - rotationCenter_.y;
+    const Vec2 rotated{rotationCenter_.x + x * rotationCos_ - y * rotationSin_,
+                       rotationCenter_.y + x * rotationSin_ + y * rotationCos_};
+    vtx_.push_back({rotated, uv, color});
 }
 
 DrawList::Layer DrawList::BeginLayer() {
@@ -307,7 +326,7 @@ void DrawList::AddConvexFill(const Vec2* p, int n, Color c) {
     PrepareCmd(0);
     const uint32_t col = c.ToU32();
     const uint32_t base = static_cast<uint32_t>(vtx_.size());
-    for (int i = 0; i < n; ++i) vtx_.push_back({p[i], {0.f, 0.f}, col});
+    for (int i = 0; i < n; ++i) AddVertex(p[i], {}, col);
     for (int i = 1; i < n - 1; ++i) {
         idx_.push_back(base);
         idx_.push_back(base + i);
@@ -376,7 +395,7 @@ void DrawList::AddConvexFillGradient(const Vec2* points, int count,
     for (int i = 0; i < count; ++i) {
         Color color = SampleGradient(gradient, points[i], bounds);
         color.a *= opacity;
-        vtx_.push_back({points[i], {0.f, 0.f}, color.ToU32()});
+        AddVertex(points[i], {}, color.ToU32());
     }
     for (int i = 1; i < count - 1; ++i) {
         idx_.push_back(base);
@@ -425,7 +444,7 @@ void DrawList::AddBorderRing(Rect r, Color color, const LinearGradient* gradient
     auto addVertex = [&](Vec2 position) {
         Color vertexColor = gradient ? SampleGradient(*gradient, position, r) : color;
         if (gradient) vertexColor.a *= opacity;
-        vtx_.push_back({position, {0.f, 0.f}, vertexColor.ToU32()});
+        AddVertex(position, {}, vertexColor.ToU32());
     };
     for (Vec2 position : outer) addVertex(position);
     for (Vec2 position : inner) addVertex(position);
@@ -476,10 +495,10 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
     PrepareCmd(imageId);
     const uint32_t col = c.ToU32();
     const uint32_t base = static_cast<uint32_t>(vtx_.size());
-    vtx_.push_back({{r.x,       r.y},       {uv.x,        uv.y},        col});
-    vtx_.push_back({{r.x + r.w, r.y},       {uv.x + uv.w, uv.y},        col});
-    vtx_.push_back({{r.x + r.w, r.y + r.h}, {uv.x + uv.w, uv.y + uv.h}, col});
-    vtx_.push_back({{r.x,       r.y + r.h}, {uv.x,        uv.y + uv.h}, col});
+    AddVertex({r.x, r.y}, {uv.x, uv.y}, col);
+    AddVertex({r.x + r.w, r.y}, {uv.x + uv.w, uv.y}, col);
+    AddVertex({r.x + r.w, r.y + r.h}, {uv.x + uv.w, uv.y + uv.h}, col);
+    AddVertex({r.x, r.y + r.h}, {uv.x, uv.y + uv.h}, col);
     const uint32_t i[6] = {0, 1, 2, 0, 2, 3};
     for (uint32_t k : i) idx_.push_back(base + k);
 
@@ -496,7 +515,7 @@ void DrawList::AddQuad(Rect r, Rect uv, Color c, GPUImageId imageId) {
             Vertex outer = vtx_[base + static_cast<uint32_t>(corner)];
             outer.pos = outerPositions[corner];
             outer.col &= 0x00FFFFFFu;
-            vtx_.push_back(outer);
+            AddVertex(outer.pos, outer.uv, outer.col);
         }
         for (uint32_t edge = 0; edge < 4; ++edge) {
             const uint32_t next = (edge + 1) % 4;

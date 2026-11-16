@@ -21,11 +21,14 @@ enum class Prop : uint8_t {
     BackgroundGradient, TextGradient, ForegroundGradient, AccentGradient,
     BorderColorGradient, ShadowColorGradient, RoundingTopLeft, RoundingTopRight,
     RoundingBottomRight, RoundingBottomLeft, WindowCanDock, WindowChildDock,
-    ScrollbarWidth
+    ScrollbarWidth, Position, PositionCoordinates, OffsetTop, OffsetRight, OffsetBottom,
+    OffsetLeft, Rotation, Translate
 };
 
 enum class BackgroundFit : uint8_t { Stretch, Cover, Contain };
 enum class ScrollbarWidth : uint8_t { Auto, Thin, None };
+enum class PositionType : uint8_t { Static, Relative, Absolute, Fixed };
+enum class TransitionEasing : uint8_t { Linear, Ease, EaseIn, EaseOut, EaseInOut };
 enum class HorizontalAlignment : uint8_t { Auto, Start, Center, End };
 enum class VerticalAlignment : uint8_t { Auto, Start, Center, End };
 enum class TextAlignment : uint8_t { Start, Center, End };
@@ -57,6 +60,14 @@ struct ComputedStyle {
     float height = -1.f;
     bool widthPercent = false;
     bool heightPercent = false;
+    PositionType position = PositionType::Static;
+    float top = 0.f, right = 0.f, bottom = 0.f, left = 0.f;
+    bool topSet = false, rightSet = false, bottomSet = false, leftSet = false;
+    bool topPercent = false, rightPercent = false, bottomPercent = false,
+         leftPercent = false;
+    float rotation = 0.f;
+    Vec2 translate;
+    bool translateXPercent = false, translateYPercent = false;
     HorizontalAlignment justifySelf = HorizontalAlignment::Auto;
     VerticalAlignment alignSelf = VerticalAlignment::Auto;
     TextAlignment textAlign = TextAlignment::Start;
@@ -71,6 +82,7 @@ struct ComputedStyle {
     ScrollbarWidth scrollbarWidth = ScrollbarWidth::Auto;
     float opacity     = 1.f;
     float transitionSpeed = 14.f; // higher = snappier
+    TransitionEasing transitionEasing = TransitionEasing::Linear;
     Edges padding {4.f, 8.f, 4.f, 8.f};
     GPUImageId backgroundImage = 0;
     Vec2 backgroundImageSize;

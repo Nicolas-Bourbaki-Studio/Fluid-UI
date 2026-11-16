@@ -658,7 +658,7 @@ int main(int argc, char** argv) {
 
     if (!glfwInit()) return 1;
     glfwWindowHint(GLFW_SAMPLES, 4);
-    GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI component and docking demo", nullptr, nullptr);
+    GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI | Testing Demo | Version Smoke 2.0", nullptr, nullptr);
     if (!win) { glfwTerminate(); return 1; }
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);
@@ -1146,6 +1146,7 @@ int main(int argc, char** argv) {
             if (ui.Selectable("Selectable row", selectedItem == 0)) selectedItem = 0;
             if (ui.Selectable("Second row", selectedItem == 1)) selectedItem = 1;
 
+            ui.HorizontalSeparatorText("Hierarchy");
             if (ui.TreeNode("Tree node", Context::TreeNode_DefaultOpen)) {
                 ui.Text("Nested tree content");
                 ui.TreePop();
@@ -1153,6 +1154,7 @@ int main(int argc, char** argv) {
             if (ui.CollapsingHeader("Collapsing header")) {
                 ui.Text("Header content is visible.");
             }
+            ui.HorizontalSeparator();
 
             if (ui.Button("Open popup")) ui.OpenPopup("Advanced popup");
             if (ui.BeginPopup("Advanced popup")) {

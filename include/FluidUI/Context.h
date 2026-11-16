@@ -192,6 +192,8 @@ public:
     void SameLine();
     void Spacing(float pixels);
     void Separator();
+    void HorizontalSeparator();
+    void HorizontalSeparatorText(std::string_view text);
     void DockWindows(bool enabled) { dockingEnabled_ = enabled; }
 
     // Styling / IDs
@@ -216,7 +218,8 @@ private:
     };
     struct WindowState {
         std::string title;
-        Vec2 pos, size, dragOff, dockDragStartPos, resizeStart, startSize, resizeStartPos;
+        Vec2 pos, size, styleBasePos, styleTranslate, dragOff, dockDragStartPos,
+             resizeStart, startSize, resizeStartPos;
         Vec2 dockRestoreSize, lastTitleClickPos;
         float scrollY = 0.f, contentHeight = 0.f, scrollDragOffset = 0.f;
         float scrollbarWidth = 7.f;
@@ -226,6 +229,7 @@ private:
         uint64_t zOrder = 0;
         DrawList::Layer drawLayer;
         DockSide dock = DockSide::None;
+        PositionType stylePosition = PositionType::Static;
         uint8_t resizeEdges = 0;
         bool init = false, open = true, hasDrawLayer = false;
         bool canDock = true, canBeChildDock = true;

@@ -1,6 +1,8 @@
 :root {
     --ui-accent: rgb(31, 83, 255);
     --ui-accent-muted: rgb(22, 56, 168);
+    --ui-accent-highlight: hsl(229, 100%, 63%);
+
 
     --ui-window: #080808;
     --ui-sunken: linear-gradient(180deg, #080808 0%, #000000 100%);
@@ -9,8 +11,8 @@
     --ui-panel-active: #0c0c0c;
     --ui-overlay: transparent;
 
-    --ui-border: #22222277;
-    --ui-border-hover: #242932;
+    --ui-border: #2e2e2e77;
+    --ui-border-hover: #49494977;
     --ui-window-border: linear-gradient(180deg, #070707 0%, #030303 100%);
 
     --ui-text: #E8E8E8;
@@ -21,9 +23,9 @@
     --ui-danger-hover: #E54850;
     --ui-danger-border: #B92D35;
 
-    --ui-radius: 8px;
+    --ui-radius: 9px;
     --ui-outline-width: 1px;
-    --ui-dock-splitter: rgba(255, 255, 255, 0.116)
+    --ui-dock-splitter: rgba(77, 77, 77, 0.116);
 }
 
 
@@ -31,6 +33,7 @@
     color: #2eee2e;
     font-size: 20px;
     gap: 6px;
+    rotation: 0deg;
     transition-speed: 20;
     shadow-color: rgba(226, 20, 20, 0.521);
 }
@@ -39,8 +42,8 @@
     color: var(--ui-text);
     font-size: 18px;
     gap: 6px;
-    transition-speed: 20;
-    shadow-color: rgba(0, 0, 0, 0.521);
+    transition-speed: 25;
+    shadow-color: rgba(0, 0, 0, 0.274);
 }
 
 *:disabled {
@@ -52,9 +55,9 @@ window {
     border-color: var(--ui-window-border);
     border-width: var(--ui-outline-width);
     border-radius: var(--ui-radius);
-    outline: 2px solid var(--ui-window-border);
+    outline: 1.5px solid var(--ui-window-border);
     shadow-enabled: true;
-    padding: 5px;
+    padding: 8px;
     window-can-dock: true;
     window-child-dock: true;
 }
@@ -149,13 +152,14 @@ menu-item:checked {
 }
 
 window-scrollbar {
-    background: var(--ui-panel);
-    accent: var(--ui-accent);
+    background: var(--ui-overlay);
+    width: 2px;
+    accent: var(--ui-border);
 }
 
 container-scrollbar {
-    background: var(--ui-panel);
-    accent: var(--ui-accent);
+    background: var(--ui-overlay);
+    width: 2px;
 }
 
 window-resize {
@@ -226,7 +230,6 @@ empty-widget.brand {
 }
 
 image-widget {
-    background: var(--ui-panel);
     border-color: var(--ui-border);
     border-width: 1px;
     border-radius: var(--ui-radius);
@@ -377,7 +380,8 @@ input-text:active {
 selectable,
 tree-node {
     background: var(--ui-panel);
-    border: 0px solid var(--ui-border);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
     color: var(--ui-text);
     padding: 5px 8px;
 }
@@ -389,18 +393,29 @@ collapsing-header:hover {
 }
 
 selectable:checked {
-    background: var(--ui-accent-muted);
+    background: var(--ui-accent);
+    border: 1px solid var(--ui-accent-highlight);
 }
 
 collapsing-header {
     background: var(--ui-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
     color: var(--ui-text);
     padding: 6px 8px;
 }
 
 separator {
-    color: var(--ui-border-hover);
+    color: var(--ui-text-secondary);
     border-width: 1px;
+}
+
+separator-text {
+    color: var(--ui-text-secondary);
+    border-color: var(--ui-border-hover);
+    border-width: 1px;
+    padding: 3px 8px;
+    gap: 8px;
 }
 
 console-output-normal {
@@ -436,14 +451,13 @@ context-menu-item:hover {
 
 hint,
 notification {
-    background: var(--ui-panel);
+    background: var(--ui-accent);
     color: var(--ui-text);
     border: 1px solid var(--ui-border-hover);
     border-radius: var(--ui-radius);
     padding: 7px 11px;
     shadow-enabled: true;
-    shadow-color: rgba(0, 0, 0, 0.72);
-    shadow-blur: 12px;
+    shadow-color: #182c8623;
 }
 
 notification {
@@ -454,20 +468,20 @@ notification {
 
 checkbox,
 radio {
-    background: var(--ui-panel-hover);
+    background: var(--ui-panel);
     border-color: var(--ui-border);
     border-width: 1px;
-    border-radius: var(--ui-radius);
+    border-radius: 1000px;
     accent: var(--ui-accent);
 }
 
 checkbox:hover,
 radio:hover {
-    border-color: var(--ui-accent);
+    border-color: var(--ui-panel-hover);
 }
 
 toggle {
-    background: var(--ui-panel-active);
+    background: var(--ui-panel);
     accent: var(--ui-accent);
     color: var(--ui-text);
     gap: 8px;
@@ -477,6 +491,8 @@ slider {
     background: var(--ui-panel-hover);
     accent: var(--ui-accent);
     border-radius: var(--ui-radius);
+    border-width: 1px;
+    border-color: var(--ui-border);
     padding: 4px 8px;
 }
 

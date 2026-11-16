@@ -30,6 +30,8 @@ public:
 
     void PushClipRect(Rect r);
     void PopClipRect();
+    void SetRotation(Rect bounds, float degrees);
+    Rect ClipRect() const { return CurrentClip(); }
     Layer BeginLayer();
     void EndLayer(Layer& layer);
     void BringLayerToFront(const Layer& layer);
@@ -74,6 +76,7 @@ public:
 private:
     Rect CurrentClip() const;
     void PrepareCmd(GPUImageId imageId);
+    void AddVertex(Vec2 position, Vec2 uv, uint32_t color);
     void FinishPrimitive();
     void BringLayerToFrontImpl(const Layer& layer, Layer* trackedLayer,
                                Layer* secondTrackedLayer = nullptr,
@@ -88,6 +91,8 @@ private:
     std::vector<uint32_t> idx_;
     std::vector<DrawCmd> cmds_;
     std::vector<Rect> clipStack_;
+    Vec2 rotationCenter_;
+    float rotationCos_ = 1.f, rotationSin_ = 0.f;
     bool breakCommand_ = false;
 };
 

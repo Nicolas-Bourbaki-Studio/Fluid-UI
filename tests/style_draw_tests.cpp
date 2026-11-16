@@ -78,6 +78,8 @@ int main() {
         "button.primary { background: blue; width: 0px; height: 0%;"
         " opacity: 0; border-radius: 0; outline: 0; text-align: right;"
         " vertical-align: bottom; align: center; }"
+        "selectable, tree-node, collapsing-header { border: 3px solid #abcdef;"
+        " border-radius: 12px; border-radius-top-left: 2px; }"
         "#confirm { background: green; }"
         "button#confirm { background: yellow; }"
         "button.primary#confirm { background: PuRpLe; }"
@@ -100,12 +102,53 @@ int main() {
         css.Resolve("button", {}, fluid::State_None, "confirm");
     Require(idOnly.background.r > 0.9f && idOnly.background.g > 0.9f &&
             idOnly.background.b < 0.1f);
+    for (const char* widget : {"selectable", "tree-node", "collapsing-header"}) {
+        const fluid::ComputedStyle rowStyle =
+            css.Resolve(widget, {}, fluid::State_None);
+        Require(rowStyle.borderWidth == 3.f &&
+                rowStyle.borderColor.b > 0.9f &&
+                rowStyle.cornerRadii.topLeft == 2.f &&
+                rowStyle.cornerRadii.topRight == 12.f);
+    }
+
+    fluid::StyleSheet positionStyles;
+    Require(positionStyles.LoadCSS(
+        "button { position: fixed; top: 10%; right: 12px; left: auto; }"
+        "button.relative { position: relative; left: -5px; bottom: 25%; }"
+        "button.coordinates { position: (15px, 30%); rotation: 45deg;"
+        " translate: translate(10px, 20%); transition: all 200ms ease; }",
+        &error));
+    const fluid::ComputedStyle fixedStyle =
+        positionStyles.Resolve("button", {}, fluid::State_None);
+    Require(fixedStyle.position == fluid::PositionType::Fixed &&
+            fixedStyle.topSet && fixedStyle.topPercent &&
+            fixedStyle.top == 0.1f && fixedStyle.rightSet &&
+            fixedStyle.right == 12.f && !fixedStyle.leftSet);
+    const fluid::ComputedStyle relativeStyle =
+        positionStyles.Resolve("button", {"relative"}, fluid::State_None);
+    Require(relativeStyle.position == fluid::PositionType::Relative &&
+            relativeStyle.leftSet && relativeStyle.left == -5.f &&
+            relativeStyle.bottomSet && relativeStyle.bottomPercent &&
+            relativeStyle.bottom == 0.25f);
+    const fluid::ComputedStyle coordinatesStyle =
+        positionStyles.Resolve("button", {"coordinates"}, fluid::State_None);
+    Require(coordinatesStyle.position == fluid::PositionType::Absolute &&
+            coordinatesStyle.leftSet && coordinatesStyle.left == 15.f &&
+            coordinatesStyle.topPercent && coordinatesStyle.top == 0.3f);
+    Require(coordinatesStyle.rotation == 45.f &&
+            coordinatesStyle.translate.x == 10.f &&
+            coordinatesStyle.translate.y == 0.2f &&
+            coordinatesStyle.translateYPercent &&
+            std::abs(coordinatesStyle.transitionSpeed - 5.f) < 0.01f &&
+            coordinatesStyle.transitionEasing == fluid::TransitionEasing::Ease);
 
     fluid::StyleSheet scrollbarStyles;
     Require(scrollbarStyles.LoadCSS(
         "window { scrollbar-width: none; }"
         "container { scrollbar-width: thin; }"
-        "console-output { scrollbar-width: auto; }",
+        "console-output { scrollbar-width: auto; }"
+        "window-scrollbar { width: 11px; }"
+        "container-scrollbar { width: 13px; }",
         &error));
     Require(scrollbarStyles.Resolve("window", {}, fluid::State_None).scrollbarWidth ==
             fluid::ScrollbarWidth::None);
@@ -113,6 +156,10 @@ int main() {
             fluid::ScrollbarWidth::Thin);
     Require(scrollbarStyles.Resolve("console-output", {}, fluid::State_None).scrollbarWidth ==
             fluid::ScrollbarWidth::Auto);
+    Require(scrollbarStyles.Resolve("window-scrollbar", {}, fluid::State_None).width ==
+            11.f);
+    Require(scrollbarStyles.Resolve("container-scrollbar", {}, fluid::State_None).width ==
+            13.f);
 
     fluid::StyleSheet important;
     Require(important.LoadCSS(
@@ -148,8 +195,92 @@ int main() {
     Require(captureText.colors.front().r > 0.9f &&
             captureText.colors.front().g < 0.1f);
 
+    fluid::Context separatorUi;
+    CaptureText separatorText;
+    separatorUi.SetTextBackend(&separatorText);
+    Require(separatorUi.Style().LoadCSS(
+        "separator-text { color: #ffffff; border-color: #888888;"
+        " border-width: 2px; }", &error));
+    separatorUi.NewFrame(input);
+    separatorUi.HorizontalSeparator();
+    separatorUi.HorizontalSeparatorText("Section");
+    separatorUi.EndFrame();
+    Require(separatorText.emitted.size() == 1 &&
+            separatorText.emitted.front() == "Section");
+
+    fluid::Context fullTextUi;
+    CaptureText fullText;
+    fullTextUi.SetTextBackend(&fullText);
+    Require(fullTextUi.Style().LoadCSS(
+        "button#full-text { width: 40px; padding: 0; }", &error));
+    fullTextUi.NewFrame(input);
+    fullTextUi.Button("Long label text##full-text");
+    fullTextUi.EndFrame();
+    Require(fullText.emitted.size() == 1 &&
+            fullText.emitted.front() == "Long label text");
+
+    fluid::Context rotationUi;
+    Require(rotationUi.Style().LoadCSS(
+        "container { padding: 0; scrollbar-width: none; }"
+        "button#transform { width: 40px; height: 20px; padding: 0;"
+        " border-radius: 0; shadow-enabled: false; background: red;"
+        " translate: 10px 5px; rotation: 90deg; }",
+        &error));
+    rotationUi.NewFrame(input);
+    Require(rotationUi.BeginContainer("Transform parent", {100.f, 80.f}));
+    rotationUi.Button("Transform##transform");
+    const fluid::Vec2 translatedPosition = rotationUi.GetItemRectMin();
+    Require(std::abs(translatedPosition.x - 10.f) < 0.01f &&
+            std::abs(translatedPosition.y - 5.f) < 0.01f);
+    rotationUi.EndContainer();
+    const fluid::DrawList& transformedDraw = rotationUi.EndFrame();
+    Require(ContainsPosition(transformedDraw, {40.f, 35.f}));
+
+    fluid::Context positionUi;
+    Require(positionUi.Style().LoadCSS(
+        "container { padding: 0; scrollbar-width: none; }"
+        "button#fixed { position: fixed; left: 25%; top: 10%;"
+        " width: 50%; height: 20px; }"
+        "button#absolute { position: absolute; right: 10px; bottom: 5px;"
+        " width: 30px; height: 10px; }"
+        "button#coordinates { position: (15px, 30%); width: 10px; height: 10px; }"
+        "window#positioned { position: fixed; top: 15px; right: 10px;"
+        " width: 100px; height: 120px; padding: 0; translate: 5px 0; }",
+        &error));
+    fluid::InputState positionFrame;
+    positionFrame.displaySize = {400.f, 300.f};
+    positionUi.NewFrame(positionFrame);
+    Require(positionUi.BeginContainer("Position parent", {400.f, 300.f}));
+    positionUi.Button("Fixed##fixed");
+    const fluid::Vec2 fixedPosition = positionUi.GetItemRectMin();
+    Require(std::abs(fixedPosition.x - 100.f) < 0.01f &&
+            std::abs(fixedPosition.y - 30.f) < 0.01f);
+    positionUi.Button("Flow after fixed");
+    const fluid::Vec2 flowPosition = positionUi.GetItemRectMin();
+    Require(std::abs(flowPosition.x) < 0.01f &&
+            std::abs(flowPosition.y) < 0.01f);
+    positionUi.Button("Absolute##absolute");
+    const fluid::Vec2 absolutePosition = positionUi.GetItemRectMin();
+    Require(std::abs(absolutePosition.x - 360.f) < 0.01f &&
+            std::abs(absolutePosition.y - 285.f) < 0.01f);
+    positionUi.Button("Coordinates##coordinates");
+    const fluid::Vec2 coordinatePosition = positionUi.GetItemRectMin();
+    Require(std::abs(coordinatePosition.x - 15.f) < 0.01f &&
+            std::abs(coordinatePosition.y - 90.f) < 0.01f);
+    positionUi.EndContainer();
+    positionUi.EndFrame();
+    positionUi.NewFrame(positionFrame);
+    Require(positionUi.BeginWindow("Fixed window##positioned",
+                                   {20.f, 20.f, 220.f, 160.f}));
+    positionUi.Text("Window content");
+    const fluid::Vec2 windowPosition = positionUi.GetItemRectMin();
+    Require(std::abs(windowPosition.x - 295.f) < 0.01f);
+    positionUi.EndWindow();
+    positionUi.EndFrame();
+
     fluid::Context windowUi;
-    Require(windowUi.Style().LoadCSS("window { padding: 0; }", &error));
+    Require(windowUi.Style().LoadCSS(
+        "window { padding: 0; } window-scrollbar { width: 15px; }", &error));
     auto measureWindowContentWidth = [&](fluid::WindowFlags flags) {
         fluid::InputState frame;
         frame.displaySize = {400.f, 300.f};
@@ -167,10 +298,12 @@ int main() {
         measureWindowContentWidth(fluid::WindowFlags::None);
     const float windowWithoutScrollbar =
         measureWindowContentWidth(fluid::WindowFlags::NoScrollbar);
+    Require(std::abs(windowWithoutScrollbar - windowWithScrollbar - 20.f) < 0.01f);
     Require(windowWithoutScrollbar > windowWithScrollbar + 6.f);
 
     fluid::Context containerUi;
-    Require(containerUi.Style().LoadCSS("container { padding: 0; }", &error));
+    Require(containerUi.Style().LoadCSS(
+        "container { padding: 0; } container-scrollbar { width: 14px; }", &error));
     auto measureContainerContentWidth = [&]() {
         fluid::InputState frame;
         frame.displaySize = {400.f, 300.f};
@@ -184,6 +317,7 @@ int main() {
     };
     measureContainerContentWidth();
     const float containerWithScrollbar = measureContainerContentWidth();
+    Require(std::abs(containerWithScrollbar - 86.f) < 0.01f);
     Require(containerUi.Style().LoadCSS(
         "container { padding: 0; scrollbar-width: none; }", &error));
     const float containerWithoutScrollbar = measureContainerContentWidth();
