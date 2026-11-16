@@ -4,7 +4,7 @@
 
     --ui-window: #080808;
     --ui-sunken: linear-gradient(180deg, #080808 0%, #000000 100%);
-    --ui-panel: #030303;
+    --ui-panel: #0c0c0c;
     --ui-panel-hover: #0e0e0e;
     --ui-panel-active: #0c0c0c;
     --ui-overlay: transparent;
@@ -265,7 +265,7 @@ image-button {
 button:hover,
 dropdown:hover,
 image-button:hover {
-    background: #181B22;
+    background: var(--ui-panel-hover);
     border-color: var(--ui-border-hover);
 }
 
@@ -279,7 +279,7 @@ interactive-image {
 }
 
 interactive-image:hover {
-    background: #181B22;
+    background: var(--ui-panel-hover);
     border-color: var(--ui-border-hover);
 }
 
@@ -325,7 +325,7 @@ tile-container {
 }
 
 tile {
-    background: var(--ui-panel);
+    background: var(--ui-panel-hover);
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
     padding: 6px;
@@ -385,7 +385,7 @@ tree-node {
 selectable:hover,
 tree-node:hover,
 collapsing-header:hover {
-    background: var(--ui-panel-hover);
+    background: var(--ui-panel);
 }
 
 selectable:checked {
