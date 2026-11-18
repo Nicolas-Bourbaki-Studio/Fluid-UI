@@ -709,7 +709,7 @@ int main(int argc, char** argv) {
 
     if (!glfwInit()) return 1;
     glfwWindowHint(GLFW_SAMPLES, 4);
-    GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI | Testing Demo | Version Smoke 2.0", nullptr, nullptr);
+    GLFWwindow* win = glfwCreateWindow(1600, 900, "Fluid UI Demo - V2.0 Crystal", nullptr, nullptr);
     if (!win) { glfwTerminate(); return 1; }
     glfwMakeContextCurrent(win);
     glfwSwapInterval(1);
