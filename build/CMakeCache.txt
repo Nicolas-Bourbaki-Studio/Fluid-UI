@@ -30,9 +30,6 @@ CMAKE_BUILD_TYPE:STRING=Debug
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
-//CXX compiler
-CMAKE_CXX_COMPILER:FILEPATH=C:/msys64/ucrt64/bin/c++.exe
-
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
 CMAKE_CXX_COMPILER_AR:FILEPATH=C:/msys64/ucrt64/bin/gcc-ar.exe
@@ -121,11 +118,6 @@ CMAKE_OBJCOPY:FILEPATH=C:/msys64/ucrt64/bin/objcopy.exe
 //Path to a program.
 CMAKE_OBJDUMP:FILEPATH=C:/msys64/ucrt64/bin/objdump.exe
 
-//Default for CMake Policy CMP<NNNN> when otherwise left unset.
-// Set to OLD or NEW to externally control the policy for projects
-// that have not set it via cmake_minimum_required or cmake_policy.
-CMAKE_POLICY_DEFAULT_CMP0091:UNINITIALIZED=NEW
-
 //Value Computed by CMake
 CMAKE_PROJECT_COMPAT_VERSION:STATIC=
 
@@ -179,9 +171,6 @@ CMAKE_RC_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
 CMAKE_READELF:FILEPATH=C:/msys64/ucrt64/bin/readelf.exe
-
-//No help, variable specified on the command line.
-CMAKE_SH:UNINITIALIZED=CMAKE_SH-NOTFOUND
 
 //Flags used by the linker during the creation of shared libraries
 // during all build types.
@@ -274,7 +263,7 @@ FluidUI_IS_TOP_LEVEL:STATIC=ON
 FluidUI_SOURCE_DIR:STATIC=C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI
 
 //Path to a program.
-GITCOMMAND:FILEPATH=GITCOMMAND-NOTFOUND
+GITCOMMAND:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //Command to build the project
 MAKECOMMAND:STRING=C:/Program\ Files/CMake/bin/cmake.exe --build . --config "${CTEST_CONFIGURATION_TYPE}"
@@ -286,7 +275,7 @@ MEMORYCHECK_COMMAND:FILEPATH=MEMORYCHECK_COMMAND-NOTFOUND
 MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
 
 //Name of the computer/site where compile is being run
-SITE:STRING=DESKTOP-N6010RN
+SITE:STRING=NuclearMicrowave
 
 //The directory containing a CMake configuration file for glfw3.
 glfw3_DIR:PATH=C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build
@@ -321,8 +310,6 @@ CMAKE_CPACK_COMMAND:INTERNAL=C:/Program Files/CMake/bin/cpack.exe
 CMAKE_CTEST_COMMAND-ADVANCED:INTERNAL=1
 //Path to ctest program executable.
 CMAKE_CTEST_COMMAND:INTERNAL=C:/Program Files/CMake/bin/ctest.exe
-//ADVANCED property for variable: CMAKE_CXX_COMPILER
-CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_AR
 CMAKE_CXX_COMPILER_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_RANLIB

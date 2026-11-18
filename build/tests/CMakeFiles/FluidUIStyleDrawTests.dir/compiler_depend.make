@@ -218,6 +218,7 @@ tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj: C:/Users/mi
   C:/msys64/ucrt64/include/corecrt_wstdlib.h \
   C:/msys64/ucrt64/include/corecrt_wstring.h \
   C:/msys64/ucrt64/include/corecrt_wtime.h \
+  C:/msys64/ucrt64/include/crtdefs.h \
   C:/msys64/ucrt64/include/ctype.h \
   C:/msys64/ucrt64/include/errno.h \
   C:/msys64/ucrt64/include/io.h \
@@ -719,6 +720,8 @@ C:/msys64/ucrt64/include/corecrt_wstring.h:
 C:/msys64/ucrt64/include/time.h:
 
 C:/msys64/ucrt64/include/corecrt_wtime.h:
+
+C:/msys64/ucrt64/include/crtdefs.h:
 
 C:/msys64/ucrt64/include/errno.h:
 

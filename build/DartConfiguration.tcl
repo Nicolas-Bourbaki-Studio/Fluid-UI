@@ -11,7 +11,7 @@ BuildDirectory: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/build
 CostDataFile: 
 
 # Site is something like machine.domain, i.e. pragmatic.crd
-Site: DESKTOP-N6010RN
+Site: NuclearMicrowave
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
 BuildName: Win32-mingw32-make
@@ -45,7 +45,7 @@ SVNOptions:
 SVNUpdateOptions: 
 
 # Git options
-GITCommand: GITCOMMAND-NOTFOUND
+GITCommand: C:/Program Files/Git/cmd/git.exe
 GITInitSubmodules: 
 GITUpdateOptions: 
 GITUpdateCustom: 
@@ -58,12 +58,12 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: GITCOMMAND-NOTFOUND
+UpdateCommand: C:/Program Files/Git/cmd/git.exe
 UpdateOptions: 
 UpdateType: git
 
 # Compiler info
-Compiler: C:/msys64/ucrt64/bin/c++.exe
+Compiler: C:/msys64/ucrt64/bin/g++.exe
 CompilerVersion: 16.2.0
 
 # Dynamic analysis (MemCheck)

@@ -79,15 +79,15 @@ examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: examples/CMakeFiles/basic_gl
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/examples/main.cpp
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj: examples/CMakeFiles/basic_glfw_gl.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj -MF CMakeFiles\basic_glfw_gl.dir\main.cpp.obj.d -o CMakeFiles\basic_glfw_gl.dir\main.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj -MF CMakeFiles\basic_glfw_gl.dir\main.cpp.obj.d -o CMakeFiles\basic_glfw_gl.dir\main.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp
 
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/basic_glfw_gl.dir/main.cpp.i"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp > CMakeFiles\basic_glfw_gl.dir\main.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp > CMakeFiles\basic_glfw_gl.dir\main.cpp.i
 
 examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/basic_glfw_gl.dir/main.cpp.s"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp -o CMakeFiles\basic_glfw_gl.dir\main.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\examples && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\examples\main.cpp -o CMakeFiles\basic_glfw_gl.dir\main.cpp.s
 
 # Object files for target basic_glfw_gl
 basic_glfw_gl_OBJECTS = \
@@ -99,7 +99,7 @@ basic_glfw_gl_EXTERNAL_OBJECTS =
 examples/basic_glfw_gl.exe: examples/CMakeFiles/basic_glfw_gl.dir/main.cpp.obj
 examples/basic_glfw_gl.exe: examples/CMakeFiles/basic_glfw_gl.dir/build.make
 examples/basic_glfw_gl.exe: src/libFluidUI.dll.a
-examples/basic_glfw_gl.exe: C:/Users/mike1/.conan2_new/p/b/glfw880de4c82409c/p/lib/libglfw3.a
+examples/basic_glfw_gl.exe: C:/Users/mike1/.conan2/p/b/glfw11c4cf19b7065/p/lib/libglfw3.a
 examples/basic_glfw_gl.exe: examples/CMakeFiles/basic_glfw_gl.dir/linkLibs.rsp
 examples/basic_glfw_gl.exe: examples/CMakeFiles/basic_glfw_gl.dir/objects1.rsp
 examples/basic_glfw_gl.exe: examples/CMakeFiles/basic_glfw_gl.dir/link.txt

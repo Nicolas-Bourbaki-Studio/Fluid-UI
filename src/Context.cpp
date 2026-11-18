@@ -121,9 +121,10 @@ float ResolveScrollbarSize(ScrollbarWidth inheritedWidth,
     if (inheritedWidth == ScrollbarWidth::None ||
         scrollbarStyle.scrollbarWidth == ScrollbarWidth::None)
         return 0.f;
-    float size = scrollbarStyle.width >= 0.f
-        ? (scrollbarStyle.widthPercent
-            ? availableSize * scrollbarStyle.width : scrollbarStyle.width)
+    float size = scrollbarStyle.widthSet
+        ? (scrollbarStyle.widthPixels +
+           (scrollbarStyle.widthPercent
+                ? availableSize * scrollbarStyle.widthPercentValue : 0.f))
         : ScrollbarSize(scrollbarStyle.scrollbarWidth == ScrollbarWidth::Auto
                             ? inheritedWidth : scrollbarStyle.scrollbarWidth,
                         defaultSize);
@@ -865,17 +866,19 @@ Rect Context::PlaceStyled(Vec2 size, const ComputedStyle& style) {
     const float referenceWidth = fixed ? in_.displaySize.x : content_.w;
     const float referenceHeight = fixed ? in_.displaySize.y : content_.h;
     auto applyTransform = [&](Rect rect) {
-        rect.x += style.translateXPercent ? rect.w * style.translate.x
-                                           : style.translate.x;
-        rect.y += style.translateYPercent ? rect.h * style.translate.y
-                                           : style.translate.y;
+        rect.x += style.translatePixels.x +
+                  (style.translateXPercent ? rect.w * style.translatePercent.x : 0.f);
+        rect.y += style.translatePixels.y +
+                  (style.translateYPercent ? rect.h * style.translatePercent.y : 0.f);
         draw_.SetRotation(rect, style.rotation);
         return rect;
     };
-    if (style.width >= 0.f)
-        size.x = style.widthPercent ? referenceWidth * style.width : style.width;
-    if (style.height >= 0.f)
-        size.y = style.heightPercent ? referenceHeight * style.height : style.height;
+    if (style.widthSet)
+        size.x = style.widthPixels + (style.widthPercent
+            ? referenceWidth * style.widthPercentValue : 0.f);
+    if (style.heightSet)
+        size.y = style.heightPixels + (style.heightPercent
+            ? referenceHeight * style.heightPercentValue : 0.f);
 
     const Rect parent = content_;
     if (style.position == PositionType::Absolute ||
@@ -893,10 +896,14 @@ Rect Context::PlaceStyled(Vec2 size, const ComputedStyle& style) {
         const float originY = fixed ? 0.f : parent.y;
         const float extentX = fixed ? in_.displaySize.x : parent.w;
         const float extentY = fixed ? in_.displaySize.y : parent.h;
-        const float left = style.leftPercent ? extentX * style.left : style.left;
-        const float right = style.rightPercent ? extentX * style.right : style.right;
-        const float top = style.topPercent ? extentY * style.top : style.top;
-        const float bottom = style.bottomPercent ? extentY * style.bottom : style.bottom;
+        const float left = style.leftPixels + (style.leftPercent
+            ? extentX * style.leftPercentValue : 0.f);
+        const float right = style.rightPixels + (style.rightPercent
+            ? extentX * style.rightPercentValue : 0.f);
+        const float top = style.topPixels + (style.topPercent
+            ? extentY * style.topPercentValue : 0.f);
+        const float bottom = style.bottomPixels + (style.bottomPercent
+            ? extentY * style.bottomPercentValue : 0.f);
         const float x = style.leftSet ? originX + left
             : style.rightSet ? originX + extentX - right - size.x : originX;
         const float y = style.topSet ? originY + top
@@ -937,10 +944,14 @@ Rect Context::PlaceStyled(Vec2 size, const ComputedStyle& style) {
     }
     lastRight_ = rect.x + rect.w;
     if (style.position == PositionType::Relative) {
-        const float left = style.leftPercent ? parent.w * style.left : style.left;
-        const float right = style.rightPercent ? parent.w * style.right : style.right;
-        const float top = style.topPercent ? parent.h * style.top : style.top;
-        const float bottom = style.bottomPercent ? parent.h * style.bottom : style.bottom;
+        const float left = style.leftPixels + (style.leftPercent
+            ? parent.w * style.leftPercentValue : 0.f);
+        const float right = style.rightPixels + (style.rightPercent
+            ? parent.w * style.rightPercentValue : 0.f);
+        const float top = style.topPixels + (style.topPercent
+            ? parent.h * style.topPercentValue : 0.f);
+        const float bottom = style.bottomPixels + (style.bottomPercent
+            ? parent.h * style.bottomPercentValue : 0.f);
         if (style.leftSet) rect.x += left;
         else if (style.rightSet) rect.x -= right;
         if (style.topSet) rect.y += top;
@@ -2242,12 +2253,12 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
                 w.styleBasePos = w.pos;
             w.stylePosition = ws.position;
         }
-        if (ws.width >= 0.f)
-            w.size.x = std::max(0.f, ws.widthPercent
-                ? in_.displaySize.x * ws.width : ws.width);
-        if (ws.height >= 0.f)
-            w.size.y = std::max(0.f, ws.heightPercent
-                ? in_.displaySize.y * ws.height : ws.height);
+        if (ws.widthSet)
+            w.size.x = std::max(0.f, ws.widthPixels + (ws.widthPercent
+                ? in_.displaySize.x * ws.widthPercentValue : 0.f));
+        if (ws.heightSet)
+            w.size.y = std::max(0.f, ws.heightPixels + (ws.heightPercent
+                ? in_.displaySize.y * ws.heightPercentValue : 0.f));
         if (ws.justifySelf != HorizontalAlignment::Auto) {
             if (ws.justifySelf == HorizontalAlignment::Center)
                 w.pos.x = (in_.displaySize.x - w.size.x) * 0.5f;
@@ -2268,10 +2279,14 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
             const bool relative = ws.position == PositionType::Relative;
             const float originX = relative ? w.styleBasePos.x : 0.f;
             const float originY = relative ? w.styleBasePos.y : 0.f;
-            const float left = ws.leftPercent ? in_.displaySize.x * ws.left : ws.left;
-            const float right = ws.rightPercent ? in_.displaySize.x * ws.right : ws.right;
-            const float top = ws.topPercent ? in_.displaySize.y * ws.top : ws.top;
-            const float bottom = ws.bottomPercent ? in_.displaySize.y * ws.bottom : ws.bottom;
+            const float left = ws.leftPixels + (ws.leftPercent
+                ? in_.displaySize.x * ws.leftPercentValue : 0.f);
+            const float right = ws.rightPixels + (ws.rightPercent
+                ? in_.displaySize.x * ws.rightPercentValue : 0.f);
+            const float top = ws.topPixels + (ws.topPercent
+                ? in_.displaySize.y * ws.topPercentValue : 0.f);
+            const float bottom = ws.bottomPixels + (ws.bottomPercent
+                ? in_.displaySize.y * ws.bottomPercentValue : 0.f);
             w.pos.x = ws.leftSet ? originX + left
                 : ws.rightSet ? originX + in_.displaySize.x - right - w.size.x
                 : originX;
@@ -2280,8 +2295,10 @@ bool Context::BeginWindow(std::string_view title, Rect initial, WindowFlags flag
                 : originY;
         }
         w.styleTranslate = {
-            ws.translateXPercent ? w.size.x * ws.translate.x : ws.translate.x,
-            ws.translateYPercent ? w.size.y * ws.translate.y : ws.translate.y
+            ws.translatePixels.x +
+                (ws.translateXPercent ? w.size.x * ws.translatePercent.x : 0.f),
+            ws.translatePixels.y +
+                (ws.translateYPercent ? w.size.y * ws.translatePercent.y : 0.f)
         };
         w.pos = w.pos + w.styleTranslate;
     } else {

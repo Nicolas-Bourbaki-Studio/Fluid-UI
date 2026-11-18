@@ -11,7 +11,7 @@ endif()
 
 ########### VARIABLES #######################################################################
 #############################################################################################
-set(opengl_PACKAGE_FOLDER_DEBUG "C:/Users/mike1/.conan2_new/p/opengb4dfd9d76a483/p")
+set(opengl_PACKAGE_FOLDER_DEBUG "C:/Users/mike1/.conan2/p/opengb4dfd9d76a483/p")
 set(opengl_BUILD_MODULES_PATHS_DEBUG )
 
 

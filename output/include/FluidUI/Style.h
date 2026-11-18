@@ -58,16 +58,28 @@ struct ComputedStyle {
     float fontSize    = 16.f;
     float width = -1.f;
     float height = -1.f;
+    float widthPixels = -1.f;
+    float heightPixels = -1.f;
+    bool widthSet = false;
+    bool heightSet = false;
     bool widthPercent = false;
     bool heightPercent = false;
+    float widthPercentValue = 0.f;
+    float heightPercentValue = 0.f;
     PositionType position = PositionType::Static;
     float top = 0.f, right = 0.f, bottom = 0.f, left = 0.f;
+    float topPixels = 0.f, rightPixels = 0.f, bottomPixels = 0.f,
+          leftPixels = 0.f;
     bool topSet = false, rightSet = false, bottomSet = false, leftSet = false;
     bool topPercent = false, rightPercent = false, bottomPercent = false,
          leftPercent = false;
+    float topPercentValue = 0.f, rightPercentValue = 0.f,
+          bottomPercentValue = 0.f, leftPercentValue = 0.f;
     float rotation = 0.f;
     Vec2 translate;
+    Vec2 translatePixels;
     bool translateXPercent = false, translateYPercent = false;
+    Vec2 translatePercent;
     HorizontalAlignment justifySelf = HorizontalAlignment::Auto;
     VerticalAlignment alignSelf = VerticalAlignment::Auto;
     TextAlignment textAlign = TextAlignment::Start;
@@ -98,7 +110,7 @@ struct ComputedStyle {
 
 FLUID_API ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t);
 
-struct StyleValue { float v[4] = {0, 0, 0, 0}; };
+struct StyleValue { float v[6] = {0, 0, 0, 0, 0, 0}; };
 struct StyleDecl  {
     Prop prop;
     StyleValue value;

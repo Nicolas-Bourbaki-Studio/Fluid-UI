@@ -170,8 +170,10 @@ Styles can be configured in C++ with `StyleSheet::Rule` or loaded from a CSS-lik
 Selectors support widget names, multiple classes, one ID, grouped selectors, and widget
 states (`hover`, `active`, `checked`, `disabled`), for example `button.primary#confirm:hover`.
 Use `PushClass`/`PopClass` to apply classes, and either `PushStyleID`/`PopStyleID` or a
-`Visible label##id` label to apply an ID selector. The `##id` suffix is hidden and identifies
-the widget. User rules override the built-in dark theme defaults;
+`Visible label##id` label to apply an ID selector. This also applies to windows: a window
+declared as `Settings##settings` matches `window#settings`, and active classes match
+`window.some-class`. The `##id` suffix is hidden and identifies the widget. User rules
+override the built-in dark theme defaults;
 selector specificity still determines precedence between user rules. Global
 custom properties can be declared
 in `:root`, retained across successive `LoadCSS` calls, and referenced with `var(--name)`
@@ -186,7 +188,13 @@ region), `align` (`left`, `center`, `right`, `top`, `middle`, or `bottom`),
 `justify-self`, `align-self`, `text-align`, `vertical-align`, `gap`, `shadow-blur`,
 `shadow-enabled` (`true` or `false`), and `scrollbar-width` (`auto`, `thin`, or `none`).
 `position` supports `static`, `relative`, `absolute`, and `fixed`, with `top`, `right`,
-`bottom`, and `left` offsets in pixels or percentages. Absolute offsets are relative to the
+`bottom`, and `left` offsets in pixels or percentages. The `position-top`, `position-right`,
+`position-bottom`, and `position-left` aliases set the same offsets. Lengths in `width`,
+`height`, offsets, coordinates, and `translate` accept `calc()` expressions with addition,
+subtraction, multiplication by a unitless number, and division by a nonzero unitless number.
+`min()`, `max()`, and `clamp()` are supported when their arguments use comparable units.
+For example, `width: calc(50% - 12px)` combines a percentage of the available content size
+with a pixel adjustment. Absolute offsets are relative to the
 current content region (the display for top-level windows); fixed offsets are relative to the
 display. Docked windows keep their dock-managed positions. Positioned elements are
 removed from normal layout flow for `absolute` and `fixed`; relative offsets preserve their

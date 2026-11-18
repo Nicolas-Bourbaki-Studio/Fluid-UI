@@ -27,6 +27,7 @@
 #include <iterator>
 #include <limits>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace fluid;
@@ -510,18 +511,19 @@ static GLuint CreateTextureFromFile(const std::filesystem::path& path, int& widt
 }
 
 struct DemoFontAtlas {
-    static constexpr int Width = 512;
-    static constexpr int Height = 512;
     static constexpr int FirstCharacter = 32;
     static constexpr int CharacterCount = 96;
-    static constexpr float BakeSize = 32.f;
 
+    int width = 0;
+    int height = 0;
+    int bakeSize = 0;
     GLuint texture = 0;
     std::array<stbtt_bakedchar, CharacterCount> glyphs{};
 };
 
-static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
-                                   DemoFontAtlas& atlas, std::string& error) {
+static bool LoadOpenSansFontData(const std::filesystem::path& path,
+                                 std::vector<unsigned char>& fontData,
+                                 std::string& error) {
     std::ifstream file(path, std::ios::binary);
     if (!file) {
         error = "Could not open Open Sans font: " + path.string();
@@ -529,7 +531,7 @@ static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
     }
     const std::istreambuf_iterator<char> fontBegin(file);
     const std::istreambuf_iterator<char> fontEnd;
-    std::vector<unsigned char> fontData(fontBegin, fontEnd);
+    fontData.assign(fontBegin, fontEnd);
     if (file.bad()) {
         error = "Could not read Open Sans font: " + path.string();
         return false;
@@ -538,16 +540,33 @@ static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
         error = "Open Sans font file is empty or too large";
         return false;
     }
+    return true;
+}
 
-    std::vector<unsigned char> coverage(DemoFontAtlas::Width * DemoFontAtlas::Height);
-    const int packedRows = stbtt_BakeFontBitmap(
-        fontData.data(), 0, DemoFontAtlas::BakeSize, coverage.data(),
-        DemoFontAtlas::Width, DemoFontAtlas::Height, DemoFontAtlas::FirstCharacter,
-        DemoFontAtlas::CharacterCount, atlas.glyphs.data());
+static bool CreateOpenSansFontAtlas(const std::vector<unsigned char>& fontData,
+                                    int bakeSize, DemoFontAtlas& atlas,
+                                    std::string& error) {
+    int dimension = 512;
+    while (dimension < bakeSize * 16 && dimension < 4096) dimension *= 2;
+    std::vector<unsigned char> coverage;
+    int packedRows = 0;
+    while (dimension <= 4096) {
+        coverage.assign(static_cast<size_t>(dimension) * dimension, 0);
+        packedRows = stbtt_BakeFontBitmap(
+            fontData.data(), 0, static_cast<float>(bakeSize), coverage.data(),
+            dimension, dimension, DemoFontAtlas::FirstCharacter,
+            DemoFontAtlas::CharacterCount, atlas.glyphs.data());
+        if (packedRows > 0) break;
+        dimension *= 2;
+    }
     if (packedRows <= 0) {
-        error = "Could not bake Open Sans glyphs into the font atlas";
+        error = "Could not bake Open Sans glyphs at " +
+                std::to_string(bakeSize) + "px";
         return false;
     }
+    atlas.width = dimension;
+    atlas.height = dimension;
+    atlas.bakeSize = bakeSize;
 
     std::vector<unsigned char> pixels(coverage.size() * 4);
     for (size_t i = 0; i < coverage.size(); ++i) {
@@ -565,7 +584,7 @@ static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
     constexpr GLint clampToEdge = 0x812F;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clampToEdge);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clampToEdge);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DemoFontAtlas::Width, DemoFontAtlas::Height,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas.width, atlas.height,
                  0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
     glBindTexture(GL_TEXTURE_2D, 0);
     const GLenum uploadError = glGetError();
@@ -583,11 +602,13 @@ static bool CreateOpenSansFontAtlas(const std::filesystem::path& path,
 
 class DemoTextBackend final : public ITextBackend {
 public:
-    explicit DemoTextBackend(const DemoFontAtlas& atlas)
-        : texture_(atlas.texture), glyphs_(atlas.glyphs) {}
+    explicit DemoTextBackend(std::vector<unsigned char> fontData)
+        : fontData_(std::move(fontData)) {}
 
     Vec2 Measure(std::string_view text, float fontSize) override {
-        const float scale = fontSize / DemoFontAtlas::BakeSize;
+        const DemoFontAtlas* atlas = GetAtlas(fontSize);
+        if (!atlas) return {};
+        const float scale = fontSize / static_cast<float>(atlas->bakeSize);
         float lineWidth = 0.f, maxWidth = 0.f;
         size_t lines = 1;
         for (unsigned char ch : text) {
@@ -598,14 +619,16 @@ public:
                 continue;
             }
             const unsigned int glyph = GlyphIndex(ch);
-            lineWidth += glyphs_[glyph].xadvance * scale;
+            lineWidth += atlas->glyphs[glyph].xadvance * scale;
         }
         maxWidth = std::max(maxWidth, lineWidth);
         return {maxWidth, static_cast<float>(lines) * fontSize * 1.2f};
     }
 
     void Emit(DrawList& draw, Vec2 pos, std::string_view text, float fontSize, Color color) override {
-        const float scale = fontSize / DemoFontAtlas::BakeSize;
+        const DemoFontAtlas* atlas = GetAtlas(fontSize);
+        if (!atlas) return;
+        const float scale = fontSize / static_cast<float>(atlas->bakeSize);
         float penX = 0.f, lineOffset = 0.f;
         for (unsigned char ch : text) {
             if (ch == '\n') {
@@ -615,21 +638,48 @@ public:
             }
             stbtt_aligned_quad quad{};
             float glyphY = 0.f;
-            stbtt_GetBakedQuad(glyphs_.data(), DemoFontAtlas::Width, DemoFontAtlas::Height,
-                               static_cast<int>(GlyphIndex(ch)), &penX, &glyphY, &quad, 1);
+            stbtt_GetBakedQuad(atlas->glyphs.data(), atlas->width, atlas->height,
+                               static_cast<int>(GlyphIndex(ch)), &penX, &glyphY,
+                               &quad, scale);
             const float baseline = pos.y + fontSize + lineOffset;
-            const float width = (quad.x1 - quad.x0) * scale;
-            const float height = (quad.y1 - quad.y0) * scale;
+            const float width = quad.x1 - quad.x0;
+            const float height = quad.y1 - quad.y0;
             if (width > 0.f && height > 0.f) {
-                draw.AddQuad({pos.x + quad.x0 * scale, baseline + quad.y0 * scale,
-                              width, height},
+                const float x = std::round(pos.x + quad.x0);
+                const float y = std::round(baseline + quad.y0);
+                draw.AddQuad({x, y, width, height},
                              {quad.s0, quad.t0, quad.s1 - quad.s0, quad.t1 - quad.t0},
-                             color, texture_);
+                             color, atlas->texture);
             }
         }
     }
 
+    void ReleaseTextures() {
+        for (auto& [size, atlas] : atlases_) {
+            (void)size;
+            if (atlas.texture) glDeleteTextures(1, &atlas.texture);
+        }
+        atlases_.clear();
+    }
+
 private:
+    const DemoFontAtlas* GetAtlas(float fontSize) {
+        if (!std::isfinite(fontSize) || fontSize <= 0.f || fontData_.empty())
+            return nullptr;
+        const int size = static_cast<int>(std::clamp(std::lround(fontSize), 1L, 128L));
+        auto found = atlases_.find(size);
+        if (found != atlases_.end()) return &found->second;
+        if (atlasErrors_.find(size) != atlasErrors_.end()) return nullptr;
+        DemoFontAtlas atlas;
+        std::string error;
+        if (!CreateOpenSansFontAtlas(fontData_, size, atlas, error)) {
+            std::fprintf(stderr, "%s\n", error.c_str());
+            atlasErrors_.emplace(size, std::move(error));
+            return nullptr;
+        }
+        return &atlases_.emplace(size, std::move(atlas)).first->second;
+    }
+
     static unsigned int GlyphIndex(unsigned char ch) {
         const unsigned int character = ch >= DemoFontAtlas::FirstCharacter &&
             ch < DemoFontAtlas::FirstCharacter + DemoFontAtlas::CharacterCount
@@ -637,8 +687,9 @@ private:
         return character - DemoFontAtlas::FirstCharacter;
     }
 
-    GPUImageId texture_;
-    std::array<stbtt_bakedchar, DemoFontAtlas::CharacterCount> glyphs_;
+    std::vector<unsigned char> fontData_;
+    std::unordered_map<int, DemoFontAtlas> atlases_;
+    std::unordered_map<int, std::string> atlasErrors_;
 };
 
 int main(int argc, char** argv) {
@@ -768,11 +819,11 @@ int main(int argc, char** argv) {
                            timestampError.message();
         return true;
     };
-    DemoFontAtlas fontAtlas;
+    std::vector<unsigned char> fontData;
     std::string fontError;
     const std::filesystem::path fontPath =
         themePath.parent_path().parent_path() / "src" / "Fonts" / "OpenSans.ttf";
-    if (!CreateOpenSansFontAtlas(fontPath, fontAtlas, fontError)) {
+    if (!LoadOpenSansFontData(fontPath, fontData, fontError)) {
         std::fprintf(stderr, "%s\n", fontError.c_str());
         glDeleteTextures(1, &folderIconTexture);
         glDeleteTextures(1, &emptyIconTexture);
@@ -782,7 +833,7 @@ int main(int argc, char** argv) {
         glfwTerminate();
         return 1;
     }
-    DemoTextBackend demoText(fontAtlas);
+    DemoTextBackend demoText(std::move(fontData));
     ui.SetTextBackend(&demoText);
     std::error_code layoutPathError;
     const bool layoutExists = std::filesystem::exists(layoutPath, layoutPathError);
@@ -839,6 +890,7 @@ int main(int argc, char** argv) {
     constexpr std::string_view settingsWindow = "Settings##settings";
     constexpr std::string_view advancedWindow = "Advanced controls##advanced";
     constexpr std::string_view themeWindow = "Theme settings##theme-settings";
+    constexpr std::string_view ViewportWindow = "Viewport##viewport-editor";
     double last = glfwGetTime();
 
     while (!glfwWindowShouldClose(win)) {
@@ -957,12 +1009,6 @@ int main(int argc, char** argv) {
                     ui.SetWindowOpen(settingsWindow, true);
                 if (ui.MenuItem("Window manager"))
                     ui.SetWindowOpen(managerWindow, true);
-                ui.EndMenu();
-            }
-
-            if (ui.BeginMenu("Connect engine to Roblox Studio")) {
-                if (ui.MenuItem("Connect to Roblox Studio")) networkConnected = true;
-                if (ui.MenuItem("EDIT API KEY"))
                 ui.EndMenu();
             }
             ui.EndMainMenuBar();
@@ -1115,6 +1161,11 @@ int main(int argc, char** argv) {
             ui.EndWindow();
         }
 
+        if (ui.BeginWindow(ViewportWindow, {1120, 400, 480, 360})) {
+            ui.Text("Viewport editor##e");
+            ui.EndWindow();
+        }
+
         if (ui.BeginWindow(settingsWindow, {360, 180, 480, 300})) {
             ui.Text("General");
             ui.Toggle("Enable docking", &dockingEnabled);
@@ -1249,7 +1300,7 @@ int main(int argc, char** argv) {
     glDeleteTextures(1, &folderIconTexture);
     glDeleteTextures(1, &emptyIconTexture);
     glDeleteTextures(1, &productImageTexture);
-    glDeleteTextures(1, &fontAtlas.texture);
+    demoText.ReleaseTextures();
     for (GLFWcursor* cursor : cursors)
         if (cursor) glfwDestroyCursor(cursor);
     glfwDestroyWindow(win);

@@ -526,7 +526,7 @@ tab:hover {
 }
 
 tab:checked {
-    background: var(--ui-accent-muted);
-    border-color: var(--ui-accent);
+    background: var(--ui-accent);
+    border-color: var(--ui-accent-highlight);
     color: var(--ui-text);
 }

@@ -142,6 +142,33 @@ int main() {
             std::abs(coordinatesStyle.transitionSpeed - 5.f) < 0.01f &&
             coordinatesStyle.transitionEasing == fluid::TransitionEasing::Ease);
 
+    fluid::StyleSheet mathStyles;
+    Require(mathStyles.LoadCSS(
+        "button.math { width: calc(50% - 10px); height: max(25%, 75%);"
+        " position: fixed; position-left: calc(25% + 6px);"
+        " position-bottom: clamp(10px, 20px, 30px);"
+        " translate: calc(50% - 10px), calc(25% + 2px); }",
+        &error));
+    const fluid::ComputedStyle mathStyle =
+        mathStyles.Resolve("button", {"math"}, fluid::State_None);
+    Require(mathStyle.width == -10.f && mathStyle.widthPercent &&
+            mathStyle.widthPercentValue == 0.5f &&
+            mathStyle.heightPercent && mathStyle.heightPercentValue == 0.75f);
+    Require(mathStyle.leftSet && mathStyle.left == 6.f &&
+            mathStyle.leftPercent && mathStyle.leftPercentValue == 0.25f &&
+            mathStyle.bottomSet && mathStyle.bottom == 20.f);
+    Require(mathStyle.translate.x == -10.f &&
+            mathStyle.translatePercent.x == 0.5f &&
+            mathStyle.translate.y == 2.f &&
+            mathStyle.translatePercent.y == 0.25f);
+    Require(mathStyles.LoadCSS(
+        "button.invalid-math { width: calc(10px * 2px);"
+        " height: calc(20px / 0); }",
+        &error));
+    const fluid::ComputedStyle invalidMath =
+        mathStyles.Resolve("button", {"invalid-math"}, fluid::State_None);
+    Require(!invalidMath.widthSet && !invalidMath.heightSet);
+
     fluid::StyleSheet scrollbarStyles;
     Require(scrollbarStyles.LoadCSS(
         "window { scrollbar-width: none; }"
@@ -239,13 +266,14 @@ int main() {
     fluid::Context positionUi;
     Require(positionUi.Style().LoadCSS(
         "container { padding: 0; scrollbar-width: none; }"
-        "button#fixed { position: fixed; left: 25%; top: 10%;"
-        " width: 50%; height: 20px; }"
+        "button#fixed { position: fixed; position-left: calc(25% + 6px);"
+        " position-top: calc(10% + 2px); width: calc(50% - 10px); height: 20px; }"
         "button#absolute { position: absolute; right: 10px; bottom: 5px;"
         " width: 30px; height: 10px; }"
         "button#coordinates { position: (15px, 30%); width: 10px; height: 10px; }"
-        "window#positioned { position: fixed; top: 15px; right: 10px;"
-        " width: 100px; height: 120px; padding: 0; translate: 5px 0; }",
+        "window#positioned { width: calc(50% - 20px); height: 120px; padding: 0; }"
+        "window.window-test { position: fixed; top: 15px; right: 10px;"
+        " translate: 5px 0; }",
         &error));
     fluid::InputState positionFrame;
     positionFrame.displaySize = {400.f, 300.f};
@@ -253,8 +281,8 @@ int main() {
     Require(positionUi.BeginContainer("Position parent", {400.f, 300.f}));
     positionUi.Button("Fixed##fixed");
     const fluid::Vec2 fixedPosition = positionUi.GetItemRectMin();
-    Require(std::abs(fixedPosition.x - 100.f) < 0.01f &&
-            std::abs(fixedPosition.y - 30.f) < 0.01f);
+    Require(std::abs(fixedPosition.x - 106.f) < 0.01f &&
+            std::abs(fixedPosition.y - 32.f) < 0.01f);
     positionUi.Button("Flow after fixed");
     const fluid::Vec2 flowPosition = positionUi.GetItemRectMin();
     Require(std::abs(flowPosition.x) < 0.01f &&
@@ -270,12 +298,14 @@ int main() {
     positionUi.EndContainer();
     positionUi.EndFrame();
     positionUi.NewFrame(positionFrame);
+    positionUi.PushClass("window-test");
     Require(positionUi.BeginWindow("Fixed window##positioned",
                                    {20.f, 20.f, 220.f, 160.f}));
     positionUi.Text("Window content");
     const fluid::Vec2 windowPosition = positionUi.GetItemRectMin();
-    Require(std::abs(windowPosition.x - 295.f) < 0.01f);
+    Require(std::abs(windowPosition.x - 215.f) < 0.01f);
     positionUi.EndWindow();
+    positionUi.PopClass();
     positionUi.EndFrame();
 
     fluid::Context windowUi;

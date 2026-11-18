@@ -27,29 +27,42 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.rounding    = Lerp(a.rounding,    b.rounding,    t);
     o.cornerRadii = Lerp(a.cornerRadii, b.cornerRadii, t);
     o.fontSize    = Lerp(a.fontSize,    b.fontSize,    t);
-    const bool interpolateWidth = a.width >= 0.f && b.width >= 0.f &&
+    const bool interpolateWidth = a.widthSet && b.widthSet &&
                                   a.widthPercent == b.widthPercent;
-    o.width = interpolateWidth ? Lerp(a.width, b.width, t)
-                               : (t < 0.5f ? a.width : b.width);
+    o.widthSet = t < 0.5f ? a.widthSet : b.widthSet;
+    o.widthPixels = interpolateWidth ? Lerp(a.widthPixels, b.widthPixels, t)
+                                     : (t < 0.5f ? a.widthPixels : b.widthPixels);
     o.widthPercent = t < 0.5f ? a.widthPercent : b.widthPercent;
-    const bool interpolateHeight = a.height >= 0.f && b.height >= 0.f &&
+    o.widthPercentValue = interpolateWidth
+        ? Lerp(a.widthPercentValue, b.widthPercentValue, t)
+        : (t < 0.5f ? a.widthPercentValue : b.widthPercentValue);
+    o.width = o.widthPercent && o.widthPixels == 0.f
+        ? o.widthPercentValue : o.widthPixels;
+    const bool interpolateHeight = a.heightSet && b.heightSet &&
                                    a.heightPercent == b.heightPercent;
-    o.height = interpolateHeight ? Lerp(a.height, b.height, t)
-                                 : (t < 0.5f ? a.height : b.height);
+    o.heightSet = t < 0.5f ? a.heightSet : b.heightSet;
+    o.heightPixels = interpolateHeight ? Lerp(a.heightPixels, b.heightPixels, t)
+                                       : (t < 0.5f ? a.heightPixels : b.heightPixels);
     o.heightPercent = t < 0.5f ? a.heightPercent : b.heightPercent;
+    o.heightPercentValue = interpolateHeight
+        ? Lerp(a.heightPercentValue, b.heightPercentValue, t)
+        : (t < 0.5f ? a.heightPercentValue : b.heightPercentValue);
+    o.height = o.heightPercent && o.heightPixels == 0.f
+        ? o.heightPercentValue : o.heightPixels;
     o.position = t < 0.5f ? a.position : b.position;
     auto lerpOffset = [t](float from, float to, bool fromSet, bool toSet,
                           bool fromPercent, bool toPercent) {
         return fromSet && toSet && fromPercent == toPercent
             ? Lerp(from, to, t) : (t < 0.5f ? from : to);
     };
-    o.top = lerpOffset(a.top, b.top, a.topSet, b.topSet, a.topPercent, b.topPercent);
-    o.right = lerpOffset(a.right, b.right, a.rightSet, b.rightSet,
-                         a.rightPercent, b.rightPercent);
-    o.bottom = lerpOffset(a.bottom, b.bottom, a.bottomSet, b.bottomSet,
-                          a.bottomPercent, b.bottomPercent);
-    o.left = lerpOffset(a.left, b.left, a.leftSet, b.leftSet,
-                        a.leftPercent, b.leftPercent);
+    o.topPixels = lerpOffset(a.topPixels, b.topPixels, a.topSet, b.topSet,
+                             a.topPercent, b.topPercent);
+    o.rightPixels = lerpOffset(a.rightPixels, b.rightPixels, a.rightSet, b.rightSet,
+                               a.rightPercent, b.rightPercent);
+    o.bottomPixels = lerpOffset(a.bottomPixels, b.bottomPixels, a.bottomSet, b.bottomSet,
+                                a.bottomPercent, b.bottomPercent);
+    o.leftPixels = lerpOffset(a.leftPixels, b.leftPixels, a.leftSet, b.leftSet,
+                              a.leftPercent, b.leftPercent);
     o.topSet = t < 0.5f ? a.topSet : b.topSet;
     o.rightSet = t < 0.5f ? a.rightSet : b.rightSet;
     o.bottomSet = t < 0.5f ? a.bottomSet : b.bottomSet;
@@ -58,6 +71,26 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     o.rightPercent = t < 0.5f ? a.rightPercent : b.rightPercent;
     o.bottomPercent = t < 0.5f ? a.bottomPercent : b.bottomPercent;
     o.leftPercent = t < 0.5f ? a.leftPercent : b.leftPercent;
+    auto lerpPercent = [t](float from, float to, bool fromSet, bool toSet,
+                           bool fromPercent, bool toPercent) {
+        return fromSet && toSet && fromPercent == toPercent
+            ? Lerp(from, to, t) : (t < 0.5f ? from : to);
+    };
+    o.topPercentValue = lerpPercent(a.topPercentValue, b.topPercentValue,
+                                    a.topSet, b.topSet, a.topPercent, b.topPercent);
+    o.rightPercentValue = lerpPercent(a.rightPercentValue, b.rightPercentValue,
+                                      a.rightSet, b.rightSet, a.rightPercent, b.rightPercent);
+    o.bottomPercentValue = lerpPercent(a.bottomPercentValue, b.bottomPercentValue,
+                                       a.bottomSet, b.bottomSet, a.bottomPercent, b.bottomPercent);
+    o.leftPercentValue = lerpPercent(a.leftPercentValue, b.leftPercentValue,
+                                     a.leftSet, b.leftSet, a.leftPercent, b.leftPercent);
+    o.top = o.topPercent && o.topPixels == 0.f ? o.topPercentValue : o.topPixels;
+    o.right = o.rightPercent && o.rightPixels == 0.f
+        ? o.rightPercentValue : o.rightPixels;
+    o.bottom = o.bottomPercent && o.bottomPixels == 0.f
+        ? o.bottomPercentValue : o.bottomPixels;
+    o.left = o.leftPercent && o.leftPixels == 0.f
+        ? o.leftPercentValue : o.leftPixels;
     o.rotation = Lerp(a.rotation, b.rotation, t);
     o.translate = {
         a.translateXPercent == b.translateXPercent
@@ -69,6 +102,26 @@ ComputedStyle Lerp(const ComputedStyle& a, const ComputedStyle& b, float t) {
     };
     o.translateXPercent = t < 0.5f ? a.translateXPercent : b.translateXPercent;
     o.translateYPercent = t < 0.5f ? a.translateYPercent : b.translateYPercent;
+    o.translatePercent = {
+        a.translateXPercent == b.translateXPercent
+            ? Lerp(a.translatePercent.x, b.translatePercent.x, t)
+            : (t < 0.5f ? a.translatePercent.x : b.translatePercent.x),
+        a.translateYPercent == b.translateYPercent
+            ? Lerp(a.translatePercent.y, b.translatePercent.y, t)
+            : (t < 0.5f ? a.translatePercent.y : b.translatePercent.y)
+    };
+    o.translatePixels = {
+        a.translateXPercent == b.translateXPercent
+            ? Lerp(a.translatePixels.x, b.translatePixels.x, t)
+            : (t < 0.5f ? a.translatePixels.x : b.translatePixels.x),
+        a.translateYPercent == b.translateYPercent
+            ? Lerp(a.translatePixels.y, b.translatePixels.y, t)
+            : (t < 0.5f ? a.translatePixels.y : b.translatePixels.y)
+    };
+    o.translate.x = o.translateXPercent && o.translatePixels.x == 0.f
+        ? o.translatePercent.x : o.translatePixels.x;
+    o.translate.y = o.translateYPercent && o.translatePixels.y == 0.f
+        ? o.translatePercent.y : o.translatePixels.y;
     o.justifySelf = t < 0.5f ? a.justifySelf : b.justifySelf;
     o.alignSelf = t < 0.5f ? a.alignSelf : b.alignSelf;
     o.textAlign = t < 0.5f ? a.textAlign : b.textAlign;
@@ -231,6 +284,8 @@ bool IsSupportedDeclaration(std::string_view name) {
         name == "width" || name == "height" || name == "align" ||
         name == "position" || name == "top" || name == "right" ||
         name == "bottom" || name == "left" ||
+        name == "position-left" || name == "position-right" ||
+        name == "position-top" || name == "position-bottom" ||
         name == "rotation" || name == "rotate" || name == "translate" ||
         name == "alignment" || name == "align-self" || name == "justify-self" ||
         name == "text-align" || name == "vertical-align" ||
@@ -315,43 +370,65 @@ void Apply(ComputedStyle& s, const StyleDecl& d) {
         case Prop::RoundingBottomLeft:  s.cornerRadii.bottomLeft = v[0]; break;
         case Prop::FontSize:        s.fontSize = v[0]; break;
         case Prop::Width:
-            s.width = v[0];
-            s.widthPercent = v[1] != 0.f;
+            s.widthPixels = v[0];
+            s.widthPercentValue = v[1];
+            s.widthPercent = v[2] != 0.f;
+            s.widthSet = v[0] >= 0.f || s.widthPercent;
+            s.width = s.widthPercent && v[0] == 0.f ? v[1] : v[0];
             break;
         case Prop::Height:
-            s.height = v[0];
-            s.heightPercent = v[1] != 0.f;
+            s.heightPixels = v[0];
+            s.heightPercentValue = v[1];
+            s.heightPercent = v[2] != 0.f;
+            s.heightSet = v[0] >= 0.f || s.heightPercent;
+            s.height = s.heightPercent && v[0] == 0.f ? v[1] : v[0];
             break;
         case Prop::Position:
             s.position = static_cast<PositionType>(static_cast<uint8_t>(v[0]));
             break;
         case Prop::PositionCoordinates: {
-            const uint8_t flags = static_cast<uint8_t>(v[3]);
             s.position = PositionType::Absolute;
-            s.left = v[0];
-            s.top = v[1];
+            s.leftPixels = v[0];
+            s.topPixels = v[1];
+            s.leftPercentValue = v[2];
+            s.topPercentValue = v[3];
             s.leftSet = s.topSet = true;
-            s.leftPercent = (flags & 1u) != 0;
-            s.topPercent = (flags & 2u) != 0;
+            s.leftPercent = v[4] != 0.f;
+            s.topPercent = v[5] != 0.f;
+            s.left = s.leftPercent && v[0] == 0.f ? v[2] : v[0];
+            s.top = s.topPercent && v[1] == 0.f ? v[3] : v[1];
             break;
         }
         case Prop::OffsetTop:
-            s.top = v[0]; s.topSet = v[1] != 0.f; s.topPercent = v[2] != 0.f;
+            s.topPixels = v[0]; s.topSet = v[1] != 0.f; s.topPercentValue = v[2];
+            s.topPercent = v[3] != 0.f;
+            s.top = s.topPercent && v[0] == 0.f ? v[2] : v[0];
             break;
         case Prop::OffsetRight:
-            s.right = v[0]; s.rightSet = v[1] != 0.f; s.rightPercent = v[2] != 0.f;
+            s.rightPixels = v[0]; s.rightSet = v[1] != 0.f; s.rightPercentValue = v[2];
+            s.rightPercent = v[3] != 0.f;
+            s.right = s.rightPercent && v[0] == 0.f ? v[2] : v[0];
             break;
         case Prop::OffsetBottom:
-            s.bottom = v[0]; s.bottomSet = v[1] != 0.f; s.bottomPercent = v[2] != 0.f;
+            s.bottomPixels = v[0]; s.bottomSet = v[1] != 0.f; s.bottomPercentValue = v[2];
+            s.bottomPercent = v[3] != 0.f;
+            s.bottom = s.bottomPercent && v[0] == 0.f ? v[2] : v[0];
             break;
         case Prop::OffsetLeft:
-            s.left = v[0]; s.leftSet = v[1] != 0.f; s.leftPercent = v[2] != 0.f;
+            s.leftPixels = v[0]; s.leftSet = v[1] != 0.f; s.leftPercentValue = v[2];
+            s.leftPercent = v[3] != 0.f;
+            s.left = s.leftPercent && v[0] == 0.f ? v[2] : v[0];
             break;
         case Prop::Rotation: s.rotation = v[0]; break;
         case Prop::Translate:
-            s.translate = {v[0], v[1]};
-            s.translateXPercent = v[2] != 0.f;
-            s.translateYPercent = v[3] != 0.f;
+            s.translatePixels = {v[0], v[1]};
+            s.translatePercent = {v[2], v[3]};
+            s.translateXPercent = v[4] != 0.f;
+            s.translateYPercent = v[5] != 0.f;
+            s.translate = {
+                s.translateXPercent && v[0] == 0.f ? v[2] : v[0],
+                s.translateYPercent && v[1] == 0.f ? v[3] : v[1]
+            };
             break;
         case Prop::Alignment:
             s.justifySelf = static_cast<HorizontalAlignment>(static_cast<uint8_t>(v[0]));
@@ -451,34 +528,295 @@ bool ParseNumber(std::string_view text, float& value) {
     return end != owned.c_str() && *end == '\0' && std::isfinite(value);
 }
 
-bool ParseDimension(std::string_view text, float& value, bool& percent) {
-    text = Trim(text);
-    if (EqualsIgnoreCase(text, "auto")) {
-        value = -1.f;
-        percent = false;
+struct LengthValue {
+    float pixels = 0.f;
+    float percent = 0.f;
+    bool hasPercent = false;
+};
+
+struct MathValue {
+    float scalar = 0.f;
+    float pixels = 0.f;
+    float percent = 0.f;
+    bool dimensional = false;
+    bool hasPixels = false;
+    bool hasPercent = false;
+};
+
+class LengthExpressionParser {
+public:
+    explicit LengthExpressionParser(std::string_view input) : input_(input) {}
+
+    bool Parse(LengthValue& result) {
+        MathValue value;
+        if (!Expression(value)) return false;
+        SkipSpace();
+        if (position_ != input_.size()) return false;
+        if (value.dimensional) {
+            result = {value.pixels, value.percent, value.hasPercent};
+        } else {
+            result = {value.scalar, 0.f, false};
+        }
+        return std::isfinite(result.pixels) && std::isfinite(result.percent);
+    }
+
+private:
+    void SkipSpace() {
+        while (position_ < input_.size() &&
+               std::isspace(static_cast<unsigned char>(input_[position_])))
+            ++position_;
+    }
+
+    bool Consume(char ch) {
+        SkipSpace();
+        if (position_ >= input_.size() || input_[position_] != ch) return false;
+        ++position_;
         return true;
     }
-    percent = !text.empty() && text.back() == '%';
-    if (percent) text.remove_suffix(1);
-    if (!ParseNumber(text, value) || value < 0.f) return false;
-    if (percent) value /= 100.f;
-    return true;
+
+    bool Expression(MathValue& value) {
+        if (!Product(value)) return false;
+        for (;;) {
+            SkipSpace();
+            if (position_ >= input_.size() ||
+                (input_[position_] != '+' && input_[position_] != '-'))
+                return true;
+            const char operation = input_[position_++];
+            MathValue rhs;
+            if (!Product(rhs) || value.dimensional != rhs.dimensional) return false;
+            if (value.dimensional) {
+                value.pixels += operation == '+' ? rhs.pixels : -rhs.pixels;
+                value.percent += operation == '+' ? rhs.percent : -rhs.percent;
+                value.hasPixels = value.hasPixels || rhs.hasPixels;
+                value.hasPercent = value.hasPercent || rhs.hasPercent;
+            } else {
+                value.scalar += operation == '+' ? rhs.scalar : -rhs.scalar;
+            }
+            if (!Finite(value)) return false;
+        }
+    }
+
+    bool Product(MathValue& value) {
+        if (!Unary(value)) return false;
+        for (;;) {
+            SkipSpace();
+            if (position_ >= input_.size() ||
+                (input_[position_] != '*' && input_[position_] != '/'))
+                return true;
+            const char operation = input_[position_++];
+            MathValue rhs;
+            if (!Unary(rhs)) return false;
+            if (operation == '/') {
+                if (rhs.dimensional) return false;
+                const float divisor = rhs.scalar;
+                if (divisor == 0.f) return false;
+                Scale(value, 1.f / divisor);
+            } else if (value.dimensional && rhs.dimensional) {
+                return false;
+            } else if (value.dimensional) {
+                Scale(value, rhs.scalar);
+            } else if (rhs.dimensional) {
+                const float multiplier = value.scalar;
+                value = rhs;
+                Scale(value, multiplier);
+            } else {
+                value.scalar *= rhs.scalar;
+            }
+            if (!Finite(value)) return false;
+        }
+    }
+
+    bool Unary(MathValue& value) {
+        bool negative = false;
+        for (;;) {
+            SkipSpace();
+            if (Consume('+')) continue;
+            if (Consume('-')) {
+                negative = !negative;
+                continue;
+            }
+            break;
+        }
+        if (!Primary(value)) return false;
+        if (negative) Scale(value, -1.f);
+        return Finite(value);
+    }
+
+    bool Primary(MathValue& value) {
+        SkipSpace();
+        if (Consume('(')) {
+            if (++depth_ > 64) {
+                --depth_;
+                return false;
+            }
+            const bool valid = Expression(value) && Consume(')');
+            --depth_;
+            return valid;
+        }
+        if (position_ < input_.size() &&
+            std::isalpha(static_cast<unsigned char>(input_[position_]))) {
+            const size_t start = position_;
+            while (position_ < input_.size() &&
+                   std::isalpha(static_cast<unsigned char>(input_[position_])))
+                ++position_;
+            std::string function(input_.substr(start, position_ - start));
+            std::transform(function.begin(), function.end(), function.begin(),
+                [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+            if (!Consume('(')) return false;
+            if (++depth_ > 64) {
+                --depth_;
+                return false;
+            }
+            if (function == "calc") {
+                const bool valid = Expression(value) && Consume(')');
+                --depth_;
+                return valid;
+            }
+            if (function != "min" && function != "max" && function != "clamp") {
+                --depth_;
+                return false;
+            }
+            std::vector<MathValue> arguments;
+            MathValue argument;
+            if (!Expression(argument)) {
+                --depth_;
+                return false;
+            }
+            arguments.push_back(argument);
+            while (Consume(',')) {
+                if (!Expression(argument)) {
+                    --depth_;
+                    return false;
+                }
+                arguments.push_back(argument);
+            }
+            if (!Consume(')')) {
+                --depth_;
+                return false;
+            }
+            if ((function == "clamp" && arguments.size() != 3) ||
+                (function != "clamp" && arguments.size() < 2)) {
+                --depth_;
+                return false;
+            }
+            for (size_t i = 1; i < arguments.size(); ++i)
+                if (!Comparable(arguments.front(), arguments[i])) {
+                    --depth_;
+                    return false;
+                }
+            if (function == "clamp") {
+                value = Compare(arguments[1], arguments[0]) < 0 ? arguments[0]
+                    : Compare(arguments[1], arguments[2]) > 0 ? arguments[2]
+                    : arguments[1];
+            } else {
+                value = arguments.front();
+                for (size_t i = 1; i < arguments.size(); ++i) {
+                    const int order = Compare(arguments[i], value);
+                    if ((function == "min" && order < 0) ||
+                        (function == "max" && order > 0))
+                        value = arguments[i];
+                }
+            }
+            --depth_;
+            return true;
+        }
+
+        const size_t start = position_;
+        const std::string remaining(input_.substr(position_));
+        char* end = nullptr;
+        const float number = std::strtof(remaining.c_str(), &end);
+        if (end == remaining.c_str() || !std::isfinite(number)) return false;
+        position_ += static_cast<size_t>(end - remaining.c_str());
+        SkipSpace();
+        if (position_ < input_.size() && input_[position_] == '%') {
+            ++position_;
+            value = {};
+            value.dimensional = true;
+            value.hasPercent = true;
+            value.percent = number / 100.f;
+        } else if (position_ + 2 <= input_.size() &&
+                   EqualsIgnoreCase(input_.substr(position_, 2), "px")) {
+            position_ += 2;
+            value = {};
+            value.dimensional = true;
+            value.hasPixels = true;
+            value.pixels = number;
+        } else {
+            value = {};
+            value.scalar = number;
+        }
+        if (position_ == start) return false;
+        return Finite(value);
+    }
+
+    static void Scale(MathValue& value, float scale) {
+        if (value.dimensional) {
+            value.pixels *= scale;
+            value.percent *= scale;
+        } else {
+            value.scalar *= scale;
+        }
+    }
+
+    static bool Finite(const MathValue& value) {
+        return std::isfinite(value.scalar) && std::isfinite(value.pixels) &&
+               std::isfinite(value.percent);
+    }
+
+    static bool Comparable(const MathValue& left, const MathValue& right) {
+        if (left.dimensional != right.dimensional) return false;
+        if (!left.dimensional) return true;
+        if (left.hasPixels != right.hasPixels ||
+            left.hasPercent != right.hasPercent)
+            return false;
+        if (left.hasPixels && left.hasPercent)
+            return left.pixels == right.pixels || left.percent == right.percent;
+        return true;
+    }
+
+    static int Compare(const MathValue& left, const MathValue& right) {
+        const float lhs = left.dimensional
+            ? left.hasPixels && left.hasPercent
+                ? (left.pixels == right.pixels ? left.percent : left.pixels)
+                : left.hasPercent ? left.percent : left.pixels
+            : left.scalar;
+        const float rhs = left.dimensional
+            ? left.hasPixels && left.hasPercent
+                ? (left.pixels == right.pixels ? right.percent : right.pixels)
+                : left.hasPercent ? right.percent : right.pixels
+            : right.scalar;
+        return lhs < rhs ? -1 : lhs > rhs ? 1 : 0;
+    }
+
+    std::string_view input_;
+    size_t position_ = 0;
+    size_t depth_ = 0;
+};
+
+bool ParseLength(std::string_view text, LengthValue& value) {
+    return LengthExpressionParser(Trim(text)).Parse(value);
 }
 
-bool ParseOffset(std::string_view text, float& value, bool& set, bool& percent) {
+bool ParseDimension(std::string_view text, LengthValue& value) {
     text = Trim(text);
     if (EqualsIgnoreCase(text, "auto")) {
-        value = 0.f;
-        set = false;
-        percent = false;
+        value = {-1.f, 0.f, false};
         return true;
     }
-    percent = !text.empty() && text.back() == '%';
-    if (percent) text.remove_suffix(1);
-    if (!ParseNumber(text, value)) return false;
-    if (percent) value /= 100.f;
-    set = true;
-    return true;
+    if (!ParseLength(text, value)) return false;
+    return (value.hasPercent || value.pixels >= 0.f) &&
+           (!value.hasPercent || value.percent >= 0.f || value.pixels != 0.f);
+}
+
+bool ParseOffset(std::string_view text, LengthValue& value, bool& set) {
+    text = Trim(text);
+    if (EqualsIgnoreCase(text, "auto")) {
+        value = {};
+        set = false;
+        return true;
+    }
+    set = ParseLength(text, value);
+    return set;
 }
 
 bool ParseAngle(std::string_view text, float& degrees) {
@@ -760,6 +1098,7 @@ bool ParseLinearGradient(std::string_view text, LinearGradient& gradient) {
 bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& out) {
     name = Trim(name);
     value = Trim(value);
+    if (name.starts_with("position-")) name.remove_prefix(9);
     auto color = [&](Prop p) {
         Color c;
         if (!ParseColor(value, c)) return false;
@@ -828,11 +1167,11 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
     if (name == "border-radius-bottom-left") return number(Prop::RoundingBottomLeft);
     if (name == "font-size") return number(Prop::FontSize);
     if (name == "width" || name == "height") {
-        float dimension = -1.f;
-        bool percent = false;
-        if (!ParseDimension(value, dimension, percent)) return false;
+        LengthValue dimension;
+        if (!ParseDimension(value, dimension)) return false;
         out.prop = name == "width" ? Prop::Width : Prop::Height;
-        out.value = {{dimension, percent ? 1.f : 0.f, 0.f, 0.f}};
+        out.value = {{dimension.pixels, dimension.percent,
+                      dimension.hasPercent ? 1.f : 0.f, 0.f}};
         return true;
     }
     if (name == "position") {
@@ -842,16 +1181,16 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
             if (comma == std::string_view::npos ||
                 coordinates.find(',', comma + 1) != std::string_view::npos)
                 return false;
-            float x = 0.f, y = 0.f;
-            bool xSet = false, ySet = false, xPercent = false, yPercent = false;
-            if (!ParseOffset(coordinates.substr(0, comma), x, xSet, xPercent) ||
-                !ParseOffset(coordinates.substr(comma + 1), y, ySet, yPercent) ||
+            LengthValue x, y;
+            bool xSet = false, ySet = false;
+            if (!ParseOffset(coordinates.substr(0, comma), x, xSet) ||
+                !ParseOffset(coordinates.substr(comma + 1), y, ySet) ||
                 !xSet || !ySet)
                 return false;
             out.prop = Prop::PositionCoordinates;
-            out.value = {{x, y, 0.f,
-                          static_cast<float>((xPercent ? 1 : 0) |
-                                             (yPercent ? 2 : 0))}};
+            out.value = {{x.pixels, y.pixels, x.percent, y.percent,
+                          x.hasPercent ? 1.f : 0.f,
+                          y.hasPercent ? 1.f : 0.f}};
             return true;
         }
         PositionType position;
@@ -887,23 +1226,26 @@ bool ParseDeclaration(std::string_view name, std::string_view value, StyleDecl& 
                 ? std::string_view{"0px"} : Trim(value.substr(split + 1));
             if (yToken.find_first_of(" \t\r\n") != std::string_view::npos) return false;
         }
-        float x = 0.f, y = 0.f;
-        bool xSet = false, ySet = false, xPercent = false, yPercent = false;
-        if (!ParseOffset(xToken, x, xSet, xPercent) ||
-            !ParseOffset(yToken, y, ySet, yPercent) || !xSet || !ySet)
+        LengthValue x, y;
+        bool xSet = false, ySet = false;
+        if (!ParseOffset(xToken, x, xSet) ||
+            !ParseOffset(yToken, y, ySet) || !xSet || !ySet)
             return false;
         out.prop = Prop::Translate;
-        out.value = {{x, y, xPercent ? 1.f : 0.f, yPercent ? 1.f : 0.f}};
+        out.value = {{x.pixels, y.pixels, x.percent, y.percent,
+                      x.hasPercent ? 1.f : 0.f,
+                      y.hasPercent ? 1.f : 0.f}};
         return true;
     }
     if (name == "top" || name == "right" || name == "bottom" || name == "left") {
-        float offset = 0.f;
-        bool set = false, percent = false;
-        if (!ParseOffset(value, offset, set, percent)) return false;
+        LengthValue offset;
+        bool set = false;
+        if (!ParseOffset(value, offset, set)) return false;
         out.prop = name == "top" ? Prop::OffsetTop
             : name == "right" ? Prop::OffsetRight
             : name == "bottom" ? Prop::OffsetBottom : Prop::OffsetLeft;
-        out.value = {{offset, set ? 1.f : 0.f, percent ? 1.f : 0.f, 0.f}};
+        out.value = {{offset.pixels, set ? 1.f : 0.f, offset.percent,
+                      offset.hasPercent ? 1.f : 0.f}};
         return true;
     }
     if (name == "align" || name == "alignment") {

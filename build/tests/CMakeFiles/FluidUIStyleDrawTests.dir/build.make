@@ -79,15 +79,15 @@ tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj: tests/CMake
 tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj: C:/Users/mike1/OneDrive/Documents/GitHub/Fluid-UI/tests/style_draw_tests.cpp
 tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj: tests/CMakeFiles/FluidUIStyleDrawTests.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj -MF CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.obj.d -o CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.obj -MF CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.obj.d -o CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.obj -c C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp
 
 tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.i"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp > CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.i
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp > CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.i
 
 tests/CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidUIStyleDrawTests.dir/style_draw_tests.cpp.s"
-	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp -o CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.s
+	cd /d C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\build\tests && C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\mike1\OneDrive\Documents\GitHub\Fluid-UI\tests\style_draw_tests.cpp -o CMakeFiles\FluidUIStyleDrawTests.dir\style_draw_tests.cpp.s
 
 # Object files for target FluidUIStyleDrawTests
 FluidUIStyleDrawTests_OBJECTS = \
